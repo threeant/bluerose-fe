@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import React, { useState } from 'react'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 import {
   CAvatar,
   CButton,
@@ -22,8 +22,8 @@ import {
   CFormLabel,
   CFormInput,
   CForm,
-} from '@coreui/react';
-import CIcon from '@coreui/icons-react';
+} from '@coreui/react'
+import CIcon from '@coreui/icons-react'
 import {
   cibCcAmex,
   cibCcApplePay,
@@ -45,23 +45,32 @@ import {
   cilPeople,
   cilUser,
   cilUserFemale,
-} from '@coreui/icons';
+} from '@coreui/icons'
 
-import avatar1 from 'src/assets/images/avatars/1.jpg';
-import avatar2 from 'src/assets/images/avatars/2.jpg';
-import avatar3 from 'src/assets/images/avatars/3.jpg';
-import avatar4 from 'src/assets/images/avatars/4.jpg';
-import avatar5 from 'src/assets/images/avatars/5.jpg';
-import avatar6 from 'src/assets/images/avatars/6.jpg';
+import avatar1 from 'src/assets/images/avatars/1.jpg'
+import avatar2 from 'src/assets/images/avatars/2.jpg'
+import avatar3 from 'src/assets/images/avatars/3.jpg'
+import avatar4 from 'src/assets/images/avatars/4.jpg'
+import avatar5 from 'src/assets/images/avatars/5.jpg'
+import avatar6 from 'src/assets/images/avatars/6.jpg'
 
 const SampleList = () => {
   // 선택한 날짜를 관리할 상태 변수를 만듭니다.
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate2, setSelectedDate2] = useState(null);
+
 
   // 날짜가 선택될 때 호출될 콜백 함수
   const handleDateChange = date => {
     setSelectedDate(date);
-  };
+  }
+  const handleDateChange2 = date => {
+    setSelectedDate2(date);
+  }
+  const clickReset = date => {
+    setSelectedDate(null);
+    setSelectedDate2(null);
+  }
 
   const progressExample = [
     { title: 'Visits', value: '29.703 Users', percent: 40, color: 'success' },
@@ -69,7 +78,7 @@ const SampleList = () => {
     { title: 'Pageviews', value: '78.706 Views', percent: 60, color: 'warning' },
     { title: 'New Users', value: '22.123 Users', percent: 80, color: 'danger' },
     { title: 'Bounce Rate', value: 'Average Rate', percent: 40.15, color: 'primary' },
-  ];
+  ]
 
   const progressGroupExample1 = [
     { title: 'Monday', value1: 34, value2: 78 },
@@ -79,7 +88,7 @@ const SampleList = () => {
     { title: 'Friday', value1: 22, value2: 73 },
     { title: 'Saturday', value1: 53, value2: 82 },
     { title: 'Sunday', value1: 9, value2: 69 },
-  ];
+  ]
 
   const tableExample = [
     {
@@ -170,7 +179,7 @@ const SampleList = () => {
       payment: { name: 'Amex', icon: cibCcAmex },
       activity: 'Last week',
     },
-  ];
+  ]
 
   return (
     <>
@@ -179,58 +188,94 @@ const SampleList = () => {
           <CCard className="mb-4">
             <CCardHeader>샘플정보관리</CCardHeader>
             <CCardBody>
-              <CForm className="row g-3">
-                <CCol md={6}>
-                  <CFormSelect id="inputState" label="미디어">
-                    <option>-전체-</option>
-                    <option>LP</option>
-                    <option>CD</option>
-                  </CFormSelect>
-                </CCol>
-                <CCol md={6}>
-                  <CFormSelect id="inputState" label="장르">
-                    <option>-전체-</option>
-                    <option>JAZZ</option>
-                    <option>K-POP</option>
-                  </CFormSelect>
-                </CCol>
-                <CCol md={6}>
-                  <CFormInput type="text" id="inputEmail4" label="앨범명" placeholder="전체" />
-                </CCol>
-                <CCol md={6}>
-                  <CFormInput type="text" id="inputPassword4" label="아티스트" placeholder="전체" />
-                </CCol>
-                <CCol md={12}>
-                  <div>
-                    <CFormLabel htmlFor="autoSizingInputGroup">Username</CFormLabel>
-                  </div>
-                  <div style={{ display: 'flex' }}>
-                    <div>
-                      <DatePicker
-                        selected={selectedDate}
-                        onChange={handleDateChange}
-                        dateFormat={'yyyy-MM-dd'} // 날짜 형태
-                        shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
-                        minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
-                        maxDate={new Date()} // maxDate 이후 날짜 선택 불가
-                        className="DatePicker"
-                      />
+              <CForm className="row">
+                <CRow className="mb-3">
+                  <CCol xs={1}>
+                    <CFormLabel htmlFor="inputEmail3" className="col-form-label">미디어</CFormLabel>
+                  </CCol>
+                  <CCol xs={5}>
+                    <CFormSelect id="inputState" aria-label="미디어">
+                      <option>-전체-</option>
+                      <option>LP</option>
+                      <option>CD</option>
+                    </CFormSelect>
+                  </CCol>
+                  <CCol xs={1}>
+                    <CFormLabel htmlFor="inputEmail3" className="col-form-label">장르</CFormLabel>
+                  </CCol>
+                  <CCol xs={5}>
+                    <CFormSelect id="inputState" aria-label="장르">
+                      <option>-전체-</option>
+                      <option>JAZZ</option>
+                      <option>K-POP</option>
+                    </CFormSelect>
+                  </CCol>
+                </CRow>
+                <CRow className="mb-3">
+                  <CCol xs={1}>
+                    <CFormLabel htmlFor="inputEmail3" className="col-form-label">앨범명</CFormLabel>
+                  </CCol>
+                  <CCol xs={5}>
+                    <CFormInput type="text" id="inputEmail4" aria-label="앨범명" placeholder="전체" />
+                  </CCol>
+                  <CCol xs={1}>
+                    <CFormLabel htmlFor="inputEmail3" className="col-form-label">아티스트</CFormLabel>
+                  </CCol>
+                  <CCol md={5}>
+                    <CFormInput type="text" id="inputPassword4" aria-label="아티스트" placeholder="전체" />
+                  </CCol>
+                </CRow>
+                <CRow className="mb-3">
+                  <CCol md={1}>
+                    <CFormLabel htmlFor="inputEmail3" className="col-form-label">등록일</CFormLabel>
+                  </CCol>
+                  <CCol md={5}>
+                    <div style={{ display: 'flex' }}>
+                      <div>
+                        <DatePicker
+                          selected={selectedDate}
+                          onChange={handleDateChange}
+                          dateFormat={'yyyy-MM-dd'} // 날짜 형태
+                          shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
+                          minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
+                          maxDate={new Date()} // maxDate 이후 날짜 선택 불가
+                          className="DatePicker"
+                        />
+                      </div>
+                      <div style={{ whiteSpace: 'pre-wrap' }}>
+                        <span> ~ </span>
+                      </div>
+                      <div>
+                        <DatePicker
+                          selected={selectedDate2}
+                          onChange={handleDateChange2}
+                          dateFormat={'yyyy-MM-dd'} // 날짜 형태
+                          shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
+                          minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
+                          maxDate={new Date()} // maxDate 이후 날짜 선택 불가
+                          className="DatePicker"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <p>~</p>
-                    </div>
-                    <div>
-                      <DatePicker
-                        selected={selectedDate}
-                        onChange={handleDateChange}
-                        dateFormat={'yyyy-MM-dd'} // 날짜 형태
-                        shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
-                        className="DatePicker"
-                      />
-                    </div>
-                  </div>
-                </CCol>
+                  </CCol>
+                </CRow>
+
+
+                <div className="d-grid gap-2">
+                  <CRow className="justify-content-between">
+                    <CCol xs={4}>
+                      <CButton component="input" type="button" color="danger" value="등록하기" />
+                    </CCol>
+                    <CCol xs={4}>
+                      <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <CButton component="input" type="reset" color="light" value="초기화" onClick={clickReset} />
+                        <CButton component="input" color="primary" type="submit" value="조회하기" />
+                      </div>
+                    </CCol>
+                  </CRow>
+                </div>
               </CForm>
+
               <br />
 
               <CTable align="middle" className="mb-0 border" hover responsive>
@@ -289,7 +334,7 @@ const SampleList = () => {
         </CCol>
       </CRow>
     </>
-  );
-};
+  )
+}
 
-export default SampleList;
+export default SampleList
