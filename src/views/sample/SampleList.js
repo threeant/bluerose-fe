@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
+import CIcon from '@coreui/icons-react'
 import {
   CAvatar,
   CButton,
@@ -23,36 +24,10 @@ import {
   CFormInput,
   CForm,
 } from '@coreui/react'
-import CIcon from '@coreui/icons-react'
-import {
-  cibCcAmex,
-  cibCcApplePay,
-  cibCcMastercard,
-  cibCcPaypal,
-  cibCcStripe,
-  cibCcVisa,
-  cibGoogle,
-  cibFacebook,
-  cibLinkedin,
-  cifBr,
-  cifEs,
-  cifFr,
-  cifIn,
-  cifPl,
-  cifUs,
-  cibTwitter,
-  cilCloudDownload,
-  cilPeople,
-  cilUser,
-  cilUserFemale,
-} from '@coreui/icons'
 
-import avatar1 from 'src/assets/images/avatars/1.jpg'
-import avatar2 from 'src/assets/images/avatars/2.jpg'
-import avatar3 from 'src/assets/images/avatars/3.jpg'
-import avatar4 from 'src/assets/images/avatars/4.jpg'
-import avatar5 from 'src/assets/images/avatars/5.jpg'
-import avatar6 from 'src/assets/images/avatars/6.jpg'
+import {
+  cilCalendar
+} from '@coreui/icons'
 
 const SampleList = () => {
   // 선택한 날짜를 관리할 상태 변수를 만듭니다.
@@ -72,112 +47,51 @@ const SampleList = () => {
     setSelectedDate2(null);
   }
 
-  const progressExample = [
-    { title: 'Visits', value: '29.703 Users', percent: 40, color: 'success' },
-    { title: 'Unique', value: '24.093 Users', percent: 20, color: 'info' },
-    { title: 'Pageviews', value: '78.706 Views', percent: 60, color: 'warning' },
-    { title: 'New Users', value: '22.123 Users', percent: 80, color: 'danger' },
-    { title: 'Bounce Rate', value: 'Average Rate', percent: 40.15, color: 'primary' },
-  ]
-
-  const progressGroupExample1 = [
-    { title: 'Monday', value1: 34, value2: 78 },
-    { title: 'Tuesday', value1: 56, value2: 94 },
-    { title: 'Wednesday', value1: 12, value2: 67 },
-    { title: 'Thursday', value1: 43, value2: 91 },
-    { title: 'Friday', value1: 22, value2: 73 },
-    { title: 'Saturday', value1: 53, value2: 82 },
-    { title: 'Sunday', value1: 9, value2: 69 },
-  ]
-
-  const tableExample = [
+  const albumData = [
     {
-      avatar: { src: avatar1, status: 'success' },
-      user: {
-        name: 'Yiorgos Avraamu',
-        new: true,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'USA', flag: cifUs },
-      usage: {
-        value: 50,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'success',
-      },
-      payment: { name: 'Mastercard', icon: cibCcMastercard },
-      activity: '10 sec ago',
+      albumId: '9',
+      albumImgUrl: '/static/media/8.35ee8919ea545620a475.jpg',
+      mediaNm: 'LP',
+      albumNm: 'I Met You When I Was 18.',
+      artistNm: 'Lauv',
+      relesDt: '2020-04-20',
+      genrCd: 'Pop'
     },
     {
-      avatar: { src: avatar2, status: 'danger' },
-      user: {
-        name: 'Avram Tarasios',
-        new: false,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'Brazil', flag: cifBr },
-      usage: {
-        value: 22,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'info',
-      },
-      payment: { name: 'Visa', icon: cibCcVisa },
-      activity: '5 minutes ago',
+      albumId: '8',
+      albumImgUrl: '/static/media/8.35ee8919ea545620a475.jpg',
+      mediaNm: 'LP',
+      albumNm: 'I Met You When I Was 18.',
+      artistNm: 'Lauv',
+      relesDt: '2020-04-20',
+      genrCd: 'Pop'
     },
     {
-      avatar: { src: avatar3, status: 'warning' },
-      user: { name: 'Quintin Ed', new: true, registered: 'Jan 1, 2021' },
-      country: { name: 'India', flag: cifIn },
-      usage: {
-        value: 74,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'warning',
-      },
-      payment: { name: 'Stripe', icon: cibCcStripe },
-      activity: '1 hour ago',
+      albumId: '7',
+      albumImgUrl: '/static/media/8.35ee8919ea545620a475.jpg',
+      mediaNm: 'LP',
+      albumNm: 'I Met You When I Was 18.',
+      artistNm: 'Lauv',
+      relesDt: '2020-04-20',
+      genrCd: 'Pop'
     },
     {
-      avatar: { src: avatar4, status: 'secondary' },
-      user: { name: 'Enéas Kwadwo', new: true, registered: 'Jan 1, 2021' },
-      country: { name: 'France', flag: cifFr },
-      usage: {
-        value: 98,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'danger',
-      },
-      payment: { name: 'PayPal', icon: cibCcPaypal },
-      activity: 'Last month',
+      albumId: '6',
+      albumImgUrl: '/static/media/8.35ee8919ea545620a475.jpg',
+      mediaNm: 'LP',
+      albumNm: 'I Met You When I Was 18.',
+      artistNm: 'Lauv',
+      relesDt: '2020-04-20',
+      genrCd: 'Pop'
     },
     {
-      avatar: { src: avatar5, status: 'success' },
-      user: {
-        name: 'Agapetus Tadeáš',
-        new: true,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'Spain', flag: cifEs },
-      usage: {
-        value: 22,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'primary',
-      },
-      payment: { name: 'Google Wallet', icon: cibCcApplePay },
-      activity: 'Last week',
-    },
-    {
-      avatar: { src: avatar6, status: 'danger' },
-      user: {
-        name: 'Friderik Dávid',
-        new: true,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'Poland', flag: cifPl },
-      usage: {
-        value: 43,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'success',
-      },
-      payment: { name: 'Amex', icon: cibCcAmex },
-      activity: 'Last week',
+      albumId: '5',
+      albumImgUrl: '/static/media/8.35ee8919ea545620a475.jpg',
+      mediaNm: 'LP',
+      albumNm: 'I Met You When I Was 18.',
+      artistNm: 'Lauv',
+      relesDt: '2020-04-20',
+      genrCd: 'Pop'
     },
   ]
 
@@ -231,6 +145,9 @@ const SampleList = () => {
                   </CCol>
                   <CCol md={5}>
                     <div style={{ display: 'flex' }}>
+                      <div style={{ display: 'grid', placeItems: 'center', marginRight: 5 }}>
+                        <CIcon className="text-secondary" icon={cilCalendar} size="lg" />
+                      </div>
                       <div>
                         <DatePicker
                           selected={selectedDate}
@@ -242,8 +159,11 @@ const SampleList = () => {
                           className="DatePicker"
                         />
                       </div>
-                      <div style={{ whiteSpace: 'pre-wrap' }}>
+                      <div style={{ whiteSpace: 'pre-wrap', display: 'grid', placeItems: 'center' }}>
                         <span> ~ </span>
+                      </div>
+                      <div style={{ display: 'grid', placeItems: 'center', marginRight: 5 }}>
+                        <CIcon className="text-secondary" icon={cilCalendar} size="lg" />
                       </div>
                       <div>
                         <DatePicker
@@ -281,49 +201,34 @@ const SampleList = () => {
               <CTable align="middle" className="mb-0 border" hover responsive>
                 <CTableHead color="light">
                   <CTableRow>
-                    <CTableHeaderCell className="text-center">
-                      <CIcon icon={cilPeople} />
-                    </CTableHeaderCell>
-                    <CTableHeaderCell>User</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">Country</CTableHeaderCell>
-                    <CTableHeaderCell>Usage</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">Payment Method</CTableHeaderCell>
-                    <CTableHeaderCell>Activity</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">No</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">미디어</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center"></CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">앨범명</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">아티스트</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">발매일</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {tableExample.map((item, index) => (
+                  {albumData.map((item, index) => (
                     <CTableRow v-for="item in tableItems" key={index}>
                       <CTableDataCell className="text-center">
-                        <CAvatar size="md" src={item.avatar.src} status={item.avatar.status} />
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <div>{item.user.name}</div>
-                        <div className="small text-medium-emphasis">
-                          <span>{item.user.new ? 'New' : 'Recurring'}</span> | Registered:{' '}
-                          {item.user.registered}
-                        </div>
+                        <strong>{item.albumId}</strong>
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
-                        <CIcon size="xl" icon={item.country.flag} title={item.country.name} />
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <div className="clearfix">
-                          <div className="float-start">
-                            <strong>{item.usage.value}%</strong>
-                          </div>
-                          <div className="float-end">
-                            <small className="text-medium-emphasis">{item.usage.period}</small>
-                          </div>
-                        </div>
-                        <CProgress thin color={item.usage.color} value={item.usage.value} />
+                        <strong>{item.mediaNm}</strong>
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
-                        <CIcon size="xl" icon={item.payment.icon} />
+                        <CAvatar size="md" src={item.albumImgUrl} />
                       </CTableDataCell>
-                      <CTableDataCell>
-                        <div className="small text-medium-emphasis">Last login</div>
-                        <strong>{item.activity}</strong>
+                      <CTableDataCell className="text-center">
+                        {item.albumNm}
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        {item.artistNm}
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        {item.relesDt}
                       </CTableDataCell>
                     </CTableRow>
                   ))}
