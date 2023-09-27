@@ -27,6 +27,7 @@ import {
   CFormTextarea,
   CContainer,
   CImage,
+  CFormSwitch,
 } from '@coreui/react';
 import ReactImg from 'src/assets/images/image400.jpg'
 const Validation = () => {
@@ -58,6 +59,10 @@ const Validation = () => {
                 validated={validated}
                 onSubmit={handleSubmit}
               >
+                <CCol xs={12} >
+                  <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
+                  <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked />
+                </CCol>
                 <CCol xs={12}>
                   <CImage rounded thumbnail align="center" src={ReactImg} width={150} height={150} />
                   <CCardBody>
@@ -102,14 +107,13 @@ const Validation = () => {
                     <div style={{ display: 'grid', placeItems: 'center', margin: 5 }}>
                       <CIcon className="text-secondary" icon={cifUs} size="lg" />
                     </div>
-                    <div style={{ width: '100%' }}>
+                    <div style={{ width: '60%' }}>
                       <CFormSelect id="validationCustom04">
-                        <option>LP</option>
-                        <option>CD</option>
+                        <option>USA</option>
+                        <option>KOREA</option>
                       </CFormSelect>
                       <CFormFeedback invalid>미디어를 선택해주세요</CFormFeedback>
                     </div>
-
                   </div>
                 </CCol>
                 <CCol xs={6}>
@@ -132,60 +136,12 @@ const Validation = () => {
                     </div>
                   </div>
                 </CCol>
+                <CCol md={12}>
+                  <CFormLabel htmlFor="validationCustom01">Style</CFormLabel>
+                  <CFormInput type="text" id="validationCustom01" required />
+                  <CFormFeedback valid>Looks good!</CFormFeedback>
+                </CCol>
 
-                <CCol xs={6}>
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationCustom01">Email</CFormLabel>
-                    <CFormInput type="text" id="validationCustom01" defaultValue="Mark" required />
-                    <CFormFeedback valid>Looks good!</CFormFeedback>
-                  </CCol>
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationCustom02">Email</CFormLabel>
-                    <CFormInput type="text" id="validationCustom02" defaultValue="Otto" required />
-                    <CFormFeedback valid>Looks good!</CFormFeedback>
-                  </CCol>
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationCustomUsername">Username</CFormLabel>
-                    <CInputGroup className="has-validation">
-                      <CInputGroupText id="inputGroupPrepend">@</CInputGroupText>
-                      <CFormInput
-                        type="text"
-                        id="validationCustomUsername"
-                        defaultValue=""
-                        aria-describedby="inputGroupPrepend"
-                        required
-                      />
-                      <CFormFeedback invalid>Please choose a username.</CFormFeedback>
-                    </CInputGroup>
-                  </CCol>
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationCustom03">City</CFormLabel>
-                    <CFormInput type="text" id="validationCustom03" required />
-                    <CFormFeedback invalid>Please provide a valid city.</CFormFeedback>
-                  </CCol>
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationCustom04">City</CFormLabel>
-                    <CFormSelect id="validationCustom04">
-                      <option disabled>Choose...</option>
-                      <option>...</option>
-                    </CFormSelect>
-                    <CFormFeedback invalid>Please provide a valid city.</CFormFeedback>
-                  </CCol>
-                </CCol>
-                <CCol md={4}>
-                  <CFormLabel htmlFor="validationCustom05">City</CFormLabel>
-                  <CFormInput type="text" id="validationCustom05" required />
-                  <CFormFeedback invalid>Please provide a valid zip.</CFormFeedback>
-                </CCol>
-                <CCol xs={12}>
-                  <CFormCheck
-                    type="checkbox"
-                    id="invalidCheck"
-                    label="Agree to terms and conditions"
-                    required
-                  />
-                  <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
-                </CCol>
                 <div className="d-grid gap-2">
                   <CRow className="justify-content-between">
                     <CCol xs={12}>

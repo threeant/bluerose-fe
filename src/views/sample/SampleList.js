@@ -23,6 +23,8 @@ import {
   CFormLabel,
   CFormInput,
   CForm,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react'
 
 import {
@@ -234,8 +236,24 @@ const SampleList = () => {
                   ))}
                 </CTableBody>
               </CTable>
+              <br />
+
             </CCardBody>
+
           </CCard>
+        </CCol>
+        <CCol className="justify-content-md-center">
+          <CPagination aria-label="Page navigation example">
+            <CPaginationItem aria-label="Previous" disabled>
+              <span aria-hidden="true">&laquo;</span>
+            </CPaginationItem>
+            <CPaginationItem active>1</CPaginationItem>
+            <CPaginationItem>2</CPaginationItem>
+            <CPaginationItem>3</CPaginationItem>
+            <CPaginationItem aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </CPaginationItem>
+          </CPagination>
         </CCol>
       </CRow>
     </>
