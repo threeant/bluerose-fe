@@ -53,8 +53,18 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 const SampleList = React.lazy(() => import('./views/sample/SampleList'))
 const SampleForm = React.lazy(() => import('./views/sample/SampleForm'))
 
+
+const AlbumForm = React.lazy(() => import('./views/music/AlbumForm'))
+const AlbumList = React.lazy(() => import('./views/music/AlbumList'))
+
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
+  { path: '/music', exact: true, name: 'Album' },
+  { path: '/music/albumList', name: 'AlbumList', element: AlbumList },
+  { path: '/music/albumForm/:albumId', name: 'AlbumDetail', element: AlbumForm },
+  { path: '/music/albumForm', name: 'AlbumForm', element: AlbumForm },
+  { path: '/sample/sampleList', exact: true, name: 'SampleForm' },
   { path: '/sample', exact: true, name: 'Sample' },
   { path: '/sample/sampleList', name: 'SampleList', element: SampleList },
   { path: '/sample/sampleForm', name: 'SampleForm', element: SampleForm },

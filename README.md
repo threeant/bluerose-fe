@@ -30,23 +30,23 @@ $ yarn run start
 ## Package
 ```
 admin-app
-├── public/          # static files &nbsp;
-│   └── index.html   # html template &nbsp;
-│ &nbsp;
-├── src/             # project root &nbsp;
-│   ├── assets/      # images, icons, etc. &nbsp;
-│   ├── components/  # common components - header, footer, sidebar, etc. &nbsp;
-│   ├── layouts/     # layout containers &nbsp;
-│   ├── scss/        # scss styles &nbsp;
-│   ├── views/       # application views &nbsp;
-│   │   └── sample/  # ** SAMPLE : 해당 마크업을 기준으로 작업 ** &nbsp;
-│   ├── _nav.js      # sidebar navigation config &nbsp;
-│   ├── App.js &nbsp;
-│   ├── ... &nbsp;
-│   ├── index.js &nbsp;
-│   ├── routes.js    # routes config &nbsp;
-│   └── store.js     # template state example  &nbsp;
-│&nbsp;
+├── public/          # static files
+│   └── index.html   # html template
+│
+├── src/             # project root
+│   ├── assets/      # images, icons, etc.
+│   ├── components/  # common components - header, footer, sidebar, etc.
+│   ├── layouts/     # layout containers
+│   ├── scss/        # scss styles
+│   ├── views/       # 업무 추가 화면
+│   │   └── sample/  # ** SAMPLE : 해당 마크업을 기준으로 작업 **
+│   ├── _nav.js      # 메뉴추가
+│   ├── App.js
+│   ├── ...
+│   ├── index.js
+│   ├── routes.js    # 화면추가
+│   └── store.js     # template state example 
+│
 └── package.json&nbsp;
 ```
 
