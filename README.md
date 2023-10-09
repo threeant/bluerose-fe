@@ -1,7 +1,5 @@
 # MUSIC REQ APP 
 
-## Quick Start
-
 ### Installation
 
 ``` bash
@@ -13,9 +11,6 @@ or
 ``` bash
 $ yarn install
 ```
-
-prettier 세팅
-
 
 
 ### Run
@@ -34,25 +29,25 @@ $ yarn run start
 
 ## Package
 
-admin-app
-├── public/          # static files 
-│   └── index.html   # html template 
-│ 
-├── src/             # project root 
-│   ├── assets/      # images, icons, etc. 
-│   ├── components/  # common components - header, footer, sidebar, etc. 
-│   ├── layouts/     # layout containers 
-│   ├── scss/        # scss styles 
-│   ├── views/       # application views 
-│   │   └── sample/  # ** SAMPLE : 해당 마크업을 기준으로 작업 ** 
-│   ├── _nav.js      # sidebar navigation config 
-│   ├── App.js 
-│   ├── ... 
-│   ├── index.js 
-│   ├── routes.js    # routes config 
-│   └── store.js     # template state example  
-│
-└── package.json
+admin-app&nbsp;
+├── public/          # static files &nbsp;
+│   └── index.html   # html template &nbsp;
+│ &nbsp;
+├── src/             # project root &nbsp;
+│   ├── assets/      # images, icons, etc. &nbsp;
+│   ├── components/  # common components - header, footer, sidebar, etc. &nbsp;
+│   ├── layouts/     # layout containers &nbsp;
+│   ├── scss/        # scss styles &nbsp;
+│   ├── views/       # application views &nbsp;
+│   │   └── sample/  # ** SAMPLE : 해당 마크업을 기준으로 작업 ** &nbsp;
+│   ├── _nav.js      # sidebar navigation config &nbsp;
+│   ├── App.js &nbsp;
+│   ├── ... &nbsp;
+│   ├── index.js &nbsp;
+│   ├── routes.js    # routes config &nbsp;
+│   └── store.js     # template state example  &nbsp;
+│&nbsp;
+└── package.json&nbsp;
 ```
 
 ## Reference
