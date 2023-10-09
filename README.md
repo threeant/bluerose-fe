@@ -28,8 +28,8 @@ $ yarn run start
 ```
 
 ## Package
-
-admin-app&nbsp;
+```
+admin-app
 ├── public/          # static files &nbsp;
 │   └── index.html   # html template &nbsp;
 │ &nbsp;
