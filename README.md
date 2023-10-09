@@ -14,56 +14,43 @@ or
 $ yarn install
 ```
 
-### Basic usage
+prettier 세팅
+
+
+
+### Run
 
 ``` bash
 # dev server with hot reload at http://localhost:3000
-$ npm start 
+$ npm run start 
 ```
 
 or 
 
 ``` bash
 # dev server with hot reload at http://localhost:3000
-$ yarn start
+$ yarn run start
 ```
 
-Navigate to [http://localhost:3000](http://localhost:3000). The app will automatically reload if you change any of the source files.
-
-#### Build
-
-Run `build` to build the project. The build artifacts will be stored in the `build/` directory.
-
-```bash
-# build for production with minification
-$ npm run build
-```
-
-or
-
-```bash
-# build for production with minification
-$ yarn build
-```
-
-## What's included
+## Package
 
 admin-app
-├── public/          # static files
-│   └── index.html   # html template
-│
-├── src/             # project root
-│   ├── assets/      # images, icons, etc.
-│   ├── components/  # common components - header, footer, sidebar, etc.
-│   ├── layouts/     # layout containers
-│   ├── scss/        # scss styles
-│   ├── views/       # application views
-│   ├── _nav.js      # sidebar navigation config
-│   ├── App.js
-│   ├── ...
-│   ├── index.js
-│   ├── routes.js    # routes config
-│   └── store.js     # template state example 
+├── public/          # static files 
+│   └── index.html   # html template 
+│ 
+├── src/             # project root 
+│   ├── assets/      # images, icons, etc. 
+│   ├── components/  # common components - header, footer, sidebar, etc. 
+│   ├── layouts/     # layout containers 
+│   ├── scss/        # scss styles 
+│   ├── views/       # application views 
+│   │   └── sample/  # ** SAMPLE : 해당 마크업을 기준으로 작업 ** 
+│   ├── _nav.js      # sidebar navigation config 
+│   ├── App.js 
+│   ├── ... 
+│   ├── index.js 
+│   ├── routes.js    # routes config 
+│   └── store.js     # template state example  
 │
 └── package.json
 ```
