@@ -25,6 +25,7 @@ import {
   CForm,
   CPagination,
   CPaginationItem,
+  CContainer,
 } from '@coreui/react'
 
 import {
@@ -47,6 +48,11 @@ const SampleList = () => {
   const clickReset = date => {
     setSelectedDate(null);
     setSelectedDate2(null);
+  }
+
+  const clickDetail = key => {
+    console.log('KEY??');
+    console.log(key);
   }
 
   const albumData = [
@@ -181,8 +187,6 @@ const SampleList = () => {
                     </div>
                   </CCol>
                 </CRow>
-
-
                 <div className="d-grid gap-2">
                   <CRow className="justify-content-between">
                     <CCol xs={4}>
@@ -197,9 +201,7 @@ const SampleList = () => {
                   </CRow>
                 </div>
               </CForm>
-
               <br />
-
               <CTable align="middle" className="mb-0 border" hover responsive>
                 <CTableHead color="light">
                   <CTableRow>
@@ -213,7 +215,7 @@ const SampleList = () => {
                 </CTableHead>
                 <CTableBody>
                   {albumData.map((item, index) => (
-                    <CTableRow v-for="item in tableItems" key={index}>
+                    <CTableRow v-for="item in tableItems" key={index} onClick={clickDetail}>
                       <CTableDataCell className="text-center">
                         <strong>{item.albumId}</strong>
                       </CTableDataCell>
@@ -224,7 +226,7 @@ const SampleList = () => {
                         <CAvatar size="md" src={item.albumImgUrl} />
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
-                        {item.albumNm}
+                        <a href='/sample/sampleForm/{{}}/'>{item.albumNm}</a>
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
                         {item.artistNm}
@@ -237,25 +239,25 @@ const SampleList = () => {
                 </CTableBody>
               </CTable>
               <br />
-
+              <CRow>
+                <CCol md={{ span: 6, offset: 5 }}>
+                  <CPagination aria-label="Page navigation example">
+                    <CPaginationItem aria-label="Previous" disabled>
+                      <span aria-hidden="true">&laquo;</span>
+                    </CPaginationItem>
+                    <CPaginationItem active>1</CPaginationItem>
+                    <CPaginationItem>2</CPaginationItem>
+                    <CPaginationItem>3</CPaginationItem>
+                    <CPaginationItem aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </CPaginationItem>
+                  </CPagination>
+                </CCol>
+              </CRow>
             </CCardBody>
-
           </CCard>
         </CCol>
-        <CCol className="justify-content-md-center">
-          <CPagination aria-label="Page navigation example">
-            <CPaginationItem aria-label="Previous" disabled>
-              <span aria-hidden="true">&laquo;</span>
-            </CPaginationItem>
-            <CPaginationItem active>1</CPaginationItem>
-            <CPaginationItem>2</CPaginationItem>
-            <CPaginationItem>3</CPaginationItem>
-            <CPaginationItem aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </CPaginationItem>
-          </CPagination>
-        </CCol>
-      </CRow>
+      </CRow >
     </>
   )
 }
