@@ -33,7 +33,7 @@ import {
 } from '@coreui/icons'
 
 const SampleList = () => {
-  // 선택한 날짜를 관리할 상태 변수를 만듭니다.
+  // 선택한 날짜를 관리할 상태 변수를 만듭니다..
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedDate2, setSelectedDate2] = useState(null);
 

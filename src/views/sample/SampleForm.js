@@ -50,7 +50,7 @@ const Validation = () => {
         <CCol >
           <CCard className="mb-4">
             <CCardHeader>
-              <strong>샘플등록</strong> <small>샘플수정입니다</small>
+              <strong>샘플등록</strong> <small>샘플수정입니다.</small>
             </CCardHeader>
             <CCardBody>
               <CForm
