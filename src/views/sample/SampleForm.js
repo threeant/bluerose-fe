@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 import {
   cilCalendar,
   cifUs,
@@ -30,19 +32,78 @@ import {
   CFormSwitch,
 } from '@coreui/react';
 import ReactImg from 'src/assets/images/image400.jpg'
-const Validation = () => {
+const SampleForm = () => {
+  const navigate = useNavigate();
+  const goListClick = () => {
+    navigate('/sample/sampleList');
+  };
   const [selectedDate, setSelectedDate] = useState(null);
   const handleDateChange = date => {
+    const formattedDate = date.toISOString().slice(0, 10);
+    console.log(formattedDate);
     setSelectedDate(date);
+    console.log(selectedDate);
+    setAlbumData({ ...albumData, releaseDate: formattedDate })
   }
   const [validated, setValidated] = useState(false);
-  const handleSubmit = event => {
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
+
+  const [albumData, setAlbumData] = useState({
+    //image : '',        //이미지
+    name: '',        //앨범명
+    artist: '',      //아티스트
+    label: '',       //라벨
+    format: '',      //포맷
+    releaseDate: '',      //발매일
+    musicGenre: '',      //장르
+    countryCD: '9',        //발매국가
+    mediaCD: '1',        //미디어
+    style: '',       //스타일
+    series: '',      //시리즈
+    useYn: true,      //사용여부
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    console.log(albumData);
     setValidated(true);
+    const form = e.currentTarget;
+    if (form.checkValidity() === false) {
+      e.stopPropagation();
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/albums', albumData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+
+      console.log('API 응답:', response.data);
+
+      // 폼 데이터를 초기화합니다.
+      setAlbumData({
+        name: '',        //앨범명
+        artist: '',      //아티스트
+        label: '',       //라벨
+        format: '',      //포맷
+        releaseDate: '2023-10-28',      //발매일
+        musicGenre: '',      //장르
+        countryCD: '9',        //발매국가
+        mediaCD: '1',        //미디어
+        style: '',       //스타일
+        series: '',      //시리즈
+        useYn: true,      //사용여부
+      });
+      alert('등록되었습니다.');
+      navigate('/sample/sampleList');
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
   };
   return (
     <CContainer>
@@ -61,7 +122,7 @@ const Validation = () => {
               >
                 <CCol xs={12} >
                   <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
-                  <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked />
+                  <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.value })} />
                 </CCol>
                 <CCol xs={12}>
                   <CImage rounded thumbnail align="center" src={ReactImg} width={150} height={150} />
@@ -73,51 +134,54 @@ const Validation = () => {
                 </CCol>
 
                 <CCol xs={6}>
-                  <CFormLabel htmlFor="validationCustom04">미디어*</CFormLabel>
-                  <CFormSelect id="validationCustom04">
-                    <option>LP</option>
-                    <option>CD</option>
+                  <CFormLabel htmlFor="lab_media">미디어*</CFormLabel>
+                  <CFormSelect id="sel_media" defaultValue={albumData.media} onChange={(e) => setAlbumData({ ...albumData, media: e.target.value })}  >
+                    <option value="1">LP</option>
+                    <option value="2">CD</option>
                   </CFormSelect>
                   <CFormFeedback invalid>미디어를 선택해주세요</CFormFeedback>
                 </CCol>
                 <CCol xs={6}>
-                  <CFormLabel htmlFor="validationCustom01">Label</CFormLabel>
-                  <CFormInput type="text" id="validationCustom01" defaultValue="" required />
-                  <CFormFeedback valid>아티스트를 입력해주세요.</CFormFeedback>
+                  <CFormLabel htmlFor="txt_label">Label</CFormLabel>
+                  <CFormInput type="text" id="txt_label" defaultValue="" />
                 </CCol>
                 <CCol xs={6}>
-                  <CFormLabel htmlFor="validationCustom01">앨범명*</CFormLabel>
-                  <CFormInput type="text" id="validationCustom01" defaultValue="" required />
-                  <CFormFeedback valid>앨범명을 입력해주세요.</CFormFeedback>
+                  <CFormLabel htmlFor="txt_name">앨범명*</CFormLabel>
+                  <CFormInput type="text" id="txt_name" defaultValue="" required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} />
+                  <CFormFeedback invalid>앨범명을 입력해주세요.</CFormFeedback>
                 </CCol>
                 <CCol xs={6}>
-                  <CFormLabel htmlFor="validationCustom01">아티스트*</CFormLabel>
-                  <CFormInput type="text" id="validationCustom01" defaultValue="" required />
-                  <CFormFeedback valid>아티스트를 입력해주세요.</CFormFeedback>
+                  <CFormLabel htmlFor="txt_artist">아티스트*</CFormLabel>
+                  <CFormInput type="text" id="txt_artist" defaultValue="" required onChange={(e) => setAlbumData({ ...albumData, artist: e.target.value })} />
+                  <CFormFeedback invalid>아티스트를 입력해주세요.</CFormFeedback>
+                </CCol>
+
+                <CCol md={12}>
+                  <CFormLabel htmlFor="txt_series">Series</CFormLabel>
+                  <CFormInput type="text" id="txt_series" onChange={(e) => setAlbumData({ ...albumData, series: e.target.value })} />
                 </CCol>
 
                 <CCol xs={12}>
-                  <CFormLabel htmlFor="validationCustom01">Format</CFormLabel>
-                  <CFormTextarea id="exampleFormControlTextarea1" rows="3"></CFormTextarea>
-                  <CFormFeedback valid>아티스트를 입력해주세요.</CFormFeedback>
+                  <CFormLabel htmlFor="txt_format">Format</CFormLabel>
+                  <CFormTextarea id="txt_format" rows="3"></CFormTextarea>
                 </CCol>
                 <CCol xs={6}>
-                  <CFormLabel htmlFor="validationCustom04">발매국가*</CFormLabel>
+                  <CFormLabel htmlFor="txt_country">발매국가*</CFormLabel>
                   <div style={{ display: 'flex' }}>
                     <div style={{ display: 'grid', placeItems: 'center', margin: 5 }}>
                       <CIcon className="text-secondary" icon={cifUs} size="lg" />
                     </div>
                     <div style={{ width: '60%' }}>
-                      <CFormSelect id="validationCustom04">
-                        <option>USA</option>
-                        <option>KOREA</option>
+                      <CFormSelect id="txt_country" onChange={(e) => setAlbumData({ ...albumData, country: e.target.value })}>
+                        <option value="1">USA</option>
+                        <option value="2">KOREA</option>
                       </CFormSelect>
-                      <CFormFeedback invalid>미디어를 선택해주세요</CFormFeedback>
+                      <CFormFeedback invalid>발매국가를 선택해주세요</CFormFeedback>
                     </div>
                   </div>
                 </CCol>
                 <CCol xs={6}>
-                  <CFormLabel htmlFor="validationCustom04">발매일</CFormLabel>
+                  <CFormLabel htmlFor="txt_releaseDate">발매일</CFormLabel>
                   <div style={{ display: 'flex' }}>
                     <div style={{ display: 'grid', placeItems: 'center', marginRight: 5 }}>
                       <CIcon className="text-secondary" icon={cilCalendar} size="lg" />
@@ -137,16 +201,18 @@ const Validation = () => {
                   </div>
                 </CCol>
                 <CCol md={12}>
-                  <CFormLabel htmlFor="validationCustom01">Style</CFormLabel>
-                  <CFormInput type="text" id="validationCustom01" required />
-                  <CFormFeedback valid>Looks good!</CFormFeedback>
+                  <CFormLabel htmlFor="txt_genre">장르</CFormLabel>
+                  <CFormInput type="text" id="txt_genre" onChange={(e) => setAlbumData({ ...albumData, musicGenre: e.target.value })} />
                 </CCol>
-
+                <CCol md={12}>
+                  <CFormLabel htmlFor="txt_style">Style</CFormLabel>
+                  <CFormInput type="text" id="txt_style" onChange={(e) => setAlbumData({ ...albumData, style: e.target.value })} />
+                </CCol>
                 <div className="d-grid gap-2">
                   <CRow className="justify-content-between">
                     <CCol xs={12}>
                       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <CButton component="input" type="button" color="light" value="목록" />
+                        <CButton component="input" type="button" color="light" value="목록" onClick={goListClick} />
                         <CButton component="input" color="primary" type="submit" value="등록하기" />
                       </div>
                     </CCol>
@@ -161,4 +227,4 @@ const Validation = () => {
   );
 };
 
-export default Validation;
+export default SampleForm;

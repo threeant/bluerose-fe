@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 import {
   CAvatar,
   CButton,
@@ -33,9 +35,54 @@ import {
 } from '@coreui/icons'
 
 const SampleList = () => {
+
+
+  const navigate = useNavigate();
+  const goFormClick = () => {
+    navigate('/sample/sampleForm');
+  }
   // 선택한 날짜를 관리할 상태 변수를 만듭니다..
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedDate2, setSelectedDate2] = useState(null);
+
+
+  const [albumSearch, setAlbumSearch] = useState({
+    "artist": "",
+    "endReleaseDate": "",
+    "musicGenre": "",
+    "name": "",
+    "page": 1,
+    "size": 1,
+    "startReleaseDate": "",
+  });
+
+  const [albumData, setAlbumData] = useState({ contents: [] });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    console.log(albumSearch);
+
+
+    try {
+      const response = await axios.get('http://localhost:8080/api/albums', {
+        params: albumSearch
+      });
+
+      // API 응답에서 데이터 추출
+      const data = response.data;
+      // 데이터를 상태 변수에 저장
+      setAlbumData(data);
+
+      console.log(data)
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  };
 
 
   // 날짜가 선택될 때 호출될 콜백 함수
@@ -55,54 +102,6 @@ const SampleList = () => {
     console.log(key);
   }
 
-  const albumData = [
-    {
-      albumId: '9',
-      albumImgUrl: '/static/media/8.35ee8919ea545620a475.jpg',
-      mediaNm: 'LP',
-      albumNm: 'I Met You When I Was 18.',
-      artistNm: 'Lauv',
-      relesDt: '2020-04-20',
-      genrCd: 'Pop'
-    },
-    {
-      albumId: '8',
-      albumImgUrl: '/static/media/8.35ee8919ea545620a475.jpg',
-      mediaNm: 'LP',
-      albumNm: 'I Met You When I Was 18.',
-      artistNm: 'Lauv',
-      relesDt: '2020-04-20',
-      genrCd: 'Pop'
-    },
-    {
-      albumId: '7',
-      albumImgUrl: '/static/media/8.35ee8919ea545620a475.jpg',
-      mediaNm: 'LP',
-      albumNm: 'I Met You When I Was 18.',
-      artistNm: 'Lauv',
-      relesDt: '2020-04-20',
-      genrCd: 'Pop'
-    },
-    {
-      albumId: '6',
-      albumImgUrl: '/static/media/8.35ee8919ea545620a475.jpg',
-      mediaNm: 'LP',
-      albumNm: 'I Met You When I Was 18.',
-      artistNm: 'Lauv',
-      relesDt: '2020-04-20',
-      genrCd: 'Pop'
-    },
-    {
-      albumId: '5',
-      albumImgUrl: '/static/media/8.35ee8919ea545620a475.jpg',
-      mediaNm: 'LP',
-      albumNm: 'I Met You When I Was 18.',
-      artistNm: 'Lauv',
-      relesDt: '2020-04-20',
-      genrCd: 'Pop'
-    },
-  ]
-
   return (
     <>
       <CRow>
@@ -110,7 +109,7 @@ const SampleList = () => {
           <CCard className="mb-4">
             <CCardHeader>샘플정보관리</CCardHeader>
             <CCardBody>
-              <CForm className="row">
+              <CForm className="row" onSubmit={handleSubmit}>
                 <CRow className="mb-3">
                   <CCol xs={1}>
                     <CFormLabel htmlFor="inputEmail3" className="col-form-label">미디어</CFormLabel>
@@ -190,7 +189,7 @@ const SampleList = () => {
                 <div className="d-grid gap-2">
                   <CRow className="justify-content-between">
                     <CCol xs={4}>
-                      <CButton component="input" type="button" color="danger" value="등록하기" />
+                      <CButton component="input" type="button" color="danger" value="등록하기" onClick={goFormClick} />
                     </CCol>
                     <CCol xs={4}>
                       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -214,46 +213,61 @@ const SampleList = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {albumData.map((item, index) => (
-                    <CTableRow v-for="item in tableItems" key={index} onClick={clickDetail}>
-                      <CTableDataCell className="text-center">
-                        <strong>{item.albumId}</strong>
-                      </CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        <strong>{item.mediaNm}</strong>
-                      </CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        <CAvatar size="md" src={item.albumImgUrl} />
-                      </CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        <a href='/sample/sampleForm/{{}}/'>{item.albumNm}</a>
-                      </CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        {item.artistNm}
-                      </CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        {item.relesDt}
-                      </CTableDataCell>
-                    </CTableRow>
-                  ))}
+                  {albumData.contents && albumData.contents.length > 0 ? (
+                    albumData.contents.map((item, index) => (
+                      <CTableRow v-for="item in tableItems" key={index} onClick={clickDetail}>
+                        <CTableDataCell className="text-center">
+                          <strong>{item.id}</strong>
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          <strong>{item.mediaName}</strong>
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          <CAvatar size="md" src="/static/media/8.35ee8919ea545620a475.jpg" />
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          <a href='/'>{item.name}</a>
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          {item.artist}
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          {item.releaseDate}
+                        </CTableDataCell>
+                      </CTableRow>
+                    ))
+                  ) :
+                    (
+                      <CTableRow v-for="item in tableItems" >
+                        <CTableDataCell className="text-center" colSpan={6} key={0}>
+                          조회된 데이터가 없습니다.
+                        </CTableDataCell>
+                      </CTableRow>
+                    )
+                  }
                 </CTableBody>
               </CTable>
               <br />
-              <CRow>
-                <CCol md={{ span: 6, offset: 5 }}>
-                  <CPagination aria-label="Page navigation example">
-                    <CPaginationItem aria-label="Previous" disabled>
-                      <span aria-hidden="true">&laquo;</span>
-                    </CPaginationItem>
-                    <CPaginationItem active>1</CPaginationItem>
-                    <CPaginationItem>2</CPaginationItem>
-                    <CPaginationItem>3</CPaginationItem>
-                    <CPaginationItem aria-label="Next">
-                      <span aria-hidden="true">&raquo;</span>
-                    </CPaginationItem>
-                  </CPagination>
-                </CCol>
-              </CRow>
+              {albumData.contents && albumData.contents.length > 0 ? (
+                <CRow>
+                  <CCol md={{ span: 6, offset: 5 }}>
+                    <CPagination aria-label="Page navigation example">
+                      <CPaginationItem aria-label="Previous" disabled={!albumData.first}>
+                        <span aria-hidden="true">&laquo;</span>
+                      </CPaginationItem>
+                      {Array.from({ length: albumData.totalPages }, (_, index) => (
+                        <CPaginationItem key={index} active>{index + 1}</CPaginationItem>
+                      ))}
+                      <CPaginationItem aria-label="Next" disabled={!albumData.last}>
+                        <span aria-hidden="true">&raquo;</span>
+                      </CPaginationItem>
+                    </CPagination>
+                  </CCol>
+                  <CCol md={1}>
+                    총 {albumData.totalCount}건
+                  </CCol>
+                </CRow>
+              ) : ''}
             </CCardBody>
           </CCard>
         </CCol>
