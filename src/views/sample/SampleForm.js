@@ -4,6 +4,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { getCodeList } from '../../common/utils'
 import {
   cilCalendar,
   cifUs,
@@ -33,7 +34,15 @@ import {
 } from '@coreui/react';
 import ReactImg from 'src/assets/images/image400.jpg'
 const SampleForm = () => {
+
+  /**********************************************************************
+   * 공통 영역
+  **********************************************************************/
   const navigate = useNavigate();
+
+  const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
+  const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
+
   const goListClick = () => {
     navigate('/sample/sampleList');
   };
@@ -136,8 +145,9 @@ const SampleForm = () => {
                 <CCol xs={6}>
                   <CFormLabel htmlFor="lab_media">미디어*</CFormLabel>
                   <CFormSelect id="sel_media" defaultValue={albumData.media} onChange={(e) => setAlbumData({ ...albumData, media: e.target.value })}  >
-                    <option value="1">LP</option>
-                    <option value="2">CD</option>
+                    {midiaCD.map((item, index) => (
+                      <option value={item.id} key={index}>{item.name}</option>
+                    ))}
                   </CFormSelect>
                   <CFormFeedback invalid>미디어를 선택해주세요</CFormFeedback>
                 </CCol>
@@ -167,26 +177,22 @@ const SampleForm = () => {
                 </CCol>
                 <CCol xs={6}>
                   <CFormLabel htmlFor="txt_country">발매국가*</CFormLabel>
-                  <div style={{ display: 'flex' }}>
-                    <div style={{ display: 'grid', placeItems: 'center', margin: 5 }}>
-                      <CIcon className="text-secondary" icon={cifUs} size="lg" />
-                    </div>
-                    <div style={{ width: '60%' }}>
-                      <CFormSelect id="txt_country" onChange={(e) => setAlbumData({ ...albumData, country: e.target.value })}>
-                        <option value="1">USA</option>
-                        <option value="2">KOREA</option>
-                      </CFormSelect>
-                      <CFormFeedback invalid>발매국가를 선택해주세요</CFormFeedback>
-                    </div>
+                  <div >
+                    <CFormSelect id="txt_country" onChange={(e) => setAlbumData({ ...albumData, country: e.target.value })}>
+                      {cntryCD.map((item, index) => (
+                        <option value={item.id} key={index}>{item.name}</option>
+                      ))}
+                    </CFormSelect>
+                    <CFormFeedback invalid>발매국가를 선택해주세요.</CFormFeedback>
                   </div>
                 </CCol>
                 <CCol xs={6}>
                   <CFormLabel htmlFor="txt_releaseDate">발매일</CFormLabel>
-                  <div style={{ display: 'flex' }}>
+                  <div style={{ display: 'flex', width: '100%' }}>
                     <div style={{ display: 'grid', placeItems: 'center', marginRight: 5 }}>
                       <CIcon className="text-secondary" icon={cilCalendar} size="lg" />
                     </div>
-                    <div style={{ width: '100%' }}>
+                    <div style={{ width: '90%' }}>
                       <DatePicker
                         selected={selectedDate}
                         onChange={handleDateChange}
@@ -195,7 +201,6 @@ const SampleForm = () => {
                         minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
                         maxDate={new Date()} // maxDate 이후 날짜 선택 불가
                         className="DatePicker"
-                        width="100%"
                       />
                     </div>
                   </div>

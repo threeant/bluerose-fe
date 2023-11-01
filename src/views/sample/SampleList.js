@@ -4,16 +4,14 @@ import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { getCodeList } from '../../common/utils'
 import {
   CAvatar,
   CButton,
-  CButtonGroup,
   CCard,
   CCardBody,
-  CCardFooter,
   CCardHeader,
   CCol,
-  CProgress,
   CRow,
   CTable,
   CTableBody,
@@ -27,7 +25,6 @@ import {
   CForm,
   CPagination,
   CPaginationItem,
-  CContainer,
 } from '@coreui/react'
 
 import {
@@ -37,14 +34,44 @@ import {
 const SampleList = () => {
 
 
+  /**********************************************************************
+   * 공통 영역
+  **********************************************************************/
   const navigate = useNavigate();
-  const goFormClick = () => {
+
+  const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
+  const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
+
+  /**********************************************************************
+   * 변수 영역
+  **********************************************************************/
+  const [selectedDate, setSelectedDate] = useState(null); //등록일 from
+  const [selectedDate2, setSelectedDate2] = useState(null); // 등록일 to
+
+
+  // 날짜가 선택될 때 호출될 콜백 함수
+  const handleDateChange = date => {
+    setSelectedDate(date);
+  }
+  const handleDateChange2 = date => {
+    setSelectedDate2(date);
+  }
+  const clickReset = date => {
+    setSelectedDate(null);
+    setSelectedDate2(null);
+  }
+
+  /**********************************************************************
+  * 비즈니스로직 영역
+ **********************************************************************/
+  const goFormClick = () => { //등록화면이동
     navigate('/sample/sampleForm');
   }
-  // 선택한 날짜를 관리할 상태 변수를 만듭니다..
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedDate2, setSelectedDate2] = useState(null);
 
+  const clickDetail = key => { //디테일이동
+    console.log('KEY??');
+    console.log(key);
+  }
 
   const [albumSearch, setAlbumSearch] = useState({
     "artist": "",
@@ -56,13 +83,13 @@ const SampleList = () => {
     "startReleaseDate": "",
   });
 
+
   const [albumData, setAlbumData] = useState({ contents: [] });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     console.log(albumSearch);
-
 
     try {
       const response = await axios.get('http://localhost:8080/api/albums', {
@@ -85,23 +112,6 @@ const SampleList = () => {
   };
 
 
-  // 날짜가 선택될 때 호출될 콜백 함수
-  const handleDateChange = date => {
-    setSelectedDate(date);
-  }
-  const handleDateChange2 = date => {
-    setSelectedDate2(date);
-  }
-  const clickReset = date => {
-    setSelectedDate(null);
-    setSelectedDate2(null);
-  }
-
-  const clickDetail = key => {
-    console.log('KEY??');
-    console.log(key);
-  }
-
   return (
     <>
       <CRow>
@@ -117,19 +127,16 @@ const SampleList = () => {
                   <CCol xs={5}>
                     <CFormSelect id="inputState" aria-label="미디어">
                       <option>-전체-</option>
-                      <option>LP</option>
-                      <option>CD</option>
+                      {midiaCD.map((item, index) => (
+                        <option value={item.id} key={index}>{item.name}</option>
+                      ))}
                     </CFormSelect>
                   </CCol>
                   <CCol xs={1}>
                     <CFormLabel htmlFor="inputEmail3" className="col-form-label">장르</CFormLabel>
                   </CCol>
                   <CCol xs={5}>
-                    <CFormSelect id="inputState" aria-label="장르">
-                      <option>-전체-</option>
-                      <option>JAZZ</option>
-                      <option>K-POP</option>
-                    </CFormSelect>
+                    <CFormInput type="text" id="inputMusicGenre" aria-label="장르" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumData, musicGenre: e.target.value })} />
                   </CCol>
                 </CRow>
                 <CRow className="mb-3">
@@ -140,13 +147,24 @@ const SampleList = () => {
                     <CFormInput type="text" id="inputEmail4" aria-label="앨범명" placeholder="전체" />
                   </CCol>
                   <CCol xs={1}>
-                    <CFormLabel htmlFor="inputEmail3" className="col-form-label">아티스트</CFormLabel>
+                    <CFormLabel htmlFor="txt_artist" className="col-form-label">아티스트</CFormLabel>
                   </CCol>
                   <CCol md={5}>
-                    <CFormInput type="text" id="inputPassword4" aria-label="아티스트" placeholder="전체" />
+                    <CFormInput type="text" id="txt_artist" aria-label="아티스트" placeholder="전체" />
                   </CCol>
                 </CRow>
                 <CRow className="mb-3">
+                  <CCol xs={1}>
+                    <CFormLabel htmlFor="txt_country" className="col-form-label">발매국가</CFormLabel>
+                  </CCol>
+                  <CCol xs={5}>
+                    <CFormSelect id="txt_country" aria-label="발매국가">
+                      <option>-전체-</option>
+                      {cntryCD.map((item, index) => (
+                        <option value={item.id} key={index}>{item.name}</option>
+                      ))}
+                    </CFormSelect>
+                  </CCol>
                   <CCol md={1}>
                     <CFormLabel htmlFor="inputEmail3" className="col-form-label">등록일</CFormLabel>
                   </CCol>

@@ -47,29 +47,39 @@ const Login = () => {
       //if (response.status === 200) {
       if (test) {
         // 로그인 성공 처리
-        // 사용자 토큰 저장 또는 세션에 사용자 정보 저장
+        // TODO : 사용자 토큰 저장 또는 세션에 사용자 정보 저장
 
-        const dataToStore = {
-          username: 'john_doe',
-          email: 'john@example.com',
-        };
+        //공통코드 
+        const codeResponse = await axios.get('http://localhost:8080/api/code', {}, {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
 
-        const jsonData = JSON.stringify(dataToStore);
-        sessionStorage.setItem('userData', jsonData);
+        // API 응답에서 데이터 추출
+        const codeData = codeResponse.data;
+        // 데이터를 상태 변수에 저장
+
+        console.log(codeData)
+        const jsonData = JSON.stringify(codeData);
+        sessionStorage.setItem('codeData', jsonData);
 
 
         // 세션에서 JSON 데이터 가져오기
-        const jsonData2 = sessionStorage.getItem('userData');
+        const jsonCodeData = sessionStorage.getItem('codeData');
 
         // JSON 문자열을 파싱하여 JavaScript 객체로 변환
-        const userData2 = JSON.parse(jsonData2);
+        const codeList = JSON.parse(jsonCodeData);
 
         // userData 객체 사용
-        console.log(userData2.username); // 'john_doe'
-        console.log(userData2.email); // 'john@example.com'
-        sessionStorage.removeItem('userData');
+        for (const c of codeList) {
+          //console.log(c);
+          console.log(c.description);
+          console.log(c.code);
+          console.log(c.codes);
+        }
         navigate('/dashboard');
-
+        //sessionStorage.removeItem('codeData');
 
 
       } else {
