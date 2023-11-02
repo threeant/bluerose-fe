@@ -52,6 +52,7 @@ const SampleList = () => {
   // 날짜가 선택될 때 호출될 콜백 함수
   const handleDateChange = date => {
     setSelectedDate(date);
+
   }
   const handleDateChange2 = date => {
     setSelectedDate2(date);
@@ -81,13 +82,24 @@ const SampleList = () => {
     "page": 1,
     "size": 1,
     "startReleaseDate": "",
+    "mediaCode": ""
   });
 
 
   const [albumData, setAlbumData] = useState({ contents: [] });
 
-  const handleSubmit = async (e) => {
+  const submitSearch = (e) => {
     e.preventDefault();
+    handleSubmit()
+  }
+
+  const clickPage = (e, page) => {
+    e.preventDefault();
+    console.log("===page =  : " + page);
+  }
+
+
+  const handleSubmit = async () => {
 
     console.log(albumSearch);
 
@@ -112,6 +124,7 @@ const SampleList = () => {
   };
 
 
+
   return (
     <>
       <CRow>
@@ -119,13 +132,13 @@ const SampleList = () => {
           <CCard className="mb-4">
             <CCardHeader>샘플정보관리</CCardHeader>
             <CCardBody>
-              <CForm className="row" onSubmit={handleSubmit}>
+              <CForm className="row" onSubmit={submitSearch}>
                 <CRow className="mb-3">
                   <CCol xs={1}>
-                    <CFormLabel htmlFor="inputEmail3" className="col-form-label">미디어</CFormLabel>
+                    <CFormLabel htmlFor="inputMedia" className="col-form-label">미디어</CFormLabel>
                   </CCol>
                   <CCol xs={5}>
-                    <CFormSelect id="inputState" aria-label="미디어">
+                    <CFormSelect id="inputMedia" aria-label="미디어" onChange={(e) => setAlbumSearch({ ...albumSearch, mediaCode: e.target.value })}>
                       <option>-전체-</option>
                       {midiaCD.map((item, index) => (
                         <option value={item.id} key={index}>{item.name}</option>
@@ -133,38 +146,38 @@ const SampleList = () => {
                     </CFormSelect>
                   </CCol>
                   <CCol xs={1}>
-                    <CFormLabel htmlFor="inputEmail3" className="col-form-label">장르</CFormLabel>
+                    <CFormLabel htmlFor="inputMusicGenre" className="col-form-label" >장르</CFormLabel>
                   </CCol>
                   <CCol xs={5}>
-                    <CFormInput type="text" id="inputMusicGenre" aria-label="장르" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumData, musicGenre: e.target.value })} />
+                    <CFormInput type="text" id="inputMusicGenre" aria-label="장르" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, musicGenre: e.target.value })} />
                   </CCol>
                 </CRow>
                 <CRow className="mb-3">
                   <CCol xs={1}>
-                    <CFormLabel htmlFor="inputEmail3" className="col-form-label">앨범명</CFormLabel>
+                    <CFormLabel htmlFor="inputName" className="col-form-label">앨범명</CFormLabel>
                   </CCol>
                   <CCol xs={5}>
-                    <CFormInput type="text" id="inputEmail4" aria-label="앨범명" placeholder="전체" />
+                    <CFormInput type="text" id="inputName" aria-label="앨범명" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, name: e.target.value })} />
                   </CCol>
                   <CCol xs={1}>
-                    <CFormLabel htmlFor="txt_artist" className="col-form-label">아티스트</CFormLabel>
+                    <CFormLabel htmlFor="inputArtist" className="col-form-label">아티스트</CFormLabel>
                   </CCol>
                   <CCol md={5}>
-                    <CFormInput type="text" id="txt_artist" aria-label="아티스트" placeholder="전체" />
+                    <CFormInput type="text" id="inputArtist" aria-label="아티스트" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, artist: e.target.value })} />
                   </CCol>
                 </CRow>
                 <CRow className="mb-3">
-                  <CCol xs={1}>
+                  {/* <CCol xs={1}>
                     <CFormLabel htmlFor="txt_country" className="col-form-label">발매국가</CFormLabel>
                   </CCol>
                   <CCol xs={5}>
-                    <CFormSelect id="txt_country" aria-label="발매국가">
+                    <CFormSelect id="txt_country" aria-label="발매국가" onChange={(e) => setAlbumSearch({ ...albumSearch, artist: e.target.value })}>
                       <option>-전체-</option>
                       {cntryCD.map((item, index) => (
                         <option value={item.id} key={index}>{item.name}</option>
                       ))}
                     </CFormSelect>
-                  </CCol>
+                  </CCol> */}
                   <CCol md={1}>
                     <CFormLabel htmlFor="inputEmail3" className="col-form-label">등록일</CFormLabel>
                   </CCol>
@@ -175,8 +188,8 @@ const SampleList = () => {
                       </div>
                       <div>
                         <DatePicker
-                          selected={selectedDate}
-                          onChange={handleDateChange}
+                          selected={albumSearch.startReleaseDate}
+                          onChange={(e) => setAlbumSearch({ ...albumSearch, startReleaseDate: e.target.value })}
                           dateFormat={'yyyy-MM-dd'} // 날짜 형태
                           shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
                           minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
@@ -192,8 +205,8 @@ const SampleList = () => {
                       </div>
                       <div>
                         <DatePicker
-                          selected={selectedDate2}
-                          onChange={handleDateChange2}
+                          selected={albumSearch.endReleaseDate}
+                          onChange={(e) => setAlbumSearch({ ...albumSearch, endReleaseDate: e.target.value })}
                           dateFormat={'yyyy-MM-dd'} // 날짜 형태
                           shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
                           minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
@@ -270,11 +283,11 @@ const SampleList = () => {
                 <CRow>
                   <CCol md={{ span: 6, offset: 5 }}>
                     <CPagination aria-label="Page navigation example">
-                      <CPaginationItem aria-label="Previous" disabled={!albumData.first}>
+                      <CPaginationItem aria-label="Previous" disabled={!albumData.first} onClick={(e) => clickPage(e, 1)}>
                         <span aria-hidden="true">&laquo;</span>
                       </CPaginationItem>
                       {Array.from({ length: albumData.totalPages }, (_, index) => (
-                        <CPaginationItem key={index} active>{index + 1}</CPaginationItem>
+                        <CPaginationItem key={index} active onClick={(e) => clickPage(e, index + 1)}>{index + 1}</CPaginationItem>
                       ))}
                       <CPaginationItem aria-label="Next" disabled={!albumData.last}>
                         <span aria-hidden="true">&raquo;</span>
