@@ -43,15 +43,14 @@ const AlbumReq = () => {
   const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
   const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
 
+  //목록이동
   const goListClick = () => {
-    navigate('/sample/sampleList');
+    navigate('/music/albumList');
   };
   const [selectedDate, setSelectedDate] = useState(null);
   const handleDateChange = date => {
     const formattedDate = date.toISOString().slice(0, 10);
-    console.log(formattedDate);
     setSelectedDate(date);
-    console.log(selectedDate);
     setAlbumData({ ...albumData, releaseDate: formattedDate })
   }
   const [validated, setValidated] = useState(false);
@@ -71,7 +70,8 @@ const AlbumReq = () => {
     useYn: true,      //사용여부
   });
 
-  const handleSubmit = async (e) => {
+  //등록하기 API
+  const submitRegAlbum = async (e) => {
     e.preventDefault();
 
     console.log(albumData);
@@ -120,16 +120,19 @@ const AlbumReq = () => {
         <CCol >
           <CCard className="mb-4">
             <CCardHeader>
-              <strong>샘플등록</strong> <small>샘플수정입니다.</small>
+              <strong>앨범등록</strong> <small></small>
             </CCardHeader>
             <CCardBody>
               <CForm
                 className="row g-3 needs-validation"
                 noValidate
                 validated={validated}
-                onSubmit={handleSubmit}
+                onSubmit={submitRegAlbum}
               >
-                <CCol xs={12} >
+                <CCol xs={10} >
+                  <CFormLabel></CFormLabel>
+                </CCol>
+                <CCol xs={2} >
                   <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
                   <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.value })} />
                 </CCol>
@@ -153,16 +156,16 @@ const AlbumReq = () => {
                 </CCol>
                 <CCol xs={6}>
                   <CFormLabel htmlFor="inputLabel">Label</CFormLabel>
-                  <CFormInput type="text" id="inputLabel" defaultValue="" />
+                  <CFormInput type="text" id="inputLabel" onChange={(e) => setAlbumData({ ...albumData, label: e.target.value })} />
                 </CCol>
                 <CCol xs={6}>
                   <CFormLabel htmlFor="inputName">앨범명*</CFormLabel>
-                  <CFormInput type="text" id="inputName" defaultValue="" required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} />
+                  <CFormInput type="text" id="inputName" required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} />
                   <CFormFeedback invalid>앨범명을 입력해주세요.</CFormFeedback>
                 </CCol>
                 <CCol xs={6}>
                   <CFormLabel htmlFor="inputAartist">아티스트*</CFormLabel>
-                  <CFormInput type="text" id="inputAartist" defaultValue="" required onChange={(e) => setAlbumData({ ...albumData, artist: e.target.value })} />
+                  <CFormInput type="text" id="inputAartist" required onChange={(e) => setAlbumData({ ...albumData, artist: e.target.value })} />
                   <CFormFeedback invalid>아티스트를 입력해주세요.</CFormFeedback>
                 </CCol>
 
@@ -173,7 +176,7 @@ const AlbumReq = () => {
 
                 <CCol xs={12}>
                   <CFormLabel htmlFor="inputFormat">Format</CFormLabel>
-                  <CFormTextarea id="inputFormat" rows="3"></CFormTextarea>
+                  <CFormTextarea id="inputFormat" rows="3" onChange={(e) => setAlbumData({ ...albumData, format: e.target.value })}></CFormTextarea>
                 </CCol>
                 <CCol xs={6}>
                   <CFormLabel htmlFor="inputCountry">발매국가*</CFormLabel>
@@ -206,12 +209,12 @@ const AlbumReq = () => {
                   </div>
                 </CCol>
                 <CCol md={12}>
-                  <CFormLabel htmlFor="txt_genre">장르</CFormLabel>
-                  <CFormInput type="text" id="txt_genre" onChange={(e) => setAlbumData({ ...albumData, musicGenre: e.target.value })} />
+                  <CFormLabel htmlFor="inputGenre">장르</CFormLabel>
+                  <CFormInput type="text" id="inputGenre" onChange={(e) => setAlbumData({ ...albumData, musicGenre: e.target.value })} />
                 </CCol>
                 <CCol md={12}>
-                  <CFormLabel htmlFor="txt_style">Style</CFormLabel>
-                  <CFormInput type="text" id="txt_style" onChange={(e) => setAlbumData({ ...albumData, style: e.target.value })} />
+                  <CFormLabel htmlFor="txtStyle">Style</CFormLabel>
+                  <CFormInput type="text" id="txtStyle" onChange={(e) => setAlbumData({ ...albumData, style: e.target.value })} />
                 </CCol>
                 <div className="d-grid gap-2">
                   <CRow className="justify-content-between">

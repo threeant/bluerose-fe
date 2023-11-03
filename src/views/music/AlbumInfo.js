@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { getCodeList } from '../../common/utils'
 import {
@@ -44,36 +44,64 @@ const AlbumInfo = () => {
   const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
   const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
 
+  /**********************************************************************
+   * 화면 영역
+  **********************************************************************/
+  const location = useLocation();
+  const { albumId } = location.state;
+
+  //목록이동
   const goListClick = () => {
-    navigate('/sample/sampleList');
+    navigate('/music/albumList');
   };
   const [selectedDate, setSelectedDate] = useState(null);
   const handleDateChange = date => {
     const formattedDate = date.toISOString().slice(0, 10);
-    console.log(formattedDate);
     setSelectedDate(date);
-    console.log(selectedDate);
     setAlbumData({ ...albumData, releaseDate: formattedDate })
+
   }
+
+  useEffect(() => {
+
+    submitSearchAlbum();
+
+  }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
+
+  /**********************************************************************
+  * 비즈니스로직 영역
+  **********************************************************************/
   const [validated, setValidated] = useState(false);
 
-  const [albumData, setAlbumData] = useState({
-    //image : '',        //이미지
-    name: '',        //앨범명
-    artist: '',      //아티스트
-    label: '',       //라벨
-    format: '',      //포맷
-    releaseDate: '',      //발매일
-    musicGenre: '',      //장르
-    countryCD: '9',        //발매국가
-    mediaCD: '1',        //미디어
-    style: '',       //스타일
-    series: '',      //시리즈
-    useYn: true,      //사용여부
-  });
+  //데이터
+  const [albumData, setAlbumData] = useState(); //앨범
+  const [songReqData, setSongReqData] = useState(); // 곡등록
+  const [songData, setSongData] = useState({ contents: [] });// 곡조회리스트
 
 
-  const handleSubmit = async (e) => {
+  //검색 API
+  const submitSearchAlbum = async () => {
+
+    try {
+      const response = await axios.get('http://localhost:8080/api/albums/' + albumId);
+
+      // API 응답에서 데이터 추출
+      const data = response.data;
+      // 데이터를 상태 변수에 저장
+      setAlbumData(data);
+      console.log("결과 ----")
+      console.log(data)
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  };
+
+  //수정하기 API
+  const submitUpdateAlbum = async (e) => {
     e.preventDefault();
 
     console.log(albumData);
@@ -84,8 +112,15 @@ const AlbumInfo = () => {
       return;
     }
 
+    const result = window.confirm('수정하시겠습니까?');
+
+    if (!result) {
+      setValidated(false);
+      return;
+    }
+
     try {
-      const response = await axios.post('http://localhost:8080/api/albums', albumData, {
+      const response = await axios.post('http://localhost:8080/api/albums/' + albumId, albumData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -94,21 +129,8 @@ const AlbumInfo = () => {
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      setAlbumData({
-        name: '',        //앨범명
-        artist: '',      //아티스트
-        label: '',       //라벨
-        format: '',      //포맷
-        releaseDate: '2023-10-28',      //발매일
-        musicGenre: '',      //장르
-        countryCD: '9',        //발매국가
-        mediaCD: '1',        //미디어
-        style: '',       //스타일
-        series: '',      //시리즈
-        useYn: true,      //사용여부
-      });
-      alert('등록되었습니다.');
-      navigate('/sample/sampleList');
+      alert('수정되었습니다.');
+      setValidated(false);
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
       console.error('API 요청 실패:', error);
@@ -130,9 +152,12 @@ const AlbumInfo = () => {
                   className="row g-3 needs-validation"
                   noValidate
                   validated={validated}
-                  onSubmit={handleSubmit}
+                  onSubmit={submitUpdateAlbum}
                 >
-                  <CCol xs={12} >
+                  <CCol xs={10} >
+                    <CFormLabel htmlFor="validationCustom04">ID : {albumId}</CFormLabel>
+                  </CCol>
+                  <CCol xs={2} >
                     <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
                     <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.value })} />
                   </CCol>
@@ -156,32 +181,32 @@ const AlbumInfo = () => {
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputLabel">Label</CFormLabel>
-                    <CFormInput type="text" id="inputLabel" defaultValue="" />
+                    <CFormInput type="text" id="inputLabel" defaultValue={albumData.label} onChange={(e) => setAlbumData({ ...albumData, label: e.target.value })} />
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputName">앨범명*</CFormLabel>
-                    <CFormInput type="text" id="inputName" defaultValue="" required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} />
+                    <CFormInput type="text" id="inputName" defaultValue={albumData.name} required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} />
                     <CFormFeedback invalid>앨범명을 입력해주세요.</CFormFeedback>
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputAartist">아티스트*</CFormLabel>
-                    <CFormInput type="text" id="inputAartist" defaultValue="" required onChange={(e) => setAlbumData({ ...albumData, artist: e.target.value })} />
+                    <CFormInput type="text" id="inputAartist" defaultValue={albumData.artist} required onChange={(e) => setAlbumData({ ...albumData, artist: e.target.value })} />
                     <CFormFeedback invalid>아티스트를 입력해주세요.</CFormFeedback>
                   </CCol>
 
                   <CCol md={12}>
                     <CFormLabel htmlFor="inputSeries">Series</CFormLabel>
-                    <CFormInput type="text" id="inputSeries" onChange={(e) => setAlbumData({ ...albumData, series: e.target.value })} />
+                    <CFormInput type="text" id="inputSeries" defaultValue={albumData.series} onChange={(e) => setAlbumData({ ...albumData, series: e.target.value })} />
                   </CCol>
 
                   <CCol xs={12}>
                     <CFormLabel htmlFor="inputFormat">Format</CFormLabel>
-                    <CFormTextarea id="inputFormat" rows="3"></CFormTextarea>
+                    <CFormTextarea id="inputFormat" rows="3" defaultValue={albumData.format} onChange={(e) => setAlbumData({ ...albumData, format: e.target.value })}  ></CFormTextarea>
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputCountry">발매국가*</CFormLabel>
                     <div >
-                      <CFormSelect id="inputCountry" onChange={(e) => setAlbumData({ ...albumData, country: e.target.value })}>
+                      <CFormSelect id="inputCountry" defaultValue={albumData.countryCD} onChange={(e) => setAlbumData({ ...albumData, countryCD: e.target.value })}>
                         {cntryCD.map((item, index) => (
                           <option value={item.id} key={index}>{item.name}</option>
                         ))}
@@ -204,24 +229,25 @@ const AlbumInfo = () => {
                           minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
                           maxDate={new Date()} // maxDate 이후 날짜 선택 불가
                           className="DatePicker"
+                          value={albumData.releaseDate}
                         />
                       </div>
                     </div>
                   </CCol>
                   <CCol md={12}>
                     <CFormLabel htmlFor="txt_genre">장르</CFormLabel>
-                    <CFormInput type="text" id="txt_genre" onChange={(e) => setAlbumData({ ...albumData, musicGenre: e.target.value })} />
+                    <CFormInput type="text" id="txt_genre" defaultValue={albumData.musicGenre} onChange={(e) => setAlbumData({ ...albumData, musicGenre: e.target.value })} />
                   </CCol>
                   <CCol md={12}>
                     <CFormLabel htmlFor="txt_style">Style</CFormLabel>
-                    <CFormInput type="text" id="txt_style" onChange={(e) => setAlbumData({ ...albumData, style: e.target.value })} />
+                    <CFormInput type="text" id="txt_style" defaultValue={albumData.style} onChange={(e) => setAlbumData({ ...albumData, style: e.target.value })} />
                   </CCol>
                   <div className="d-grid gap-2">
                     <CRow className="justify-content-between">
                       <CCol xs={12}>
                         <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                           <CButton component="input" type="button" color="light" value="목록" onClick={goListClick} />
-                          <CButton component="input" color="primary" type="submit" value="등록하기" />
+                          <CButton component="input" color="primary" type="submit" value="수정하기" />
                         </div>
                       </CCol>
                     </CRow>
@@ -235,6 +261,75 @@ const AlbumInfo = () => {
           </CCard>
         </CCol>
       </CRow >
+      <CCard className="mb-4">
+        <CCardHeader>
+          <strong>곡</strong> <small></small>
+        </CCardHeader>
+        {albumData ? (
+          <CCardBody>
+            <CRow>
+              <CCol xs={1}>
+                <CFormInput type="text" id="staNo" value="No" readOnly plainText />
+              </CCol>
+              <CCol xs={3}>
+                <CFormInput type="text" id="staTrackNumber" value="Track Number" readOnly plainText />
+              </CCol>
+              <CCol xs={5}>
+                <CFormInput type="text" id="staTitle" value="Title" readOnly plainText />
+              </CCol>
+              <CCol xs={2}>
+                <CFormInput type="text" id="staRunningTime" value="Running Time" readOnly plainText />
+              </CCol>
+              <CCol xs={1}>
+                <CFormInput type="text" id="staButton" value="" readOnly plainText />
+              </CCol>
+            </CRow>
+            <CRow>
+              <CCol xs={1}>
+                <CFormInput type="text" id="staNoReq" value="-" readOnly plainText />
+              </CCol>
+              <CCol xs={3}>
+                <CFormInput type="text" id="inputTrackNumber" value="" />
+              </CCol>
+              <CCol xs={5}>
+                <CFormInput type="text" id="inputTrackName" value="" />
+              </CCol>
+              <CCol xs={2}>
+                <CFormInput type="text" id="inputTrackRuntime" value="" />
+              </CCol>
+              <CCol xs={1}>
+                <CButton color="success" className="mb-3">
+                  추가
+                </CButton>
+              </CCol>
+            </CRow>
+            {midiaCD.map((item, index) => (
+              <CRow key={index}>
+                <CCol xs={1}>
+                  <CFormInput type="text" id={'staNoReq${index}'} value="-" readOnly plainText />
+                </CCol>
+                <CCol xs={3}>
+                  <CFormInput type="text" id={'inputTrackNumber${index}'} value="" readOnly plainText />
+                </CCol>
+                <CCol xs={5}>
+                  <CFormInput type="text" id={'inputTrackName${index}'} value="" readOnly plainText />
+                </CCol>
+                <CCol xs={2}>
+                  <CFormInput type="text" id={'inputTrackRuntime${index}'} value="" readOnly plainText />
+                </CCol>
+                <CCol xs={1}>
+                  <CButton color="dark" className="mb-3">
+                    삭제
+                  </CButton>
+                </CCol>
+              </CRow>
+            ))}
+          </CCardBody>
+        ) : (<div className="d-flex justify-content-center">
+          <CSpinner />
+        </div>
+        )}
+      </CCard>
     </CContainer>
   );
 };

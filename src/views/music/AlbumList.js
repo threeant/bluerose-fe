@@ -32,10 +32,8 @@ import {
 } from '@coreui/icons'
 
 const AlbumList = () => {
-
-
   /**********************************************************************
-   * 공통 영역
+   * 공통코드 영역
   **********************************************************************/
   const navigate = useNavigate();
 
@@ -43,7 +41,7 @@ const AlbumList = () => {
   const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
 
   /**********************************************************************
-   * 변수 영역
+   * 화면 영역
   **********************************************************************/
   const [selectedDate, setSelectedDate] = useState(null); //등록일 from
   const [selectedDate2, setSelectedDate2] = useState(null); // 등록일 to
@@ -52,19 +50,33 @@ const AlbumList = () => {
   // 날짜가 선택될 때 호출될 콜백 함수
   const handleDateChange = date => {
     setSelectedDate(date);
+    const formattedDate = date.toISOString().slice(0, 10);
+    setAlbumSearch({ ...albumSearch, startReleaseDate: formattedDate })
 
   }
   const handleDateChange2 = date => {
     setSelectedDate2(date);
+    const formattedDate = date.toISOString().slice(0, 10);
+    setAlbumSearch({ ...albumSearch, endReleaseDate: formattedDate })
   }
+
+  //초기화
   const clickReset = date => {
     setSelectedDate(null);
     setSelectedDate2(null);
+
+    setAlbumSearch({
+      "artist": "",
+      "endReleaseDate": "",
+      "musicGenre": "",
+      "name": "",
+      "page": 1,
+      "size": 1,
+      "startReleaseDate": "",
+      "mediaCode": ""
+    });
   }
 
-  /**********************************************************************
-  * 비즈니스로직 영역
- **********************************************************************/
   const goFormClick = () => { //등록화면이동
     navigate('/music/albumReq');
   }
@@ -76,9 +88,16 @@ const AlbumList = () => {
 
     // 새로운 동작 실행
     // 예시: id를 이용한 페이지 이동 또는 다른 동작 수행
-    navigate('/music/albumInfo', { state: { param: id } });
+    navigate('/music/albumInfo', { state: { albumId: id } });
   };
 
+  /**********************************************************************
+  * 비즈니스로직 영역
+ **********************************************************************/
+  //리스트
+  const [albumData, setAlbumData] = useState({ contents: [] });
+
+  //검색조건
   const [albumSearch, setAlbumSearch] = useState({
     "artist": "",
     "endReleaseDate": "",
@@ -90,23 +109,22 @@ const AlbumList = () => {
     "mediaCode": ""
   });
 
-
-  const [albumData, setAlbumData] = useState({ contents: [] });
-
+  //조회하기
   const submitSearch = (e) => {
     e.preventDefault();
-    handleSubmit();
+    submitSearchAlbums();
   }
 
+  //페이징
   const clickPage = (e, page) => {
     e.preventDefault();
     albumSearch.page = page;
-    handleSubmit();
+    submitSearchAlbums();
     console.log("===page =  : " + page);
   }
 
-
-  const handleSubmit = async () => {
+  //검색 API
+  const submitSearchAlbums = async () => {
 
     console.log(albumSearch);
 
@@ -130,16 +148,39 @@ const AlbumList = () => {
 
   };
 
+  const submitRegAlbum = async (e) => {
+    e.preventDefault();
 
+    console.log(albumSearch);
+
+    try {
+      const response = await axios.get('http://localhost:8080/api/albums', {
+        params: albumSearch
+      });
+
+      // API 응답에서 데이터 추출
+      const data = response.data;
+      // 데이터를 상태 변수에 저장
+      setAlbumData(data);
+
+      console.log(data)
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  };
 
   return (
     <>
       <CRow>
         <CCol>
           <CCard className="mb-4">
-            <CCardHeader>샘플정보관리</CCardHeader>
+            <CCardHeader>앨범검색</CCardHeader>
             <CCardBody>
-              <CForm className="row" onSubmit={submitSearch}>
+              <CForm className="row" onSubmit={submitSearchAlbums}>
                 <CRow className="mb-3">
                   <CCol xs={1}>
                     <CFormLabel htmlFor="inputMedia" className="col-form-label">미디어</CFormLabel>
@@ -195,8 +236,8 @@ const AlbumList = () => {
                       </div>
                       <div>
                         <DatePicker
-                          selected={albumSearch.startReleaseDate}
-                          onChange={(e) => setAlbumSearch({ ...albumSearch, startReleaseDate: e.target.value })}
+                          selected={selectedDate}
+                          onChange={handleDateChange}
                           dateFormat={'yyyy-MM-dd'} // 날짜 형태
                           shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
                           minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
@@ -212,8 +253,8 @@ const AlbumList = () => {
                       </div>
                       <div>
                         <DatePicker
-                          selected={albumSearch.endReleaseDate}
-                          onChange={(e) => setAlbumSearch({ ...albumSearch, endReleaseDate: e.target.value })}
+                          selected={selectedDate2}
+                          onChange={handleDateChange2}
                           dateFormat={'yyyy-MM-dd'} // 날짜 형태
                           shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
                           minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
