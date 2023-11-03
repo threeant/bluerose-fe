@@ -95,7 +95,7 @@ const AlbumList = () => {
   * 비즈니스로직 영역
  **********************************************************************/
   //리스트
-  const [albumData, setAlbumData] = useState({ contents: [] });
+  const [albumDatas, setAlbumDatas] = useState({ contents: [] });
 
   //검색조건
   const [albumSearch, setAlbumSearch] = useState({
@@ -103,8 +103,8 @@ const AlbumList = () => {
     "endReleaseDate": "",
     "musicGenre": "",
     "name": "",
-    "page": 1,
-    "size": 1,
+    "page": 0,
+    "size": 10,
     "startReleaseDate": "",
     "mediaCode": ""
   });
@@ -130,13 +130,14 @@ const AlbumList = () => {
 
     try {
       const response = await axios.get('http://localhost:8080/api/albums', {
-        params: albumSearch
+        params: albumSearch,
+        headers: { 'Content-Type': 'application/json' }
       });
 
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-      setAlbumData(data);
+      setAlbumDatas(data);
 
       console.log(data)
 
@@ -161,7 +162,7 @@ const AlbumList = () => {
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-      setAlbumData(data);
+      setAlbumDatas(data);
 
       console.log(data)
 
@@ -292,8 +293,8 @@ const AlbumList = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {albumData.contents && albumData.contents.length > 0 ? (
-                    albumData.contents.map((item, index) => (
+                  {albumDatas.contents && albumDatas.contents.length > 0 ? (
+                    albumDatas.contents.map((item, index) => (
                       <CTableRow v-for="item in tableItems" key={index} onClick={(e) => goInfoClick(e, item.id)}>
                         <CTableDataCell className="text-center">
                           <strong>{item.id}</strong>
@@ -327,23 +328,23 @@ const AlbumList = () => {
                 </CTableBody>
               </CTable>
               <br />
-              {albumData.contents && albumData.contents.length > 0 ? (
+              {albumDatas.contents && albumDatas.contents.length > 0 ? (
                 <CRow>
                   <CCol md={{ span: 6, offset: 5 }}>
                     <CPagination aria-label="Page navigation example">
-                      <CPaginationItem aria-label="Previous" disabled={!albumData.first} onClick={(e) => clickPage(e, 1)}>
+                      <CPaginationItem aria-label="Previous" disabled={!albumDatas.first} onClick={(e) => clickPage(e, 1)}>
                         <span aria-hidden="true">&laquo;</span>
                       </CPaginationItem>
-                      {Array.from({ length: albumData.totalPages }, (_, index) => (
+                      {Array.from({ length: albumDatas.totalPages }, (_, index) => (
                         <CPaginationItem key={index} active onClick={(e) => clickPage(e, index + 1)}>{index + 1}</CPaginationItem>
                       ))}
-                      <CPaginationItem aria-label="Next" disabled={!albumData.last}>
+                      <CPaginationItem aria-label="Next" disabled={!albumDatas.last}>
                         <span aria-hidden="true">&raquo;</span>
                       </CPaginationItem>
                     </CPagination>
                   </CCol>
                   <CCol md={1}>
-                    총 {albumData.totalCount}건
+                    총 {albumDatas.totalCount}건
                   </CCol>
                 </CRow>
               ) : ''}

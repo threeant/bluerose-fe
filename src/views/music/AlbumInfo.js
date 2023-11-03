@@ -71,15 +71,27 @@ const AlbumInfo = () => {
   /**********************************************************************
   * 비즈니스로직 영역
   **********************************************************************/
+  //앨범 유효성검사
   const [validated, setValidated] = useState(false);
 
-  //데이터
-  const [albumData, setAlbumData] = useState(); //앨범
-  const [songReqData, setSongReqData] = useState(); // 곡등록
-  const [songData, setSongData] = useState({ contents: [] });// 곡조회리스트
+  //앨범 상세 
+  const [albumData, setAlbumData] = useState();
+
+  // 곡조회리스트
+  const [songDatas, setSongDatas] = useState([]);
+
+  // 곡등록
+  const [songReqData, setSongReqData] = useState(
+    {
+      "runtime": "",
+      "trackName": "",
+      "trackNumber": ""
+    }
+  );
 
 
-  //검색 API
+
+  //앨범 검색 API
   const submitSearchAlbum = async () => {
 
     try {
@@ -89,7 +101,29 @@ const AlbumInfo = () => {
       const data = response.data;
       // 데이터를 상태 변수에 저장
       setAlbumData(data);
-      console.log("결과 ----")
+      console.log("앨범결과 ----")
+      console.log(data);
+      submitSearchSong();
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  };
+
+  //곡 검색 API
+  const submitSearchSong = async () => {
+
+    try {
+      const response = await axios.get('http://localhost:8080/api/albums/' + albumId + '/songs');
+
+      // API 응답에서 데이터 추출
+      const data = response.data;
+      // 데이터를 상태 변수에 저장
+      setSongDatas(data);
+      console.log("곡 결과 ----")
       console.log(data)
 
     } catch (error) {
@@ -100,7 +134,7 @@ const AlbumInfo = () => {
 
   };
 
-  //수정하기 API
+  //앨범 수정하기 API
   const submitUpdateAlbum = async (e) => {
     e.preventDefault();
 
@@ -138,6 +172,97 @@ const AlbumInfo = () => {
     }
 
   };
+
+  //곡 등록 클릭
+  const clickReqSong = (e) => {
+    e.preventDefault();
+
+    if (!songReqData.trackNumber) {
+      alert('Track Number를 입력해 주세요.');
+      return;
+    }
+
+    if (!songReqData.trackName) {
+      alert('Title을 입력해주세요.');
+      return;
+    }
+
+    if (!songReqData.runtime) {
+      alert('Running Time을 입력해주세요/');
+      return;
+    }
+
+
+    const result = window.confirm('해당곡을 등록 하시겠습니까?');
+
+    if (!result) {
+      return;
+    }
+
+    submitReqSong();
+
+  };
+
+
+  //곡 등록 하기 API
+  const submitReqSong = async () => {
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/albums/' + albumId + '/songs', songReqData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+
+      console.log('API 응답:', response.data);
+
+      // 폼 데이터를 초기화합니다.
+      alert('등록되었습니다.');
+      setValidated(false);
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  };
+
+  //곡 삭제 클릭
+  const clickDeletSong = (e, songId) => {
+    e.preventDefault();
+
+    const result = window.confirm('해당곡을 삭제 하시겠습니까?');
+
+    if (!result) {
+      return;
+    }
+
+    submitDeletSong(songId);
+  };
+
+  //곡 삭제 API
+  const submitDeletSong = async (songId) => {
+
+    console.log(songId);
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/songs/' + songId);
+
+      console.log('API 응답:', response.data);
+
+      // 폼 데이터를 초기화합니다.
+      alert('삭제되었습니다.');
+      setValidated(false);
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  };
+
+
+
   return (
     <CContainer>
       <CRow>
@@ -272,13 +397,13 @@ const AlbumInfo = () => {
                 <CFormInput type="text" id="staNo" value="No" readOnly plainText />
               </CCol>
               <CCol xs={3}>
-                <CFormInput type="text" id="staTrackNumber" value="Track Number" readOnly plainText />
+                <CFormInput type="text" id="staTrackNumber" value="Track Number*" readOnly plainText />
               </CCol>
               <CCol xs={5}>
-                <CFormInput type="text" id="staTitle" value="Title" readOnly plainText />
+                <CFormInput type="text" id="staTitle" value="Title*" readOnly plainText />
               </CCol>
               <CCol xs={2}>
-                <CFormInput type="text" id="staRunningTime" value="Running Time" readOnly plainText />
+                <CFormInput type="text" id="staRunningTime" value="Running Time*" readOnly plainText />
               </CCol>
               <CCol xs={1}>
                 <CFormInput type="text" id="staButton" value="" readOnly plainText />
@@ -289,36 +414,36 @@ const AlbumInfo = () => {
                 <CFormInput type="text" id="staNoReq" value="-" readOnly plainText />
               </CCol>
               <CCol xs={3}>
-                <CFormInput type="text" id="inputTrackNumber" value="" />
+                <CFormInput type="text" id="inputTrackNumber" defaultValue={songReqData.trackNumber} onChange={(e) => setSongReqData({ ...songReqData, trackNumber: e.target.value })} />
               </CCol>
               <CCol xs={5}>
-                <CFormInput type="text" id="inputTrackName" value="" />
+                <CFormInput type="text" id="inputTrackName" defaultValue={songReqData.trackName} onChange={(e) => setSongReqData({ ...songReqData, trackName: e.target.value })} />
               </CCol>
               <CCol xs={2}>
-                <CFormInput type="text" id="inputTrackRuntime" value="" />
+                <CFormInput type="text" id="inputTrackRuntime" defaultValue={songReqData.runtime} onChange={(e) => setSongReqData({ ...songReqData, runtime: e.target.value })} />
               </CCol>
               <CCol xs={1}>
-                <CButton color="success" className="mb-3">
+                <CButton color="success" className="mb-3" onClick={(e) => clickReqSong(e)}>
                   추가
                 </CButton>
               </CCol>
             </CRow>
-            {midiaCD.map((item, index) => (
+            {songDatas.map((item, index) => (
               <CRow key={index}>
                 <CCol xs={1}>
-                  <CFormInput type="text" id={'staNoReq${index}'} value="-" readOnly plainText />
+                  <CFormInput type="text" id={'txtNoReq${index}'} value={songDatas.length - index} readOnly plainText />
                 </CCol>
                 <CCol xs={3}>
-                  <CFormInput type="text" id={'inputTrackNumber${index}'} value="" readOnly plainText />
+                  <CFormInput type="text" id={'txtTrackNumber${index}'} value={item.trackNumber} readOnly plainText />
                 </CCol>
                 <CCol xs={5}>
-                  <CFormInput type="text" id={'inputTrackName${index}'} value="" readOnly plainText />
+                  <CFormInput type="text" id={'txtTrackName${index}'} value={item.trackName} readOnly plainText />
                 </CCol>
                 <CCol xs={2}>
-                  <CFormInput type="text" id={'inputTrackRuntime${index}'} value="" readOnly plainText />
+                  <CFormInput type="text" id={'txtTrackRuntime${index}'} value={item.runtime} readOnly plainText />
                 </CCol>
                 <CCol xs={1}>
-                  <CButton color="dark" className="mb-3">
+                  <CButton color="dark" className="mb-3" onClick={(e) => clickDeletSong(e, item.id)}>
                     삭제
                   </CButton>
                 </CCol>

@@ -10,6 +10,10 @@ export function getCodeList(codeNm) {
     // JSON 문자열을 파싱하여 JavaScript 객체로 변환
     const codeList = JSON.parse(jsonCodeData);
 
+    if (!codeList) {
+        throw new Error('권한이 없습니다.(로그인을 해주세요)');
+    }
+
     // userData 객체 사용
     for (const c of codeList) {
         //console.log(c);
