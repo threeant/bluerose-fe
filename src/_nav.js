@@ -51,7 +51,7 @@ const _nav = [
       {
         component: CNavItem,
         name: '앨범등록',
-        to: '/music/albumReq',
+        to: '/music/albumReg',
       },
       {
         component: CNavItem,

@@ -31,7 +31,7 @@ import {
   cilCalendar
 } from '@coreui/icons'
 
-const AlbumList = () => {
+const SongList = () => {
   /**********************************************************************
    * 공통코드 영역
   **********************************************************************/
@@ -183,7 +183,7 @@ const AlbumList = () => {
       <CRow>
         <CCol>
           <CCard className="mb-4">
-            <CCardHeader>앨범검색</CCardHeader>
+            <CCardHeader>곡검색</CCardHeader>
             <CCardBody>
               <CForm className="row" onSubmit={submitSearchAlbums}>
                 <CRow className="mb-3">
@@ -288,12 +288,14 @@ const AlbumList = () => {
               <CTable align="middle" className="mb-0 border" hover responsive>
                 <CTableHead color="light">
                   <CTableRow>
+                    <CTableHeaderCell className="text-center"></CTableHeaderCell>
                     <CTableHeaderCell className="text-center">No</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">미디어</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center"></CTableHeaderCell>
                     <CTableHeaderCell className="text-center">앨범명</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">아티스트</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">발매일</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">곡명</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Track Number</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Running Time</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -360,4 +362,4 @@ const AlbumList = () => {
   )
 }
 
-export default AlbumList
+export default SongList

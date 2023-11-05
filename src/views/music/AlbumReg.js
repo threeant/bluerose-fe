@@ -33,7 +33,7 @@ import {
   CFormSwitch,
 } from '@coreui/react';
 import ReactImg from 'src/assets/images/image400.jpg'
-const AlbumReq = () => {
+const AlbumReg = () => {
 
   /**********************************************************************
    * 공통 영역
@@ -235,4 +235,4 @@ const AlbumReq = () => {
   );
 };
 
-export default AlbumReq;
+export default AlbumReg;

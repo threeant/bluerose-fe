@@ -5,6 +5,7 @@ import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { getCodeList } from '../../common/utils'
+import SongList from '../common/SongList'; // MyModal 컴포넌트의 경로를 알맞게 설정
 import {
   CAvatar,
   CButton,
@@ -25,13 +26,16 @@ import {
   CForm,
   CPagination,
   CPaginationItem,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody
 } from '@coreui/react'
-
 import {
   cilCalendar
 } from '@coreui/icons'
 
-const AlbumList = () => {
+const MusicReq = () => {
   /**********************************************************************
    * 공통코드 영역
   **********************************************************************/
@@ -62,10 +66,6 @@ const AlbumList = () => {
 
   //초기화
   const clickReset = date => {
-
-    const popup = window.open('popup.html?param=value', '팝업 창', 'width=400,height=400');
-
-    return;
     setSelectedDate(null);
     setSelectedDate2(null);
 
@@ -94,6 +94,19 @@ const AlbumList = () => {
     // 예시: id를 이용한 페이지 이동 또는 다른 동작 수행
     navigate('/music/albumInfo', { state: { albumId: id } });
   };
+
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalData, setModalData] = useState('');
+  const [visibleXL, setVisibleXL] = useState(false)
+  //신청곡 추가 버튼
+  const popMusicAddClick = () => {
+    setVisibleXL(!visibleXL)
+    //setModalData('');
+    //setIsModalOpen(true);
+  }
+
+
 
   /**********************************************************************
   * 비즈니스로직 영역
@@ -180,120 +193,112 @@ const AlbumList = () => {
 
   return (
     <>
+      <CModal
+        size="xl"
+        visible={visibleXL}
+        onClose={() => setVisibleXL(false)}
+        aria-labelledby="OptionalSizesExample2"
+      >
+        <CModalHeader>
+          <CModalTitle id="OptionalSizesExample1">신청곡 추가</CModalTitle>
+        </CModalHeader>
+        <CModalBody><SongList /></CModalBody>
+      </CModal>
       <CRow>
         <CCol>
           <CCard className="mb-4">
-            <CCardHeader>앨범검색</CCardHeader>
+            <CCardHeader><strong>신청곡관리</strong></CCardHeader>
             <CCardBody>
-              <CForm className="row" onSubmit={submitSearchAlbums}>
-                <CRow className="mb-3">
-                  <CCol xs={1}>
-                    <CFormLabel htmlFor="inputMedia" className="col-form-label">미디어</CFormLabel>
-                  </CCol>
-                  <CCol xs={5}>
-                    <CFormSelect id="inputMedia" aria-label="미디어" onChange={(e) => setAlbumSearch({ ...albumSearch, mediaCode: e.target.value })}>
-                      <option>-전체-</option>
-                      {midiaCD.map((item, index) => (
-                        <option value={item.id} key={index}>{item.name}</option>
-                      ))}
-                    </CFormSelect>
-                  </CCol>
-                  <CCol xs={1}>
-                    <CFormLabel htmlFor="inputMusicGenre" className="col-form-label" >장르</CFormLabel>
-                  </CCol>
-                  <CCol xs={5}>
-                    <CFormInput type="text" id="inputMusicGenre" aria-label="장르" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, musicGenre: e.target.value })} />
-                  </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                  <CCol xs={1}>
-                    <CFormLabel htmlFor="inputName" className="col-form-label">앨범명</CFormLabel>
-                  </CCol>
-                  <CCol xs={5}>
-                    <CFormInput type="text" id="inputName" aria-label="앨범명" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, name: e.target.value })} />
-                  </CCol>
-                  <CCol xs={1}>
-                    <CFormLabel htmlFor="inputArtist" className="col-form-label">아티스트</CFormLabel>
-                  </CCol>
-                  <CCol md={5}>
-                    <CFormInput type="text" id="inputArtist" aria-label="아티스트" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, artist: e.target.value })} />
-                  </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                  {/* <CCol xs={1}>
-                    <CFormLabel htmlFor="txt_country" className="col-form-label">발매국가</CFormLabel>
-                  </CCol>
-                  <CCol xs={5}>
-                    <CFormSelect id="txt_country" aria-label="발매국가" onChange={(e) => setAlbumSearch({ ...albumSearch, artist: e.target.value })}>
-                      <option>-전체-</option>
-                      {cntryCD.map((item, index) => (
-                        <option value={item.id} key={index}>{item.name}</option>
-                      ))}
-                    </CFormSelect>
-                  </CCol> */}
-                  <CCol md={1}>
-                    <CFormLabel htmlFor="inputEmail3" className="col-form-label">등록일</CFormLabel>
-                  </CCol>
-                  <CCol md={5}>
-                    <div style={{ display: 'flex' }}>
-                      <div style={{ display: 'grid', placeItems: 'center', marginRight: 5 }}>
-                        <CIcon className="text-secondary" icon={cilCalendar} size="lg" />
-                      </div>
-                      <div>
-                        <DatePicker
-                          selected={selectedDate}
-                          onChange={handleDateChange}
-                          dateFormat={'yyyy-MM-dd'} // 날짜 형태
-                          shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
-                          minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
-                          maxDate={new Date()} // maxDate 이후 날짜 선택 불가
-                          className="DatePicker"
-                        />
-                      </div>
-                      <div style={{ whiteSpace: 'pre-wrap', display: 'grid', placeItems: 'center' }}>
-                        <span> ~ </span>
-                      </div>
-                      <div style={{ display: 'grid', placeItems: 'center', marginRight: 5 }}>
-                        <CIcon className="text-secondary" icon={cilCalendar} size="lg" />
-                      </div>
-                      <div>
-                        <DatePicker
-                          selected={selectedDate2}
-                          onChange={handleDateChange2}
-                          dateFormat={'yyyy-MM-dd'} // 날짜 형태
-                          shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
-                          minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
-                          maxDate={new Date()} // maxDate 이후 날짜 선택 불가
-                          className="DatePicker"
-                        />
-                      </div>
+              <CRow className="justify-content-between">
+                <CCol xs={12}>
+                  <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <CButton component="input" type="reset" color="danger" value="신청곡정지" onClick={clickReset} />
+                    <CButton component="input" color="info" value="신청곡시작" />
+                  </div>
+                </CCol>
+              </CRow>
+              <br />
+              <CTable align="middle" className="mb-0 border" hover responsive>
+                <CTableHead color="light">
+                  <CTableRow>
+                    <CTableHeaderCell className="text-center"></CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">앨범명</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">아티스트</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">TrackNumber</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Title</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Running Time</CTableHeaderCell>
+                  </CTableRow>
+                </CTableHead>
+                <CTableBody>
+                  {albumDatas.contents && albumDatas.contents.length > 0 ? (
+                    albumDatas.contents.map((item, index) => (
+                      <CTableRow v-for="item in tableItems" key={index} onClick={(e) => goInfoClick(e, item.id)}>
+                        <CTableHeaderCell className="text-center" color="light"></CTableHeaderCell>
+                        <CTableDataCell className="text-center">
+                          <strong>{item.mediaName}</strong>
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          <CAvatar size="md" src="/static/media/8.35ee8919ea545620a475.jpg" />
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          <a href='/' onClick={(e) => goInfoClick(e, item.id)}>{item.name}</a>
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          {item.artist}
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          {item.releaseDate}
+                        </CTableDataCell>
+                      </CTableRow>
+                    ))
+                  ) :
+                    (
+                      <CTableRow v-for="item in tableItems" >
+                        <CTableHeaderCell color="light" className="text-center">Now Playing</CTableHeaderCell>
+                        <CTableDataCell className="text-center" colSpan={5} key={0}>
+                          -
+                        </CTableDataCell>
+                      </CTableRow>
+                    )
+                  }
+                </CTableBody>
+              </CTable>
+              <br />
+              <div className="d-grid gap-2">
+                <CRow className="justify-content-between">
+                  <CCol xs={12}>
+                    <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                      <CButton component="input" color="success" value="곡완료" />
                     </div>
                   </CCol>
                 </CRow>
-                <div className="d-grid gap-2">
-                  <CRow className="justify-content-between">
-                    <CCol xs={4}>
-                      <CButton component="input" type="button" color="danger" value="등록하기" onClick={goFormClick} />
-                    </CCol>
-                    <CCol xs={4}>
-                      <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <CButton component="input" type="reset" color="light" value="초기화" onClick={clickReset} />
-                        <CButton component="input" color="primary" type="submit" value="조회하기" />
-                      </div>
-                    </CCol>
-                  </CRow>
-                </div>
-              </CForm>
+              </div>
+            </CCardBody>
+          </CCard>
+
+          <CCard className="mb-4">
+            <CCardHeader><strong>신청곡목록</strong> <small> 총 11건</small></CCardHeader>
+            <CCardBody>
+              <div className="d-grid gap-2">
+                <CRow className="justify-content-between">
+                  <CCol xs={12}>
+                    <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                      <CButton component="input" type="reset" color="light" value="신청곡 추가" onClick={popMusicAddClick} />
+                    </div>
+                  </CCol>
+                </CRow>
+              </div>
               <br />
               <CTable align="middle" className="mb-0 border" hover responsive>
                 <CTableHead color="light">
                   <CTableRow>
                     <CTableHeaderCell className="text-center">No</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">미디어</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center"></CTableHeaderCell>
                     <CTableHeaderCell className="text-center">앨범명</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">아티스트</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">발매일</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Track Number</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Title</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center"></CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Running Time</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -318,12 +323,15 @@ const AlbumList = () => {
                         <CTableDataCell className="text-center">
                           {item.releaseDate}
                         </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          {item.releaseDate}
+                        </CTableDataCell>
                       </CTableRow>
                     ))
                   ) :
                     (
                       <CTableRow v-for="item in tableItems" >
-                        <CTableDataCell className="text-center" colSpan={6} key={0}>
+                        <CTableDataCell className="text-center" colSpan={7} key={0}>
                           조회된 데이터가 없습니다.
                         </CTableDataCell>
                       </CTableRow>
@@ -360,4 +368,4 @@ const AlbumList = () => {
   )
 }
 
-export default AlbumList
+export default MusicReq
