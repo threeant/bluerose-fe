@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
@@ -25,13 +25,18 @@ import {
   CForm,
   CPagination,
   CPaginationItem,
+  CFormCheck,
 } from '@coreui/react'
+import PropTypes from 'prop-types';
 
 import {
   cilCalendar
 } from '@coreui/icons'
 
-const SongList = () => {
+
+
+
+const SongList = ({ openModal }) => {
   /**********************************************************************
    * 공통코드 영역
   **********************************************************************/
@@ -43,6 +48,8 @@ const SongList = () => {
   /**********************************************************************
    * 화면 영역
   **********************************************************************/
+
+
   const [selectedDate, setSelectedDate] = useState(null); //등록일 from
   const [selectedDate2, setSelectedDate2] = useState(null); // 등록일 to
 
@@ -51,109 +58,65 @@ const SongList = () => {
   const handleDateChange = date => {
     setSelectedDate(date);
     const formattedDate = date.toISOString().slice(0, 10);
-    setAlbumSearch({ ...albumSearch, startReleaseDate: formattedDate })
+    setSongSearch({ ...songSearch, startReleaseDate: formattedDate })
 
   }
   const handleDateChange2 = date => {
     setSelectedDate2(date);
     const formattedDate = date.toISOString().slice(0, 10);
-    setAlbumSearch({ ...albumSearch, endReleaseDate: formattedDate })
+    setSongSearch({ ...songSearch, endReleaseDate: formattedDate })
   }
 
   //초기화
   const clickReset = date => {
 
-    const popup = window.open('popup.html?param=value', '팝업 창', 'width=400,height=400');
-
-    return;
     setSelectedDate(null);
     setSelectedDate2(null);
 
-    setAlbumSearch({
+    setSongSearch({
       "artist": "",
+      "trackName": "",
       "endReleaseDate": "",
       "musicGenre": "",
       "name": "",
       "page": 1,
-      "size": 1,
+      "size": 999,
       "startReleaseDate": "",
       "mediaCode": ""
     });
   }
 
-  const goFormClick = () => { //등록화면이동
-    navigate('/music/albumReg');
-  }
 
-  const goInfoClick = (e, id) => {
-    // 페이지 이동 방지
-    e.preventDefault();
-    console.log('goInfoClick : ' + id);
 
-    // 새로운 동작 실행
-    // 예시: id를 이용한 페이지 이동 또는 다른 동작 수행
-    navigate('/music/albumInfo', { state: { albumId: id } });
-  };
 
   /**********************************************************************
   * 비즈니스로직 영역
  **********************************************************************/
   //리스트
-  const [albumDatas, setAlbumDatas] = useState({ contents: [] });
+  const [songDatas, setSongDatas] = useState({ contents: [] });
 
   //검색조건
-  const [albumSearch, setAlbumSearch] = useState({
-    "artist": "",
-    "endReleaseDate": "",
-    "musicGenre": "",
-    "name": "",
-    "page": 0,
-    "size": 10,
-    "startReleaseDate": "",
-    "mediaCode": ""
-  });
+  const [songSearch, setSongSearch] = useState({});
 
   //조회하기
   const submitSearch = (e) => {
     e.preventDefault();
-    submitSearchAlbums();
+    submitSearchSongs();
   }
 
   //페이징
   const clickPage = (e, page) => {
     e.preventDefault();
-    albumSearch.page = page;
-    submitSearchAlbums();
+    songSearch.page = page;
+    submitSearchSongs();
     console.log("===page =  : " + page);
   }
 
-  //검색 API
-  const submitSearchAlbums = async () => {
+  //검색조건
+  const [albumSearch, setAlbumSearch] = useState({});
 
-    console.log(albumSearch);
-
-    try {
-      const response = await axios.get('http://localhost:8080/api/albums', {
-        params: albumSearch,
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      // API 응답에서 데이터 추출
-      const data = response.data;
-      // 데이터를 상태 변수에 저장
-      setAlbumDatas(data);
-
-      console.log(data)
-
-    } catch (error) {
-      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
-    }
-
-  };
-
-  const submitRegAlbum = async (e) => {
+  //신청곡등록
+  const submitRegSongReq = async (e) => {
     e.preventDefault();
 
     console.log(albumSearch);
@@ -166,9 +129,99 @@ const SongList = () => {
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-      setAlbumDatas(data);
 
       console.log(data)
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  };
+
+  //검색 API
+  const submitSearchSongs = async () => {
+
+    console.log(songSearch);
+
+    try {
+      const response = await axios.get('http://localhost:8080/api/songs', {
+        params: songSearch,
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      // API 응답에서 데이터 추출
+      const data = response.data;
+      // 데이터를 상태 변수에 저장
+      setSongDatas(data);
+
+      console.log(data)
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  };
+
+  const [songChkDatas, setSongChkDatas] = useState([]);
+
+  useEffect(() => {
+    clickReset();
+  }, []);
+
+
+  //체크박스체크
+  const chkSongClick = (e, id) => {
+    // 페이지 이동 방지
+    var songChkData = {
+      "songId": id,
+      "tableId": 0
+    };
+    console.log(e.target.checked);
+    if (e.target.checked) {
+      setSongChkDatas((prevData) => [...prevData, songChkData]);
+    } else {
+      setSongChkDatas((prevData) => prevData.filter(item => item.songId !== id));
+    }
+  };
+
+  //추가
+  const submitRegAlbum = async (e) => {
+    e.preventDefault();
+    console.log(songChkDatas);
+
+    if (songChkDatas.length == 0) {
+      alert('신청할 데이터를 선택해주세요');
+      return;
+    } else {
+      const result = window.confirm('해당곡을 등록 하시겠습니까?');
+
+      if (!result) {
+        return;
+      }
+    }
+
+    const form = e.currentTarget;
+    if (form.checkValidity() === false) {
+      e.stopPropagation();
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/song-request', songChkDatas, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      console.log('API 응답:', response.data);
+
+      alert('등록되었습니다.');
+
+      openModal(false);
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -185,13 +238,13 @@ const SongList = () => {
           <CCard className="mb-4">
             <CCardHeader>곡검색</CCardHeader>
             <CCardBody>
-              <CForm className="row" onSubmit={submitSearchAlbums}>
+              <CForm className="row" onSubmit={submitSearchSongs}>
                 <CRow className="mb-3">
                   <CCol xs={1}>
                     <CFormLabel htmlFor="inputMedia" className="col-form-label">미디어</CFormLabel>
                   </CCol>
                   <CCol xs={5}>
-                    <CFormSelect id="inputMedia" aria-label="미디어" onChange={(e) => setAlbumSearch({ ...albumSearch, mediaCode: e.target.value })}>
+                    <CFormSelect id="inputMedia" aria-label="미디어" onChange={(e) => setSongSearch({ ...songSearch, mediaCode: e.target.value })}>
                       <option>-전체-</option>
                       {midiaCD.map((item, index) => (
                         <option value={item.id} key={index}>{item.name}</option>
@@ -199,38 +252,33 @@ const SongList = () => {
                     </CFormSelect>
                   </CCol>
                   <CCol xs={1}>
-                    <CFormLabel htmlFor="inputMusicGenre" className="col-form-label" >장르</CFormLabel>
+                    <CFormLabel htmlFor="inputMusicGenre" className="col-form-label" >곡명</CFormLabel>
                   </CCol>
                   <CCol xs={5}>
-                    <CFormInput type="text" id="inputMusicGenre" aria-label="장르" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, musicGenre: e.target.value })} />
+                    <CFormInput type="text" id="inputMusicGenre" aria-label="곡명" placeholder="전체" onChange={(e) => setSongSearch({ ...songSearch, trackName: e.target.value })} />
                   </CCol>
                 </CRow>
                 <CRow className="mb-3">
+                  <CCol xs={1}>
+                    <CFormLabel htmlFor="inputMusicGenre" className="col-form-label" >장르</CFormLabel>
+                  </CCol>
+                  <CCol xs={5}>
+                    <CFormInput type="text" id="inputMusicGenre" aria-label="장르" placeholder="전체" onChange={(e) => setSongSearch({ ...songSearch, musicGenre: e.target.value })} />
+                  </CCol>
                   <CCol xs={1}>
                     <CFormLabel htmlFor="inputName" className="col-form-label">앨범명</CFormLabel>
                   </CCol>
                   <CCol xs={5}>
-                    <CFormInput type="text" id="inputName" aria-label="앨범명" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, name: e.target.value })} />
+                    <CFormInput type="text" id="inputName" aria-label="앨범명" placeholder="전체" onChange={(e) => setSongSearch({ ...songSearch, name: e.target.value })} />
                   </CCol>
+                </CRow>
+                <CRow className="mb-3">
                   <CCol xs={1}>
                     <CFormLabel htmlFor="inputArtist" className="col-form-label">아티스트</CFormLabel>
                   </CCol>
                   <CCol md={5}>
-                    <CFormInput type="text" id="inputArtist" aria-label="아티스트" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, artist: e.target.value })} />
+                    <CFormInput type="text" id="inputArtist" aria-label="아티스트" placeholder="전체" onChange={(e) => setSongSearch({ ...songSearch, artist: e.target.value })} />
                   </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                  {/* <CCol xs={1}>
-                    <CFormLabel htmlFor="txt_country" className="col-form-label">발매국가</CFormLabel>
-                  </CCol>
-                  <CCol xs={5}>
-                    <CFormSelect id="txt_country" aria-label="발매국가" onChange={(e) => setAlbumSearch({ ...albumSearch, artist: e.target.value })}>
-                      <option>-전체-</option>
-                      {cntryCD.map((item, index) => (
-                        <option value={item.id} key={index}>{item.name}</option>
-                      ))}
-                    </CFormSelect>
-                  </CCol> */}
                   <CCol md={1}>
                     <CFormLabel htmlFor="inputEmail3" className="col-form-label">등록일</CFormLabel>
                   </CCol>
@@ -273,12 +321,12 @@ const SongList = () => {
                 <div className="d-grid gap-2">
                   <CRow className="justify-content-between">
                     <CCol xs={4}>
-                      <CButton component="input" type="button" color="danger" value="등록하기" onClick={goFormClick} />
+                      <CButton component="input" type="button" color="danger" value="추가" onClick={submitRegAlbum} />
                     </CCol>
                     <CCol xs={4}>
                       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                         <CButton component="input" type="reset" color="light" value="초기화" onClick={clickReset} />
-                        <CButton component="input" color="primary" type="submit" value="조회하기" />
+                        <CButton component="input" type="reset" color="primary" value="조회하기" onClick={(e) => submitSearch(e)} />
                       </div>
                     </CCol>
                   </CRow>
@@ -299,33 +347,43 @@ const SongList = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {albumDatas.contents && albumDatas.contents.length > 0 ? (
-                    albumDatas.contents.map((item, index) => (
-                      <CTableRow v-for="item in tableItems" key={index} onClick={(e) => goInfoClick(e, item.id)}>
+                  {songDatas.contents && songDatas.contents.length > 0 ? (
+                    songDatas.contents.map((item, index) => (
+                      <CTableRow v-for="item in tableItems" key={index} >
+                        <CTableDataCell className="text-center">
+                          <input
+                            id={'chk_' + index}
+                            type="checkbox"
+                            onChange={(e) => chkSongClick(e, item.id)}
+                          />
+                        </CTableDataCell>
                         <CTableDataCell className="text-center">
                           <strong>{item.id}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           <strong>{item.mediaName}</strong>
                         </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          <CAvatar size="md" src="/static/media/8.35ee8919ea545620a475.jpg" />
+                        <CTableDataCell className="text-left">
+                          {item.albumName}
                         </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          <a href='/' onClick={(e) => goInfoClick(e, item.id)}>{item.name}</a>
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
+                        <CTableDataCell className="text-left">
                           {item.artist}
                         </CTableDataCell>
+                        <CTableDataCell className="text-left">
+                          {item.trackName}
+                        </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {item.releaseDate}
+                          {item.trackNumber}
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          {item.runtime}
                         </CTableDataCell>
                       </CTableRow>
                     ))
                   ) :
                     (
                       <CTableRow v-for="item in tableItems" >
-                        <CTableDataCell className="text-center" colSpan={6} key={0}>
+                        <CTableDataCell className="text-center" colSpan={8} key={0}>
                           조회된 데이터가 없습니다.
                         </CTableDataCell>
                       </CTableRow>
@@ -334,23 +392,23 @@ const SongList = () => {
                 </CTableBody>
               </CTable>
               <br />
-              {albumDatas.contents && albumDatas.contents.length > 0 ? (
+              {songDatas.contents && songDatas.contents.length > 0 ? (
                 <CRow>
-                  <CCol md={{ span: 6, offset: 5 }}>
+                  <CCol md={{ span: 8, offset: 5 }}>
                     <CPagination aria-label="Page navigation example">
-                      <CPaginationItem aria-label="Previous" disabled={!albumDatas.first} onClick={(e) => clickPage(e, 1)}>
+                      <CPaginationItem aria-label="Previous" disabled={!songDatas.first} onClick={(e) => clickPage(e, 1)}>
                         <span aria-hidden="true">&laquo;</span>
                       </CPaginationItem>
-                      {Array.from({ length: albumDatas.totalPages }, (_, index) => (
-                        <CPaginationItem key={index} active onClick={(e) => clickPage(e, index + 1)}>{index + 1}</CPaginationItem>
+                      {Array.from({ length: songDatas.totalPages }, (_, index) => (
+                        <CPaginationItem key={index} className={songDatas.number == index + 1 ? 'active' : ''} onClick={(e) => clickPage(e, index + 1)}>{index + 1}</CPaginationItem>
                       ))}
-                      <CPaginationItem aria-label="Next" disabled={!albumDatas.last}>
+                      <CPaginationItem aria-label="Next" disabled={!songDatas.last}>
                         <span aria-hidden="true">&raquo;</span>
                       </CPaginationItem>
                     </CPagination>
                   </CCol>
                   <CCol md={1}>
-                    총 {albumDatas.totalCount}건
+                    총 {songDatas.totalCount}건
                   </CCol>
                 </CRow>
               ) : ''}
@@ -361,5 +419,9 @@ const SongList = () => {
     </>
   )
 }
+
+SongList.propTypes = {
+  openModal: PropTypes.func, // openModal 프로퍼티의 타입을 지정
+};
 
 export default SongList

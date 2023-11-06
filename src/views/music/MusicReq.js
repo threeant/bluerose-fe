@@ -191,6 +191,10 @@ const MusicReq = () => {
 
   };
 
+  const controllModal = (openYn) => {
+    setVisibleXL(openYn);
+  }
+
   return (
     <>
       <CModal
@@ -202,7 +206,7 @@ const MusicReq = () => {
         <CModalHeader>
           <CModalTitle id="OptionalSizesExample1">신청곡 추가</CModalTitle>
         </CModalHeader>
-        <CModalBody><SongList /></CModalBody>
+        <CModalBody><SongList openModal={controllModal} /></CModalBody>
       </CModal>
       <CRow>
         <CCol>
