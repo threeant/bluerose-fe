@@ -25,6 +25,7 @@ import {
   CForm,
   CPagination,
   CPaginationItem,
+  CFormCheck,
 } from '@coreui/react'
 
 import {
@@ -63,9 +64,6 @@ const AlbumList = () => {
   //초기화
   const clickReset = date => {
 
-    setSelectedDate(null);
-    setSelectedDate2(null);
-
     setAlbumSearch({
       "artist": "",
       "endReleaseDate": "",
@@ -79,7 +77,7 @@ const AlbumList = () => {
   }
 
   const goFormClick = () => { //등록화면이동
-    navigate('/music/albumReg');
+    navigate('/system/AdminReg');
   }
 
   const goInfoClick = (e, id) => {
@@ -89,7 +87,7 @@ const AlbumList = () => {
 
     // 새로운 동작 실행
     // 예시: id를 이용한 페이지 이동 또는 다른 동작 수행
-    navigate('/music/albumInfo', { state: { albumId: id } });
+    navigate('/system/AdminInfo', { state: { albumId: id } });
   };
 
   /**********************************************************************
@@ -180,89 +178,37 @@ const AlbumList = () => {
       <CRow>
         <CCol>
           <CCard className="mb-4">
-            <CCardHeader>앨범검색</CCardHeader>
+            <CCardHeader><strong>관리자검색</strong></CCardHeader>
             <CCardBody>
               <CForm className="row" onSubmit={submitSearchAlbums}>
                 <CRow className="mb-3">
                   <CCol xs={1}>
-                    <CFormLabel htmlFor="inputMedia" className="col-form-label">미디어</CFormLabel>
-                  </CCol>
-                  <CCol xs={5}>
-                    <CFormSelect id="inputMedia" aria-label="미디어" onChange={(e) => setAlbumSearch({ ...albumSearch, mediaCode: e.target.value })}>
-                      <option>-전체-</option>
-                      {midiaCD.map((item, index) => (
-                        <option value={item.id} key={index}>{item.name}</option>
-                      ))}
-                    </CFormSelect>
-                  </CCol>
-                  <CCol xs={1}>
-                    <CFormLabel htmlFor="inputMusicGenre" className="col-form-label" >장르</CFormLabel>
-                  </CCol>
-                  <CCol xs={5}>
-                    <CFormInput type="text" id="inputMusicGenre" aria-label="장르" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, musicGenre: e.target.value })} />
-                  </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                  <CCol xs={1}>
-                    <CFormLabel htmlFor="inputName" className="col-form-label">앨범명</CFormLabel>
+                    <CFormLabel htmlFor="inputName" className="col-form-label">아이디</CFormLabel>
                   </CCol>
                   <CCol xs={5}>
                     <CFormInput type="text" id="inputName" aria-label="앨범명" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, name: e.target.value })} />
                   </CCol>
                   <CCol xs={1}>
-                    <CFormLabel htmlFor="inputArtist" className="col-form-label">아티스트</CFormLabel>
+                    <CFormLabel htmlFor="inputArtist" className="col-form-label">이름</CFormLabel>
                   </CCol>
                   <CCol md={5}>
                     <CFormInput type="text" id="inputArtist" aria-label="아티스트" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, artist: e.target.value })} />
                   </CCol>
                 </CRow>
                 <CRow className="mb-3">
-                  {/* <CCol xs={1}>
-                    <CFormLabel htmlFor="txt_country" className="col-form-label">발매국가</CFormLabel>
+                  <CCol xs={1}>
+                    <CFormLabel htmlFor="inputName" className="col-form-label">사용여부</CFormLabel>
                   </CCol>
                   <CCol xs={5}>
-                    <CFormSelect id="txt_country" aria-label="발매국가" onChange={(e) => setAlbumSearch({ ...albumSearch, artist: e.target.value })}>
-                      <option>-전체-</option>
-                      {cntryCD.map((item, index) => (
-                        <option value={item.id} key={index}>{item.name}</option>
-                      ))}
-                    </CFormSelect>
-                  </CCol> */}
-                  <CCol md={1}>
-                    <CFormLabel htmlFor="inputEmail3" className="col-form-label">등록일</CFormLabel>
-                  </CCol>
-                  <CCol md={5}>
                     <div style={{ display: 'flex' }}>
-                      <div style={{ display: 'grid', placeItems: 'center', marginRight: 5 }}>
-                        <CIcon className="text-secondary" icon={cilCalendar} size="lg" />
+                      <div style={{ display: 'grid', placeItems: 'center', marginRight: 15 }}>
+                        <CFormCheck type="radio" name="exampleRadios" id="exampleRadios1" value="option1" label="전체" defaultChecked />
                       </div>
-                      <div>
-                        <DatePicker
-                          selected={selectedDate}
-                          onChange={handleDateChange}
-                          dateFormat={'yyyy-MM-dd'} // 날짜 형태
-                          shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
-                          minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
-                          maxDate={new Date()} // maxDate 이후 날짜 선택 불가
-                          className="DatePicker"
-                        />
+                      <div style={{ display: 'grid', placeItems: 'center', marginRight: 15 }}>
+                        <CFormCheck type="radio" name="exampleRadios" id="exampleRadios2" value="option2" label="사용" />
                       </div>
-                      <div style={{ whiteSpace: 'pre-wrap', display: 'grid', placeItems: 'center' }}>
-                        <span> ~ </span>
-                      </div>
-                      <div style={{ display: 'grid', placeItems: 'center', marginRight: 5 }}>
-                        <CIcon className="text-secondary" icon={cilCalendar} size="lg" />
-                      </div>
-                      <div>
-                        <DatePicker
-                          selected={selectedDate2}
-                          onChange={handleDateChange2}
-                          dateFormat={'yyyy-MM-dd'} // 날짜 형태
-                          shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
-                          minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
-                          maxDate={new Date()} // maxDate 이후 날짜 선택 불가
-                          className="DatePicker"
-                        />
+                      <div style={{ display: 'grid', placeItems: 'center', marginRight: 15 }}>
+                        <CFormCheck type="radio" name="exampleRadios" id="exampleRadios3" value="option3" label="미사용" />
                       </div>
                     </div>
                   </CCol>
@@ -286,11 +232,9 @@ const AlbumList = () => {
                 <CTableHead color="light">
                   <CTableRow>
                     <CTableHeaderCell className="text-center">No</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">미디어</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center"></CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">앨범명</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">아티스트</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">발매일</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">아이디</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">이름</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">사용여부</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -301,26 +245,20 @@ const AlbumList = () => {
                           <strong>{item.id}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <strong>{item.mediaName}</strong>
+                          <a href='/' onClick={(e) => goInfoClick(e, item.id)}>{item.adminId}</a>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <CAvatar size="md" src="/static/media/8.35ee8919ea545620a475.jpg" />
+                          {item.name}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <a href='/' onClick={(e) => goInfoClick(e, item.id)}>{item.name}</a>
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          {item.artist}
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          {item.releaseDate}
+                          {item.useYn}
                         </CTableDataCell>
                       </CTableRow>
                     ))
                   ) :
                     (
                       <CTableRow v-for="item in tableItems" >
-                        <CTableDataCell className="text-center" colSpan={6} key={0}>
+                        <CTableDataCell className="text-center" colSpan={4} key={0}>
                           조회된 데이터가 없습니다.
                         </CTableDataCell>
                       </CTableRow>

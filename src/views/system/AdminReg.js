@@ -33,7 +33,7 @@ import {
   CFormSwitch,
 } from '@coreui/react';
 import ReactImg from 'src/assets/images/image400.jpg'
-const AlbumReg = () => {
+const AdminReg = () => {
 
   /**********************************************************************
    * 공통 영역
@@ -45,7 +45,7 @@ const AlbumReg = () => {
 
   //목록이동
   const goListClick = () => {
-    navigate('/music/albumList');
+    navigate('/system/AdminList');
   };
   const [selectedDate, setSelectedDate] = useState(null);
   const handleDateChange = date => {
@@ -120,7 +120,7 @@ const AlbumReg = () => {
         <CCol >
           <CCard className="mb-4">
             <CCardHeader>
-              <strong>앨범등록</strong> <small></small>
+              <strong>관리자등록</strong> <small></small>
             </CCardHeader>
             <CCardBody>
               <CForm
@@ -136,85 +136,29 @@ const AlbumReg = () => {
                   <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
                   <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.value })} />
                 </CCol>
+                <CCol xs={6}>
+                  <CFormLabel htmlFor="inputName">아이디*</CFormLabel>
+                  <CFormInput type="text" id="inputName" required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} maxLength={10} />
+                  <CFormFeedback invalid>아이디를 입력해주세요.</CFormFeedback>
+                </CCol>
+                <CCol xs={6}>
+                  <CFormLabel htmlFor="inputLabel">이름*</CFormLabel>
+                  <CFormInput type="text" id="inputLabel" required onChange={(e) => setAlbumData({ ...albumData, label: e.target.value })} maxLength={10} />
+                  <CFormFeedback invalid>이름을 입력해주세요.</CFormFeedback>
+                </CCol>
+                <CCol xs={6}>
+                  <CFormLabel htmlFor="inputName">비밀번호*</CFormLabel>
+                  <CFormInput type="password" id="inputName" required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} maxLength={20} />
+                  <CFormFeedback invalid>비밀번호을 입력해주세요.</CFormFeedback>
+                </CCol>
+                <CCol xs={6}>
+                  <CFormLabel htmlFor="inputAartist">비밀번호확인*</CFormLabel>
+                  <CFormInput type="password" id="inputAartist" required onChange={(e) => setAlbumData({ ...albumData, artist: e.target.value })} maxLength={20} />
+                  <CFormFeedback invalid>비밀번호확인을 입력해주세요.</CFormFeedback>
+                </CCol>
                 <CCol xs={12}>
-                  <CImage rounded thumbnail align="center" src={ReactImg} width={150} height={150} />
-                  <CCardBody>
-                    <CCardText>
-                      <CFormInput type="file" id="formFile" />
-                    </CCardText>
-                  </CCardBody>
-                </CCol>
-
-                <CCol xs={6}>
-                  <CFormLabel htmlFor="lab_media">미디어*</CFormLabel>
-                  <CFormSelect id="sel_media" defaultValue={albumData.media} onChange={(e) => setAlbumData({ ...albumData, media: e.target.value })}  >
-                    {midiaCD.map((item, index) => (
-                      <option value={item.id} key={index}>{item.name}</option>
-                    ))}
-                  </CFormSelect>
-                  <CFormFeedback invalid>미디어를 선택해주세요</CFormFeedback>
-                </CCol>
-                <CCol xs={6}>
-                  <CFormLabel htmlFor="inputLabel">Label</CFormLabel>
-                  <CFormInput type="text" id="inputLabel" onChange={(e) => setAlbumData({ ...albumData, label: e.target.value })} maxLength={100} />
-                </CCol>
-                <CCol xs={6}>
-                  <CFormLabel htmlFor="inputName">앨범명*</CFormLabel>
-                  <CFormInput type="text" id="inputName" required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} maxLength={100} />
-                  <CFormFeedback invalid>앨범명을 입력해주세요.</CFormFeedback>
-                </CCol>
-                <CCol xs={6}>
-                  <CFormLabel htmlFor="inputAartist">아티스트*</CFormLabel>
-                  <CFormInput type="text" id="inputAartist" required onChange={(e) => setAlbumData({ ...albumData, artist: e.target.value })} maxLength={100} />
-                  <CFormFeedback invalid>아티스트를 입력해주세요.</CFormFeedback>
-                </CCol>
-
-                <CCol md={12}>
-                  <CFormLabel htmlFor="inputSeries">Series</CFormLabel>
-                  <CFormInput type="text" id="inputSeries" onChange={(e) => setAlbumData({ ...albumData, series: e.target.value })} maxLength={100} />
-                </CCol>
-
-                <CCol xs={12}>
-                  <CFormLabel htmlFor="inputFormat">Format</CFormLabel>
-                  <CFormTextarea id="inputFormat" rows="3" onChange={(e) => setAlbumData({ ...albumData, format: e.target.value })} maxLength={250}></CFormTextarea>
-                </CCol>
-                <CCol xs={6}>
-                  <CFormLabel htmlFor="inputCountry">발매국가*</CFormLabel>
-                  <div >
-                    <CFormSelect id="inputCountry" onChange={(e) => setAlbumData({ ...albumData, country: e.target.value })}>
-                      {cntryCD.map((item, index) => (
-                        <option value={item.id} key={index}>{item.name}</option>
-                      ))}
-                    </CFormSelect>
-                    <CFormFeedback invalid>발매국가를 선택해주세요.</CFormFeedback>
-                  </div>
-                </CCol>
-                <CCol xs={6}>
-                  <CFormLabel htmlFor="inputReleaseDate">발매일</CFormLabel>
-                  <div style={{ display: 'flex', width: '100%' }}>
-                    <div style={{ display: 'grid', placeItems: 'center', marginRight: 5 }}>
-                      <CIcon className="text-secondary" icon={cilCalendar} size="lg" />
-                    </div>
-                    <div style={{ width: '90%' }}>
-                      <DatePicker
-                        selected={selectedDate}
-                        onChange={handleDateChange}
-                        dateFormat={'yyyy-MM-dd'} // 날짜 형태
-                        shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
-                        minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
-                        maxDate={new Date()} // maxDate 이후 날짜 선택 불가
-                        className="DatePicker"
-                      />
-                    </div>
-                  </div>
-                </CCol>
-                <CCol md={12}>
-                  <CFormLabel htmlFor="inputGenre">장르</CFormLabel>
-                  <CFormInput type="text" id="inputGenre" onChange={(e) => setAlbumData({ ...albumData, musicGenre: e.target.value })} maxLength={100} />
-                </CCol>
-                <CCol md={12}>
-                  <CFormLabel htmlFor="txtStyle">Style</CFormLabel>
-                  <CFormInput type="text" id="txtStyle" onChange={(e) => setAlbumData({ ...albumData, style: e.target.value })} maxLength={100} />
+                  <CFormLabel htmlFor="inputFormat">비고</CFormLabel>
+                  <CFormTextarea id="inputFormat" rows="3" onChange={(e) => setAlbumData({ ...albumData, format: e.target.value })} ></CFormTextarea>
                 </CCol>
                 <div className="d-grid gap-2">
                   <CRow className="justify-content-between">
@@ -235,4 +179,4 @@ const AlbumReg = () => {
   );
 };
 
-export default AlbumReg;
+export default AdminReg;

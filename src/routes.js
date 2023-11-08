@@ -58,7 +58,17 @@ const AlbumInfo = React.lazy(() => import('./views/music/AlbumInfo'))
 const AlbumList = React.lazy(() => import('./views/music/AlbumList'))
 const AlbumReg = React.lazy(() => import('./views/music/AlbumReg'))
 
+
 const MusicReq = React.lazy(() => import('./views/music/MusicReq'))
+const MusicReqHisList = React.lazy(() => import('./views/music/MusicReqHisList'))
+const MusicReqHisInfo = React.lazy(() => import('./views/music/MusicReqHisInfo'))
+
+const TableList = React.lazy(() => import('./views/manage/TableList'))
+const AdminList = React.lazy(() => import('./views/system/AdminList'))
+const AdminReg = React.lazy(() => import('./views/system/AdminReg'))
+const AdminInfo = React.lazy(() => import('./views/system/AdminInfo'))
+
+
 
 
 const routes = [
@@ -68,6 +78,14 @@ const routes = [
   { path: '/music/albumInfo', name: 'AlbumInfo', element: AlbumInfo },
   { path: '/music/albumReg', name: 'AlbumReg', element: AlbumReg },
   { path: '/music/musicReq', name: 'MusicReq', element: MusicReq },
+  { path: '/music/musicReqHisList', name: 'MusicReqHisList', element: MusicReqHisList },
+  { path: '/music/musicReqHisInfo', name: 'MusicReqHisInfo', element: MusicReqHisInfo },
+  { path: '/manage', name: 'TableList', element: TableList },
+  { path: '/manage/tableList', name: 'TableList', element: TableList },
+  { path: '/system', name: 'AdminList', element: AdminList },
+  { path: '/system/adminList', name: 'AdminList', element: AdminList },
+  { path: '/system/adminReg', name: 'AdminReg', element: AdminReg },
+  { path: '/system/adminInfo', name: 'AdminInfo', element: AdminInfo },
   { path: '/sample/sampleList', exact: true, name: 'SampleForm' },
   { path: '/sample', exact: true, name: 'Sample' },
   { path: '/sample/sampleList', name: 'SampleList', element: SampleList },

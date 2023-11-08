@@ -34,7 +34,7 @@ import {
   CSpinner,
 } from '@coreui/react';
 import ReactImg from 'src/assets/images/image400.jpg'
-const AlbumInfo = () => {
+const AdminInfo = () => {
 
   /**********************************************************************
    * 공통 영역
@@ -332,16 +332,16 @@ const AlbumInfo = () => {
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputLabel">Label</CFormLabel>
-                    <CFormInput type="text" id="inputLabel" value={albumData.label} onChange={(e) => setAlbumData({ ...albumData, label: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="inputLabel" value={albumData.label} onChange={(e) => setAlbumData({ ...albumData, label: e.target.value })} />
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputName">앨범명*</CFormLabel>
-                    <CFormInput type="text" id="inputName" value={albumData.name} required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="inputName" value={albumData.name} required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} maxLength={40} />
                     <CFormFeedback invalid>앨범명을 입력해주세요.</CFormFeedback>
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputAartist">아티스트*</CFormLabel>
-                    <CFormInput type="text" id="inputAartist" value={albumData.artist} required onChange={(e) => setAlbumData({ ...albumData, artist: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="inputAartist" value={albumData.artist} required onChange={(e) => setAlbumData({ ...albumData, artist: e.target.value })} maxLength={40} />
                     <CFormFeedback invalid>아티스트를 입력해주세요.</CFormFeedback>
                   </CCol>
 
@@ -352,7 +352,7 @@ const AlbumInfo = () => {
 
                   <CCol xs={12}>
                     <CFormLabel htmlFor="inputFormat">Format</CFormLabel>
-                    <CFormTextarea id="inputFormat" rows="3" value={albumData.format} onChange={(e) => setAlbumData({ ...albumData, format: e.target.value })} maxLength={250}  ></CFormTextarea>
+                    <CFormTextarea id="inputFormat" rows="3" value={albumData.format} onChange={(e) => setAlbumData({ ...albumData, format: e.target.value })} maxLength={100}></CFormTextarea>
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputCountry">발매국가*</CFormLabel>
@@ -485,4 +485,4 @@ const AlbumInfo = () => {
   );
 };
 
-export default AlbumInfo;
+export default AdminInfo;

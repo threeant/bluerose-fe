@@ -79,7 +79,7 @@ const _nav = [
       {
         component: CNavItem,
         name: '히스토리',
-        to: '/music/musicHistory',
+        to: '/music/musicReqHisList',
       },
     ],
   },
@@ -90,7 +90,7 @@ const _nav = [
   {
     component: CNavItem,
     name: '테이블관리',
-    to: '/admin/tableList',
+    to: '/manage/tableList',
     icon: <CIcon icon={cilSofa} customClassName="nav-icon" />,
   },
   {
@@ -100,7 +100,7 @@ const _nav = [
   {
     component: CNavItem,
     name: '계정관리',
-    to: '/admin/admin',
+    to: '/system/adminList',
     icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
   },
   {

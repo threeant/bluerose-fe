@@ -31,7 +31,7 @@ import {
   cilCalendar
 } from '@coreui/icons'
 
-const AlbumList = () => {
+const MusicReqHisList = () => {
   /**********************************************************************
    * 공통코드 영역
   **********************************************************************/
@@ -357,4 +357,4 @@ const AlbumList = () => {
   )
 }
 
-export default AlbumList
+export default MusicReqHisList
