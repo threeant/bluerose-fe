@@ -29,6 +29,122 @@ export function getCodeList(codeNm) {
     return rtnCodeList;
 }
 
-export function otherCommonFunction(arg1, arg2) {
-    // 다른 공통 함수 내용
+/******************************************************************************
+* Function Name: getCurrentTime
+* Description  : 현재 시간 반환
+* Return       : yyyyMMddHHmmSS
+******************************************************************************/
+export function getCurrentTime() {
+    var current = new Date();
+
+    var year = current.getFullYear();
+    var month = current.getMonth() + 1;
+    var day = current.getDate();
+    var hour = current.getHours();
+    var min = current.getMinutes();
+    var sec = current.getSeconds();
+
+    if (month < 10) {
+        month = "0" + month;
+    }
+    if (day < 10) {
+        day = "0" + day;
+    }
+    if (hour < 10) {
+        hour = "0" + hour;
+    }
+    if (min < 10) {
+        min = "0" + min;
+    }
+    if (sec < 10) {
+        sec = "0" + sec;
+    }
+
+    return "" + year + month + day + hour + min + sec;
 }
+
+/******************************************************************************
+* Function Name: getCurrentDate
+* Description  : 현재 시간 반환
+* Return       : yyyy-MM-dd
+******************************************************************************/
+export function getCurrentDate() {
+    var current = new Date();
+
+    console.log(current);
+
+    var year = current.getFullYear();
+    var month = current.getMonth() + 1;
+    var day = current.getDate();
+
+    if (month < 10) {
+        month = "0" + month;
+    }
+    if (day < 10) {
+        day = "0" + day;
+    }
+    return "" + year + '-' + month + '-' + day
+}
+
+/* ----------------------------------------------------------------------------
+ * 특정 날짜에 대해 지정한 값만큼 가감(+-)한 날짜를 반환
+ *
+ * 입력 파라미터 -----
+ * pInterval : "yyyy" 는 연도 가감, "m" 은 월 가감, "d" 는 일 가감
+ * pAddVal  : 가감 하고자 하는 값 (정수형)
+ * pYyyymmdd : 가감의 기준이 되는 날짜
+ * pDelimiter : pYyyymmdd 값에 사용된 구분자를 설정 (없으면 "" 입력)
+ *
+ * 반환값 ----
+ * yyyymmdd 또는 함수 입력시 지정된 구분자를 가지는 yyyy?mm?dd 값
+ *
+ * 사용예 ---
+ * 2008-01-01 에 3 일 더하기 ==> getAddDate("d", 3, "2008-08-01", "-");
+ * 20080301 에 8 개월 더하기 ==> getAddDate("m", 8, "20080301", "");
+ --------------------------------------------------------------------------- */
+export function getAddDate(pInterval, pAddVal, pYyyymmdd, pDelimiter) {
+    var yyyy;
+    var mm;
+    var dd;
+    var cDate;
+    var cYear, cMonth, cDay;
+
+    console.log(pInterval + "" + pAddVal + "" + pYyyymmdd + "" + pDelimiter);
+
+    if (pDelimiter != "") {
+        pYyyymmdd = pYyyymmdd.replace(eval("/\\" + pDelimiter + "/g"), "");
+    }
+
+    if (pYyyymmdd == "") {
+        return;
+    }
+
+    yyyy = pYyyymmdd.substr(0, 4);
+    mm = pYyyymmdd.substr(4, 2);
+    dd = pYyyymmdd.substr(6, 2);
+
+    if (pInterval == "yyyy") {
+        yyyy = (yyyy * 1) + (pAddVal * 1);
+    } else if (pInterval == "m") {
+        mm = (mm * 1) + (pAddVal * 1);
+    } else if (pInterval == "d") {
+        dd = (dd * 1) + (pAddVal * 1);
+    }
+
+    cDate = new Date(yyyy, mm - 1, dd); // 12월, 31일을 초과하는 입력값에 대해 자동으로 계산된 날짜가 만들어짐.
+    cYear = cDate.getFullYear();
+    cMonth = cDate.getMonth() + 1;
+    cDay = cDate.getDate();
+
+    cMonth = cMonth < 10 ? "0" + cMonth : cMonth;
+    cDay = cDay < 10 ? "0" + cDay : cDay;
+
+    if (pDelimiter != "") {
+        console.log(cYear + pDelimiter + cMonth + pDelimiter + cDay);
+        return cYear + pDelimiter + cMonth + pDelimiter + cDay;
+    } else {
+        console.log("" + cYear + cMonth + cDay);
+        return "" + cYear + cMonth + cDay;
+    }
+}
+

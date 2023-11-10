@@ -9,7 +9,7 @@ import {
   cilCalendar,
   cifUs,
 } from '@coreui/icons';
-
+import PropTypes from 'prop-types';
 import {
   CButton,
   CCard,
@@ -34,7 +34,7 @@ import {
   CSpinner,
 } from '@coreui/react';
 import ReactImg from 'src/assets/images/image400.jpg'
-const AlbumInfo = () => {
+const AlbumInfo = ({ openModal, albumId }) => {
 
   /**********************************************************************
    * 공통 영역
@@ -47,9 +47,6 @@ const AlbumInfo = () => {
   /**********************************************************************
    * 화면 영역
   **********************************************************************/
-  const location = useLocation();
-  const { albumId } = location.state;
-
   //목록이동
   const goListClick = () => {
     navigate('/music/albumList');
@@ -63,10 +60,10 @@ const AlbumInfo = () => {
   }
 
   useEffect(() => {
-
+    console.log('albumId>>>> ' + albumId)
     submitSearchAlbum();
 
-  }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
+  }, [albumId]); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
 
 
   const setSongRuntime = (e) => {
@@ -485,5 +482,9 @@ const AlbumInfo = () => {
   );
 };
 
+AlbumInfo.propTypes = {
+  openModal: PropTypes.func, // openModal 프로퍼티의 타입을 지정
+  albumId: PropTypes.number, // openModal 프로퍼티의 타입을 지정
+};
 
 export default AlbumInfo;

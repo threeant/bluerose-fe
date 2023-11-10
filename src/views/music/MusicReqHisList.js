@@ -69,8 +69,6 @@ const MusicReqHisList = () => {
   //초기화
   const clickReset = date => {
 
-    setSelectedDate(null);
-    setSelectedDate2(null);
 
     setAlbumSearch({
       "startDate": "",
@@ -78,6 +76,10 @@ const MusicReqHisList = () => {
       "page": 1,
       "size": 1
     });
+    const todayDate = new Date();
+    const pastDate = new Date(todayDate.getTime() - 7 * 24 * 60 * 60 * 1000); // 7일 전 날짜 계산
+    handleDateChange(pastDate);
+    handleDateChange2(todayDate);
   }
 
   const goInfoClick = (e, id) => {

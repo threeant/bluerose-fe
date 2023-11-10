@@ -1,11 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
+import {
+  cilSync
+} from '@coreui/icons'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { getCodeList } from '../../common/utils'
+import { getCodeList, getCurrentDate, getAddDate } from '../../common/utils'
 import SongList from '../common/SongList'; // MyModal 컴포넌트의 경로를 알맞게 설정
+import AlbumInfo from '../common/AlbumInfo'
 import {
   CAvatar,
   CButton,
@@ -35,6 +39,7 @@ import {
   cilCalendar
 } from '@coreui/icons'
 
+
 const MusicReq = () => {
   /**********************************************************************
    * 공통코드 영역
@@ -44,66 +49,36 @@ const MusicReq = () => {
   const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
   const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
 
+  //앨범아이디
+  const [albumId, setAlbumId] = useState('2');
+
+
   /**********************************************************************
    * 화면 영역
   **********************************************************************/
-  const [selectedDate, setSelectedDate] = useState(null); //등록일 from
-  const [selectedDate2, setSelectedDate2] = useState(null); // 등록일 to
+  useEffect(() => {
+    setAlbumId('1');
+    refreshMusicReq();
 
-
-  // 날짜가 선택될 때 호출될 콜백 함수
-  const handleDateChange = date => {
-    setSelectedDate(date);
-    const formattedDate = date.toISOString().slice(0, 10);
-    setAlbumSearch({ ...albumSearch, startReleaseDate: formattedDate })
-
-  }
-  const handleDateChange2 = date => {
-    setSelectedDate2(date);
-    const formattedDate = date.toISOString().slice(0, 10);
-    setAlbumSearch({ ...albumSearch, endReleaseDate: formattedDate })
-  }
-
-  //초기화
-  const clickReset = date => {
-    setSelectedDate(null);
-    setSelectedDate2(null);
-
-    setAlbumSearch({
-      "artist": "",
-      "endReleaseDate": "",
-      "musicGenre": "",
-      "name": "",
-      "page": 1,
-      "size": 1,
-      "startReleaseDate": "",
-      "mediaCode": ""
-    });
-  }
+  }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
 
   const goFormClick = () => { //등록화면이동
     navigate('/music/albumReg');
   }
 
-  const goInfoClick = (e, id) => {
-    // 페이지 이동 방지
-    e.preventDefault();
-    console.log('goInfoClick : ' + id);
-
-    // 새로운 동작 실행
-    // 예시: id를 이용한 페이지 이동 또는 다른 동작 수행
-    navigate('/music/albumInfo', { state: { albumId: id } });
-  };
-
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalData, setModalData] = useState('');
-  const [visibleXL, setVisibleXL] = useState(false)
+  const [visibleSong, setVisibleSong] = useState(false);
+  const [visibleAlbum, setVisibleAlbum] = useState(false)
   //신청곡 추가 버튼
   const popMusicAddClick = () => {
-    setVisibleXL(!visibleXL)
-    //setModalData('');
-    //setIsModalOpen(true);
+    setVisibleSong(!visibleSong)
+  }
+
+
+  //앨범 팝업 추가 버튼
+  const popAlbumInfoClick = (e, pAlbumId) => {
+    e.preventDefault();
+    setAlbumId('1');
+    setVisibleAlbum(!visibleAlbum);
   }
 
 
@@ -111,50 +86,47 @@ const MusicReq = () => {
   /**********************************************************************
   * 비즈니스로직 영역
  **********************************************************************/
-  //리스트
-  const [albumDatas, setAlbumDatas] = useState({ contents: [] });
+  //신청곡리스트
+  const [musicReqDatas, setMusicReqDatas] = useState({ contents: [] });
 
-  //검색조건
-  const [albumSearch, setAlbumSearch] = useState({
-    "artist": "",
-    "endReleaseDate": "",
-    "musicGenre": "",
-    "name": "",
-    "page": 0,
-    "size": 10,
-    "startReleaseDate": "",
-    "mediaCode": ""
-  });
+  //플레잉곡
+  const [nowPlayingData, setNowPlayingData] = useState({});
 
-  //조회하기
-  const submitSearch = (e) => {
-    e.preventDefault();
-    submitSearchAlbums();
+
+
+
+
+  //초기화후 조회
+  const refreshMusicReq = async () => {
+    const dateStr = getCurrentDate();
+    /*const hour = new Date().getHours();
+    if (hour < 6) {
+      dateStr = getAddDate("d", -1, dateStr, "-")
+    }
+    */
+
+    submitSearchMusicReq(dateStr);
+    submitSearchNowPlaying(dateStr);
+
   }
 
-  //페이징
-  const clickPage = (e, page) => {
-    e.preventDefault();
-    albumSearch.page = page;
-    submitSearchAlbums();
-    console.log("===page =  : " + page);
-  }
 
-  //검색 API
-  const submitSearchAlbums = async () => {
+  //신청곡 리스트 검색 API
+  const submitSearchMusicReq = async (dateStr) => {
 
-    console.log(albumSearch);
 
     try {
-      const response = await axios.get('http://localhost:8080/api/albums', {
-        params: albumSearch,
+      const response = await axios.get('http://localhost:8080/api/song-request', {
+        params: {
+          "date": dateStr
+        },
         headers: { 'Content-Type': 'application/json' }
       });
 
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-      setAlbumDatas(data);
+      setMusicReqDatas(data);
 
       console.log(data)
 
@@ -164,22 +136,24 @@ const MusicReq = () => {
       alert('네트워크 오류 ');
     }
 
-  };
+  }
 
-  const submitRegAlbum = async (e) => {
-    e.preventDefault();
+  //신청곡 리스트 검색 API
+  const submitSearchNowPlaying = async (dateStr) => {
 
-    console.log(albumSearch);
 
     try {
-      const response = await axios.get('http://localhost:8080/api/albums', {
-        params: albumSearch
+      const response = await axios.get('http://localhost:8080/api/song-request/now-playing', {
+        params: {
+          "date": dateStr
+        },
+        headers: { 'Content-Type': 'application/json' }
       });
 
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-      setAlbumDatas(data);
+      setNowPlayingData(data);
 
       console.log(data)
 
@@ -189,24 +163,158 @@ const MusicReq = () => {
       alert('네트워크 오류 ');
     }
 
+  }
+
+  //신청곡 선곡 클릭
+  const clickSelectMusicReq = (e, musicReqId) => {
+    e.preventDefault();
+
+    const result = window.confirm('해당곡을 선곡 하시겠습니까?');
+
+    if (!result) {
+      return;
+    }
+
+    submitSelectMusicReq(musicReqId);
   };
 
-  const controllModal = (openYn) => {
-    setVisibleXL(openYn);
+
+  //신청곡 선곡 API
+  const submitSelectMusicReq = async (musicReqId) => {
+
+    console.log(musicReqId);
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/song-request/now-playing/register',
+        {
+          "songRequestId": musicReqId
+        }
+        ,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+      console.log('API 응답:', response.data);
+
+      // 폼 데이터를 초기화합니다.
+      alert('선곡되었습니다.');
+      refreshMusicReq();
+
+
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  }
+
+  //신청곡 삭제 클릭
+  const clickDeletMusicReq = (e, musicReqId) => {
+    e.preventDefault();
+
+    const result = window.confirm('해당곡을 삭제 하시겠습니까?');
+
+    if (!result) {
+      return;
+    }
+
+    submitDeletSong(musicReqId);
+  };
+
+  //곡 삭제 API
+  const submitDeletSong = async (musicReqId) => {
+
+    console.log(musicReqId);
+
+    try {
+      const response = await axios.delete('http://localhost:8080/api/song-request/' + musicReqId);
+
+      console.log('API 응답:', response.data);
+
+      // 폼 데이터를 초기화합니다.
+      alert('삭제되었습니다.');
+      refreshMusicReq();
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  };
+
+  const controllSongModal = (openYn) => {
+    setVisibleSong(openYn);
+  }
+
+  const controllAlbumModal = (openYn) => {
+    setVisibleAlbum(openYn);
+  }
+
+  //신청곡 완료 클릭
+  const clickCompleteMusicReq = (e) => {
+    e.preventDefault();
+
+    const result = window.confirm('해당곡을 완료 하시겠습니까?');
+
+    if (!result) {
+      return;
+    }
+
+    submitCompleteMusicReq();
+  };
+
+
+  //신청곡 완료 API
+  const submitCompleteMusicReq = async () => {
+
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/song-request/now-playing/complete');
+
+      console.log('API 응답:', response.data);
+
+      // 폼 데이터를 초기화합니다.
+      alert('곡이 끝났습니다.');
+      refreshMusicReq();
+
+
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
   }
 
   return (
     <>
       <CModal
         size="xl"
-        visible={visibleXL}
-        onClose={() => setVisibleXL(false)}
+        visible={visibleSong}
+        onClose={() => setVisibleSong(false)}
         aria-labelledby="OptionalSizesExample2"
       >
         <CModalHeader>
           <CModalTitle id="OptionalSizesExample1">신청곡 추가</CModalTitle>
         </CModalHeader>
-        <CModalBody><SongList openModal={controllModal} /></CModalBody>
+        <CModalBody><SongList openModal={controllSongModal} /></CModalBody>
+      </CModal>
+      <CModal
+        size="xl"
+        visible={visibleAlbum}
+        onClose={() => setVisibleAlbum(false)}
+        aria-labelledby="OptionalSizesExample4"
+      >
+        <CModalHeader>
+          <CModalTitle id="OptionalSizesExample3">앨범정보</CModalTitle>
+        </CModalHeader>
+        <CModalBody><AlbumInfo openModal={controllAlbumModal} albumId={albumId} /></CModalBody>
       </CModal>
       <CRow>
         <CCol>
@@ -216,7 +324,7 @@ const MusicReq = () => {
               <CRow className="justify-content-between">
                 <CCol xs={12}>
                   <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <CButton component="input" type="reset" color="danger" value="신청곡정지" onClick={clickReset} />
+                    <CButton component="input" type="reset" color="danger" value="신청곡정지" />
                     <CButton component="input" color="info" value="신청곡시작" />
                   </div>
                 </CCol>
@@ -234,27 +342,25 @@ const MusicReq = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {albumDatas.contents && albumDatas.contents.length > 0 ? (
-                    albumDatas.contents.map((item, index) => (
-                      <CTableRow v-for="item in tableItems" key={index} onClick={(e) => goInfoClick(e, item.id)}>
-                        <CTableHeaderCell className="text-center" color="light"></CTableHeaderCell>
-                        <CTableDataCell className="text-center">
-                          <strong>{item.mediaName}</strong>
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          <CAvatar size="md" src="/static/media/8.35ee8919ea545620a475.jpg" />
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          <a href='/' onClick={(e) => goInfoClick(e, item.id)}>{item.name}</a>
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          {item.artist}
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          {item.releaseDate}
-                        </CTableDataCell>
-                      </CTableRow>
-                    ))
+                  {nowPlayingData && nowPlayingData.id != null ? (
+                    <CTableRow v-for="item in tableItems"  >
+                      <CTableHeaderCell className="text-center" color="light">Now Playing</CTableHeaderCell>
+                      <CTableDataCell className="text-center">
+                        <strong><a href='/' onClick={(e) => popAlbumInfoClick(e, nowPlayingData.albumId)}>{nowPlayingData.albumName}</a></strong>
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        <strong>{nowPlayingData.artist}</strong>
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        <strong>{nowPlayingData.trackNumber}</strong>
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        <strong>{nowPlayingData.title}</strong>
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        <strong>{nowPlayingData.runningTime}</strong>
+                      </CTableDataCell>
+                    </CTableRow>
                   ) :
                     (
                       <CTableRow v-for="item in tableItems" >
@@ -268,26 +374,32 @@ const MusicReq = () => {
                 </CTableBody>
               </CTable>
               <br />
-              <div className="d-grid gap-2">
-                <CRow className="justify-content-between">
-                  <CCol xs={12}>
-                    <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                      <CButton component="input" color="success" value="곡완료" />
-                    </div>
-                  </CCol>
-                </CRow>
-              </div>
+              {nowPlayingData && nowPlayingData.id != null ? (
+                <div className="d-grid gap-2">
+                  <CRow className="justify-content-between">
+                    <CCol xs={12}>
+                      <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <CButton component="input" color="success" value="곡완료" onClick={(e) => clickCompleteMusicReq(e)} />
+                      </div>
+                    </CCol>
+                  </CRow>
+                </div>
+              ) : ('')}
             </CCardBody>
           </CCard>
 
           <CCard className="mb-4">
-            <CCardHeader><strong>신청곡목록</strong> <small> 총 11건</small></CCardHeader>
+            <CCardHeader><strong>신청곡목록</strong> <small>  오전 6시에 초기화 됩니다.</small> {musicReqDatas.contents && musicReqDatas.contents.length > 0 ? (<small>총 {musicReqDatas.contents.length
+            }건</small>) : ('')}</CCardHeader>
             <CCardBody>
               <div className="d-grid gap-2">
                 <CRow className="justify-content-between">
                   <CCol xs={12}>
                     <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                      <CButton component="input" type="reset" color="light" value="신청곡 추가" onClick={popMusicAddClick} />
+                      <CButton component="input" type="reset" color="secondary" value="신청곡 추가" onClick={popMusicAddClick} />
+                      <CButton color="light" onClick={refreshMusicReq}>
+                        <CIcon icon={cilSync} title="Download file" />
+                      </CButton>
                     </div>
                   </CCol>
                 </CRow>
@@ -301,34 +413,43 @@ const MusicReq = () => {
                     <CTableHeaderCell className="text-center">아티스트</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">Track Number</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">Title</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Table Number</CTableHeaderCell>
                     <CTableHeaderCell className="text-center"></CTableHeaderCell>
                     <CTableHeaderCell className="text-center">Running Time</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {albumDatas.contents && albumDatas.contents.length > 0 ? (
-                    albumDatas.contents.map((item, index) => (
-                      <CTableRow v-for="item in tableItems" key={index} onClick={(e) => goInfoClick(e, item.id)}>
+                  {musicReqDatas && musicReqDatas.length > 0 ? (
+                    musicReqDatas.map((item, index) => (
+                      <CTableRow v-for="item in tableItems" key={index} >
                         <CTableDataCell className="text-center">
                           <strong>{item.id}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <strong>{item.mediaName}</strong>
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          <CAvatar size="md" src="/static/media/8.35ee8919ea545620a475.jpg" />
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          <a href='/' onClick={(e) => goInfoClick(e, item.id)}>{item.name}</a>
+                          <strong><a href='/' onClick={(e) => popAlbumInfoClick(e, item.albumId)}>{item.albumName}</a></strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           {item.artist}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {item.releaseDate}
+                          {item.trackNumber}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {item.releaseDate}
+                          {item.title}
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          {item.tableNumber == '0' ? '관리자' : item.tableNumber}
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          <CButton color="success" shape="rounded-pill" className="mb-3" onClick={(e) => clickSelectMusicReq(e, item.id)}>
+                            선곡
+                          </CButton>
+                          <CButton color="dark" shape="rounded-pill" className="mb-3" onClick={(e) => clickDeletMusicReq(e, item.id)}>
+                            삭제
+                          </CButton>
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          {item.runningTime}
                         </CTableDataCell>
                       </CTableRow>
                     ))
@@ -343,27 +464,6 @@ const MusicReq = () => {
                   }
                 </CTableBody>
               </CTable>
-              <br />
-              {albumDatas.contents && albumDatas.contents.length > 0 ? (
-                <CRow>
-                  <CCol md={{ span: 6, offset: 5 }}>
-                    <CPagination aria-label="Page navigation example">
-                      <CPaginationItem aria-label="Previous" disabled={!albumDatas.first} onClick={(e) => clickPage(e, 1)}>
-                        <span aria-hidden="true">&laquo;</span>
-                      </CPaginationItem>
-                      {Array.from({ length: albumDatas.totalPages }, (_, index) => (
-                        <CPaginationItem key={index} active onClick={(e) => clickPage(e, index + 1)}>{index + 1}</CPaginationItem>
-                      ))}
-                      <CPaginationItem aria-label="Next" disabled={!albumDatas.last}>
-                        <span aria-hidden="true">&raquo;</span>
-                      </CPaginationItem>
-                    </CPagination>
-                  </CCol>
-                  <CCol md={1}>
-                    총 {albumDatas.totalCount}건
-                  </CCol>
-                </CRow>
-              ) : ''}
             </CCardBody>
           </CCard>
         </CCol>
