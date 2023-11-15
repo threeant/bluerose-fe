@@ -292,7 +292,7 @@ const AlbumInfo = ({ openModal, albumId }) => {
         <CCol >
           <CCard className="mb-4">
             <CCardHeader>
-              <strong>앨범수정</strong> <small></small>
+              <strong>앨범조회</strong> <small></small>
             </CCardHeader>
             <CCardBody>
               {albumData ? (
@@ -307,20 +307,20 @@ const AlbumInfo = ({ openModal, albumId }) => {
                   </CCol>
                   <CCol xs={2} >
                     <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
-                    <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.value })} />
+                    <CFormSwitch label="사용여부" id="formSwitchCheckChecked" disabled defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.value })} />
                   </CCol>
                   <CCol xs={12}>
                     <CImage rounded thumbnail align="center" src={ReactImg} width={150} height={150} />
                     <CCardBody>
                       <CCardText>
-                        <CFormInput type="file" id="formFile" />
+                        <CFormInput type="file" id="formFile" disabled />
                       </CCardText>
                     </CCardBody>
                   </CCol>
 
                   <CCol xs={6}>
                     <CFormLabel htmlFor="lab_media">미디어*</CFormLabel>
-                    <CFormSelect id="sel_media" value={albumData.media} onChange={(e) => setAlbumData({ ...albumData, media: e.target.value })}  >
+                    <CFormSelect id="sel_media" value={albumData.media} onChange={(e) => setAlbumData({ ...albumData, media: e.target.value })} disabled >
                       {midiaCD.map((item, index) => (
                         <option value={item.id} key={index}>{item.name}</option>
                       ))}
@@ -329,32 +329,32 @@ const AlbumInfo = ({ openModal, albumId }) => {
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputLabel">Label</CFormLabel>
-                    <CFormInput type="text" id="inputLabel" value={albumData.label} onChange={(e) => setAlbumData({ ...albumData, label: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="inputLabel" value={albumData.label} onChange={(e) => setAlbumData({ ...albumData, label: e.target.value })} maxLength={100} disabled />
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputName">앨범명*</CFormLabel>
-                    <CFormInput type="text" id="inputName" value={albumData.name} required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="inputName" value={albumData.name} required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} maxLength={100} disabled />
                     <CFormFeedback invalid>앨범명을 입력해주세요.</CFormFeedback>
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputAartist">아티스트*</CFormLabel>
-                    <CFormInput type="text" id="inputAartist" value={albumData.artist} required onChange={(e) => setAlbumData({ ...albumData, artist: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="inputAartist" value={albumData.artist} required onChange={(e) => setAlbumData({ ...albumData, artist: e.target.value })} maxLength={100} disabled />
                     <CFormFeedback invalid>아티스트를 입력해주세요.</CFormFeedback>
                   </CCol>
 
                   <CCol md={12}>
                     <CFormLabel htmlFor="inputSeries">Series</CFormLabel>
-                    <CFormInput type="text" id="inputSeries" value={albumData.series} onChange={(e) => setAlbumData({ ...albumData, series: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="inputSeries" value={albumData.series} onChange={(e) => setAlbumData({ ...albumData, series: e.target.value })} maxLength={100} disabled />
                   </CCol>
 
                   <CCol xs={12}>
                     <CFormLabel htmlFor="inputFormat">Format</CFormLabel>
-                    <CFormTextarea id="inputFormat" rows="3" value={albumData.format} onChange={(e) => setAlbumData({ ...albumData, format: e.target.value })} maxLength={250}  ></CFormTextarea>
+                    <CFormTextarea id="inputFormat" rows="3" value={albumData.format} onChange={(e) => setAlbumData({ ...albumData, format: e.target.value })} maxLength={250} disabled ></CFormTextarea>
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputCountry">발매국가*</CFormLabel>
                     <div >
-                      <CFormSelect id="inputCountry" value={albumData.countryCD} onChange={(e) => setAlbumData({ ...albumData, countryCD: e.target.value })}>
+                      <CFormSelect id="inputCountry" value={albumData.countryCD} onChange={(e) => setAlbumData({ ...albumData, countryCD: e.target.value })} disabled>
                         {cntryCD.map((item, index) => (
                           <option value={item.id} key={index}>{item.name}</option>
                         ))}
@@ -369,7 +369,7 @@ const AlbumInfo = ({ openModal, albumId }) => {
                         <CIcon className="text-secondary" icon={cilCalendar} size="lg" />
                       </div>
                       <div style={{ width: '90%' }}>
-                        <DatePicker
+                        <DatePicker disabled
                           selected={selectedDate}
                           onChange={handleDateChange}
                           dateFormat={'yyyy-MM-dd'} // 날짜 형태
@@ -384,21 +384,13 @@ const AlbumInfo = ({ openModal, albumId }) => {
                   </CCol>
                   <CCol md={12}>
                     <CFormLabel htmlFor="txt_genre">장르</CFormLabel>
-                    <CFormInput type="text" id="txt_genre" value={albumData.musicGenre} onChange={(e) => setAlbumData({ ...albumData, musicGenre: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="txt_genre" value={albumData.musicGenre} onChange={(e) => setAlbumData({ ...albumData, musicGenre: e.target.value })} maxLength={100} disabled />
                   </CCol>
                   <CCol md={12}>
                     <CFormLabel htmlFor="txt_style">Style</CFormLabel>
-                    <CFormInput type="text" id="txt_style" value={albumData.style} onChange={(e) => setAlbumData({ ...albumData, style: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="txt_style" value={albumData.style} onChange={(e) => setAlbumData({ ...albumData, style: e.target.value })} maxLength={100} disabled />
                   </CCol>
                   <div className="d-grid gap-2">
-                    <CRow className="justify-content-between">
-                      <CCol xs={12}>
-                        <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                          <CButton component="input" type="button" color="light" value="목록" onClick={goListClick} />
-                          <CButton component="input" color="primary" type="submit" value="수정하기" />
-                        </div>
-                      </CCol>
-                    </CRow>
                   </div>
                 </CForm>
               ) : (<div className="d-flex justify-content-center">
@@ -428,28 +420,6 @@ const AlbumInfo = ({ openModal, albumId }) => {
               <CCol xs={2}>
                 <CFormInput type="text" id="staRunningTime" value="Running Time*" readOnly plainText />
               </CCol>
-              <CCol xs={1}>
-                <CFormInput type="text" id="staButton" value="" readOnly plainText />
-              </CCol>
-            </CRow>
-            <CRow>
-              <CCol xs={1}>
-                <CFormInput type="text" id="staNoReq" value="-" readOnly plainText />
-              </CCol>
-              <CCol xs={3}>
-                <CFormInput type="text" id="inputTrackNumber" value={songReqData.trackInfo} onChange={(e) => setSongReqData({ ...songReqData, trackInfo: e.target.value })} placeholder="A1" maxLength={4} />
-              </CCol>
-              <CCol xs={5}>
-                <CFormInput type="text" id="inputTrackName" value={songReqData.trackName} onChange={(e) => setSongReqData({ ...songReqData, trackName: e.target.value })} placeholder="Title" maxLength={150} />
-              </CCol>
-              <CCol xs={2}>
-                <CFormInput type="text" id="inputTrackRuntime" value={songReqData.runtime} onChange={(e) => setSongRuntime(e)} placeholder="00:00" maxLength={5} />
-              </CCol>
-              <CCol xs={1}>
-                <CButton color="success" className="mb-3" onClick={(e) => clickReqSong(e)}>
-                  추가
-                </CButton>
-              </CCol>
             </CRow>
             {songDatas.map((item, index) => (
               <CRow key={index}>
@@ -464,11 +434,6 @@ const AlbumInfo = ({ openModal, albumId }) => {
                 </CCol>
                 <CCol xs={2}>
                   <CFormInput type="text" id={'txtTrackRuntime${index}'} value={item.runtime} readOnly plainText />
-                </CCol>
-                <CCol xs={1}>
-                  <CButton color="dark" className="mb-3" onClick={(e) => clickDeletSong(e, item.id)}>
-                    삭제
-                  </CButton>
                 </CCol>
               </CRow>
             ))}

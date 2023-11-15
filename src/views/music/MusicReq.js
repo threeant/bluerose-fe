@@ -50,16 +50,15 @@ const MusicReq = () => {
   const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
 
   //앨범아이디
-  const [albumId, setAlbumId] = useState('2');
+  const [albumId, setAlbumId] = useState();
 
 
   /**********************************************************************
    * 화면 영역
   **********************************************************************/
   useEffect(() => {
-    setAlbumId('1');
-    refreshMusicReq();
-
+    refreshMusicReq(); //신청곡 조회
+    submitSearchNowPlayingCondition(); // 신청곡 상태조회
   }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
 
   const goFormClick = () => { //등록화면이동
@@ -77,7 +76,7 @@ const MusicReq = () => {
   //앨범 팝업 추가 버튼
   const popAlbumInfoClick = (e, pAlbumId) => {
     e.preventDefault();
-    setAlbumId('1');
+    setAlbumId(pAlbumId);
     setVisibleAlbum(!visibleAlbum);
   }
 
@@ -92,8 +91,33 @@ const MusicReq = () => {
   //플레잉곡
   const [nowPlayingData, setNowPlayingData] = useState({});
 
+  //플레잉곡
+  const [nowPlayingConditionData, setNowPlayingCondtionData] = useState({});
 
 
+  //신청곡 시작/정지 여부 조회 API
+  const submitSearchNowPlayingCondition = async () => {
+
+
+    try {
+      const response = await axios.get('http://localhost:8080/api/song-request/condition', {
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      // API 응답에서 데이터 추출
+      const data = response.data;
+      // 데이터를 상태 변수에 저장
+
+      console.log(data);
+      setNowPlayingCondtionData(data);
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  }
 
 
   //초기화후 조회
@@ -255,6 +279,59 @@ const MusicReq = () => {
     setVisibleAlbum(openYn);
   }
 
+  //신청곡 시작 정지 조건 변경 클릭
+  const clickConditonChange = (e, startYn) => {
+    e.preventDefault();
+
+    var msg = '신청곡을 중단 하시겠습니까?';
+
+    if (startYn) {
+      msg = '신청곡을 받기 하시겠습니까?';
+    }
+
+    const result = window.confirm(msg);
+
+    if (!result) {
+      return;
+    }
+
+
+    submitClickConditonChange();
+  };
+
+
+
+  //신청곡 시작 정지 조건 변경 API
+  const submitClickConditonChange = async () => {
+
+
+    try {
+
+      const response = await axios.post('http://localhost:8080/api/song-request/condition',
+        {
+          "songRequestId": false
+        }
+        ,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+      console.log('API 응답:', response.data);
+
+      alert('변경되었습니다.');
+
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  }
+
+
   //신청곡 완료 클릭
   const clickCompleteMusicReq = (e) => {
     e.preventDefault();
@@ -324,8 +401,9 @@ const MusicReq = () => {
               <CRow className="justify-content-between">
                 <CCol xs={12}>
                   <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <CButton component="input" type="reset" color="danger" value="신청곡정지" />
-                    <CButton component="input" color="info" value="신청곡시작" />
+                    {nowPlayingConditionData ? (<CButton component="input" type="reset" color="danger" value="신청곡정지" onClick={(e) => clickConditonChange(e, false)} />)
+                      : (<CButton component="input" color="info" value="신청곡시작" onClick={(e) => clickConditonChange(e, true)} />)}
+
                   </div>
                 </CCol>
               </CRow>
