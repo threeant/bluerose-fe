@@ -68,8 +68,9 @@ const AdminList = React.lazy(() => import('./views/system/AdminList'))
 const AdminReg = React.lazy(() => import('./views/system/AdminReg'))
 const AdminInfo = React.lazy(() => import('./views/system/AdminInfo'))
 
-
-
+const DisplayInfo = React.lazy(() => import('./views/display/DisplayInfo'))
+const DisplayList = React.lazy(() => import('./views/display/DisplayList'))
+const DisplayReg = React.lazy(() => import('./views/display/DisplayReg'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -80,6 +81,9 @@ const routes = [
   { path: '/music/musicReq', name: 'MusicReq', element: MusicReq },
   { path: '/music/musicReqHisList', name: 'MusicReqHisList', element: MusicReqHisList },
   { path: '/music/musicReqHisInfo', name: 'MusicReqHisInfo', element: MusicReqHisInfo },
+  { path: '/display/displayList', name: 'DisplayList', element: DisplayList },
+  { path: '/display/displayInfo', name: 'DisplayInfo', element: DisplayInfo },
+  { path: '/display/displayReg', name: 'DisplayReg', element: DisplayReg },
   { path: '/manage', name: 'TableList', element: TableList },
   { path: '/manage/tableList', name: 'TableList', element: TableList },
   { path: '/system', name: 'AdminList', element: AdminList },
