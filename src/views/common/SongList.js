@@ -321,7 +321,7 @@ const SongList = ({ openModal }) => {
                 <div className="d-grid gap-2">
                   <CRow className="justify-content-between">
                     <CCol xs={4}>
-                      <CButton component="input" type="button" color="danger" value="추가" onClick={submitRegAlbum} />
+                      <CButton component="input" type="button" color="info" value="추가" onClick={submitRegAlbum} />
                     </CCol>
                     <CCol xs={4}>
                       <div className="d-grid gap-2 d-md-flex justify-content-md-end">

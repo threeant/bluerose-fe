@@ -449,7 +449,7 @@ const AdminInfo = () => {
                 <CFormInput type="text" id="inputTrackRuntime" value={songReqData.runtime} onChange={(e) => setSongRuntime(e)} placeholder="00:00" maxLength={5} />
               </CCol>
               <CCol xs={1}>
-                <CButton color="success" className="mb-3" onClick={(e) => clickReqSong(e)}>
+                <CButton color="info" className="mb-3" onClick={(e) => clickReqSong(e)}>
                   추가
                 </CButton>
               </CCol>

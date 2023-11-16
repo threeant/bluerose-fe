@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
+import CIcon from '@coreui/icons-react'
 import {
   CButton,
   CCard,
@@ -13,6 +14,9 @@ import {
   CContainer,
   CSpinner,
 } from '@coreui/react';
+import {
+  cilSync
+} from '@coreui/icons'
 import ReactImg from 'src/assets/images/image400.jpg'
 const TableList = () => {
 
@@ -137,6 +141,7 @@ const TableList = () => {
 
   };
 
+
   //삭제 클릭
   const clickDeletTable = (e, tableId) => {
     e.preventDefault();
@@ -177,7 +182,10 @@ const TableList = () => {
     <CContainer>
       <CCard className="mb-4">
         <CCardHeader>
-          <strong>테이블 목록</strong> <small></small>
+          <CButton color="light" onClick={submitSearchTable}>
+            <CIcon icon={cilSync} title="Download file" />
+          </CButton>
+          <strong> 테이블 목록</strong> <small></small>
         </CCardHeader>
         {tableDatas ? (
           <CCardBody>
@@ -212,7 +220,7 @@ const TableList = () => {
                 <CFormInput type="text" id="inputTrackRuntime" value="-" readOnly plainText />
               </CCol>
               <CCol xs={1}>
-                <CButton color="success" className="mb-3" onClick={(e) => clickTableSong(e)}>
+                <CButton color="info" className="mb-3" onClick={(e) => clickTableSong(e)}>
                   추가
                 </CButton>
               </CCol>
@@ -244,7 +252,7 @@ const TableList = () => {
         </div>
         )}
       </CCard>
-    </CContainer>
+    </CContainer >
   );
 };
 

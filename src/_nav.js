@@ -17,6 +17,8 @@ import {
   cilHeadphones,
   cilSofa,
   cilUser,
+  cilBirthdayCake,
+  cilFolderOpen
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -94,6 +96,24 @@ const _nav = [
     icon: <CIcon icon={cilSofa} customClassName="nav-icon" />,
   },
   {
+    component: CNavGroup,
+    name: '이벤트관리',
+    to: '/music',
+    icon: <CIcon icon={cilBirthdayCake} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: '이벤트관리',
+        to: '/',
+      },
+      {
+        component: CNavItem,
+        name: '참여자관리',
+        to: '/',
+      },
+    ],
+  },
+  {
     component: CNavTitle,
     name: '시스템관리',
   },
@@ -104,36 +124,14 @@ const _nav = [
     icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
   },
   {
+    component: CNavItem,
+    name: '공통코드관리',
+    to: '/system/CodeList',
+    icon: <CIcon icon={cilFolderOpen} customClassName="nav-icon" />,
+  },
+  {
     component: CNavTitle,
     name: 'SAMPLE',
-  },
-  {
-    component: CNavGroup,
-    name: 'Sample',
-    to: '/sample',
-    icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'SampleList',
-        to: '/sample/sampleList',
-      },
-      {
-        component: CNavItem,
-        name: 'SampleForm',
-        to: '/sample/sampleForm',
-      },
-    ],
-  },
-  {
-    component: CNavItem,
-    name: '메인',
-    to: '/dashboard',
-    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-    badge: {
-      color: 'info',
-      text: 'NEW',
-    },
   },
   {
     component: CNavItem,

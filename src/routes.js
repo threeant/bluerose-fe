@@ -67,6 +67,7 @@ const TableList = React.lazy(() => import('./views/manage/TableList'))
 const AdminList = React.lazy(() => import('./views/system/AdminList'))
 const AdminReg = React.lazy(() => import('./views/system/AdminReg'))
 const AdminInfo = React.lazy(() => import('./views/system/AdminInfo'))
+const CodeList = React.lazy(() => import('./views/system/CodeList'))
 
 const DisplayInfo = React.lazy(() => import('./views/display/DisplayInfo'))
 const DisplayList = React.lazy(() => import('./views/display/DisplayList'))
@@ -90,6 +91,7 @@ const routes = [
   { path: '/system/adminList', name: 'AdminList', element: AdminList },
   { path: '/system/adminReg', name: 'AdminReg', element: AdminReg },
   { path: '/system/adminInfo', name: 'AdminInfo', element: AdminInfo },
+  { path: '/system/codeList', name: 'CodeList', element: CodeList },
   { path: '/sample/sampleList', exact: true, name: 'SampleForm' },
   { path: '/sample', exact: true, name: 'Sample' },
   { path: '/sample/sampleList', name: 'SampleList', element: SampleList },
