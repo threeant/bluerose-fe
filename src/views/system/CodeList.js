@@ -48,34 +48,11 @@ const CodeList = () => {
   const [selectedDate2, setSelectedDate2] = useState(null); // 등록일 to
 
 
-  // 날짜가 선택될 때 호출될 콜백 함수
-  const handleDateChange = date => {
-    setSelectedDate(date);
-    const formattedDate = date.toISOString().slice(0, 10);
-    setAlbumSearch({ ...albumSearch, startReleaseDate: formattedDate })
-
-  }
-  const handleDateChange2 = date => {
-    setSelectedDate2(date);
-    const formattedDate = date.toISOString().slice(0, 10);
-    setAlbumSearch({ ...albumSearch, endReleaseDate: formattedDate })
-  }
-
   //초기화
   const clickReset = date => {
 
-    setSelectedDate(null);
-    setSelectedDate2(null);
-
-    setAlbumSearch({
-      "artist": "",
-      "endReleaseDate": "",
-      "musicGenre": "",
-      "name": "",
-      "page": 1,
-      "size": 1,
-      "startReleaseDate": "",
-      "mediaCode": ""
+    setCodeSearch({
+      "codeStr": ""
     });
   }
 
@@ -83,32 +60,20 @@ const CodeList = () => {
     navigate('/music/albumReg');
   }
 
-  const goInfoClick = (e, id) => {
-    // 페이지 이동 방지
-    e.preventDefault();
-    console.log('goInfoClick : ' + id);
-
-    // 새로운 동작 실행
-    // 예시: id를 이용한 페이지 이동 또는 다른 동작 수행
-  };
-
-  //좌석수 숫자세팅
-  const setNumberTableCnt = (e) => {
-    const value = e.target.value;
-
-    if (value.length <= 3) {
-      setTableReqData({ ...tableReqData, tableNumber: e.target.value });
-    }
-
-  }
-
 
 
   /**********************************************************************
   * 비즈니스로직 영역
  **********************************************************************/
-  //리스트
-  const [albumDatas, setAlbumDatas] = useState({ contents: [] });
+  //마스터 리스트
+  const [codeMasterDatas, setCodeMasterDatas] = useState({ contents: [] });
+
+  // 상세 리스트
+  const [codeDatas, setCodeDatas] = useState([]);
+
+  // 선텍데이터
+  const [selCodeDatas, setSelCodeDatas] = useState({});
+
 
   // 테이블 등록
   const [tableReqData, setTableReqData] = useState(
@@ -175,46 +140,81 @@ const CodeList = () => {
 
 
   //검색조건
-  const [albumSearch, setAlbumSearch] = useState({
-    "artist": "",
-    "endReleaseDate": "",
-    "musicGenre": "",
-    "name": "",
-    "page": 0,
-    "size": 10,
-    "startReleaseDate": "",
-    "mediaCode": ""
+  const [codeSearch, setCodeSearch] = useState({
+    "codeStr": ""
   });
 
   //조회하기
   const submitSearch = (e) => {
     e.preventDefault();
-    submitSearchAlbums();
+    submitSearchCodes();
   }
 
   //페이징
   const clickPage = (e, page) => {
     e.preventDefault();
-    albumSearch.page = page;
-    submitSearchAlbums();
+    codeSearch.page = page;
+    submitSearchCodes();
     console.log("===page =  : " + page);
   }
 
   //검색 API
-  const submitSearchAlbums = async () => {
+  const submitSearchCodes = async () => {
 
-    console.log(albumSearch);
+    console.log(codeSearch);
 
     try {
-      const response = await axios.get('http://localhost:8080/api/albums', {
-        params: albumSearch,
+      const response = await axios.get('http://localhost:8080/api/code/search/master', {
+        params: codeSearch,
         headers: { 'Content-Type': 'application/json' }
       });
 
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-      setAlbumDatas(data);
+      setCodeMasterDatas(data);
+
+      console.log(data)
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  };
+
+  //코드상세조회
+  const showDetailClick = (e, data) => {
+    // 페이지 이동 방지
+    e.preventDefault();
+    console.log(data);
+
+    if (data) {
+      setSelCodeDatas(data);
+      submitSearchDetailCodes(data.code);
+    }
+  };
+
+  //검색 API
+  const submitSearchDetailCodes = async (code) => {
+
+    console.log(code);
+    console.log(selCodeDatas);
+
+
+    try {
+      const response = await axios.get('http://localhost:8080/api/code/search', {
+        params: {
+          "code": code
+        },
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      // API 응답에서 데이터 추출
+      const data = response.data;
+      // 데이터를 상태 변수에 저장
+      setCodeDatas(data);
 
       console.log(data)
 
@@ -229,17 +229,17 @@ const CodeList = () => {
   const submitRegAlbum = async (e) => {
     e.preventDefault();
 
-    console.log(albumSearch);
+    console.log(codeSearch);
 
     try {
       const response = await axios.get('http://localhost:8080/api/albums', {
-        params: albumSearch
+        params: codeSearch
       });
 
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-      setAlbumDatas(data);
+      setCodeMasterDatas(data);
 
       console.log(data)
 
@@ -258,13 +258,13 @@ const CodeList = () => {
           <CCard className="mb-4">
             <CCardHeader>코드마스터</CCardHeader>
             <CCardBody>
-              <CForm className="row" onSubmit={submitSearchAlbums}>
+              <CForm className="row" onSubmit={submitSearch}>
                 <CRow className="mb-3">
                   <CCol xs={2}>
                     <CFormLabel htmlFor="inputName" className="col-form-label">코드정보</CFormLabel>
                   </CCol>
                   <CCol xs={10}>
-                    <CFormInput type="text" id="inputName" aria-label="앨범명" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, name: e.target.value })} />
+                    <CFormInput type="text" id="inputName" aria-label="코드정보" placeholder="전체" onChange={(e) => setCodeSearch({ ...codeSearch, codeStr: e.target.value })} />
                   </CCol>
                 </CRow>
                 <div className="d-grid gap-2">
@@ -286,12 +286,12 @@ const CodeList = () => {
                   <CTableRow>
                     <CTableHeaderCell className="text-center">No</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">CODE</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">코드정보</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">코드설명</CTableHeaderCell>
                     <CTableHeaderCell className="text-center"></CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  <CTableRow v-for="item in tableItems" key="row0" onClick={(e) => goInfoClick(e, null)}>
+                  <CTableRow v-for="item in tableItems" key="row0" onClick={(e) => showDetailClick(e)}>
                     <CTableDataCell className="text-center">
                       -
                     </CTableDataCell>
@@ -307,17 +307,17 @@ const CodeList = () => {
                       </CButton>
                     </CTableDataCell>
                   </CTableRow>
-                  {albumDatas.contents && albumDatas.contents.length > 0 ? (
-                    albumDatas.contents.map((item, index) => (
-                      <CTableRow v-for="item in tableItems" key={index} onClick={(e) => goInfoClick(e, item.id)}>
+                  {codeMasterDatas.contents && codeMasterDatas.contents.length > 0 ? (
+                    codeMasterDatas.contents.map((item, index) => (
+                      <CTableRow v-for="item in tableItems" key={index} onClick={(e) => showDetailClick(e, item)}>
                         <CTableDataCell className="text-center">
                           <strong>{item.id}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <strong>{item.mediaName}</strong>
+                          <CFormInput type="text" id="inputCode" value={item.code} onChange={(e) => setTableReqData({ ...tableReqData, code: e.target.value })} maxLength={30} />
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <strong>{item.id}</strong>
+                          <CFormInput type="text" id="inputCode" value={item.description} onChange={(e) => setTableReqData({ ...tableReqData, description: e.target.value })} maxLength={30} />
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           <CButton color="success" shape="rounded-pill" className="mb-3" onClick={(e) => clickTableSong(e)}>
@@ -337,89 +337,88 @@ const CodeList = () => {
                 </CTableBody>
               </CTable>
               <br />
-              {albumDatas.contents && albumDatas.contents.length > 0 ? (
+              {codeMasterDatas.contents && codeMasterDatas.contents.length > 0 ? (
                 <CRow>
                   <CCol md={{ span: 6, offset: 5 }}>
                     <CPagination aria-label="Page navigation example">
-                      <CPaginationItem aria-label="Previous" disabled={!albumDatas.first} onClick={(e) => clickPage(e, 1)}>
+                      <CPaginationItem aria-label="Previous" disabled={!codeMasterDatas.first} onClick={(e) => clickPage(e, 1)}>
                         <span aria-hidden="true">&laquo;</span>
                       </CPaginationItem>
-                      {Array.from({ length: albumDatas.totalPages }, (_, index) => (
+                      {Array.from({ length: codeMasterDatas.totalPages }, (_, index) => (
                         <CPaginationItem key={index} active onClick={(e) => clickPage(e, index + 1)}>{index + 1}</CPaginationItem>
                       ))}
-                      <CPaginationItem aria-label="Next" disabled={!albumDatas.last}>
+                      <CPaginationItem aria-label="Next" disabled={!codeMasterDatas.last}>
                         <span aria-hidden="true">&raquo;</span>
                       </CPaginationItem>
                     </CPagination>
                   </CCol>
                   <CCol md={1}>
-                    총 {albumDatas.totalCount}건
+                    총 {codeMasterDatas.totalCount}건
                   </CCol>
                 </CRow>
               ) : ''}
             </CCardBody>
           </CCard>
-
-          <CCard className="mb-4">
-            <CCardHeader>코드상세</CCardHeader>
-            <CCardBody>
-              <CTable align="middle" >
-                <CTableHead color="dark">
-                  <CTableRow>
-                    <CTableHeaderCell className="text-center">111</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">DISP</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">전시관리</CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
-              </CTable>
-              <CTable align="middle" >
-                <CTableHead color="light">
-                  <CTableRow>
-                    <CTableHeaderCell className="text-center">No</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">CODE_NM</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">CODE_ETC_1</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">CODE_ETC_2</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">사용여부</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center"></CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
-                <CTableBody>
-                  <CTableRow v-for="item in tableItems" key="row0" >
-                    <CTableDataCell className="text-center">
-                      -
-                    </CTableDataCell>
-                    <CTableDataCell className="text-center">
-                      <CFormInput type="text" id="inputTrackNumber" value={tableReqData.numberOfSeats} onChange={(e) => setTableReqData({ ...tableReqData, numberOfSeats: e.target.value })} maxLength={5} />
-                    </CTableDataCell>
-                    <CTableDataCell className="text-center">
-                      <CFormInput type="text" id="inputTrackNumber" value={tableReqData.numberOfSeats} onChange={(e) => setTableReqData({ ...tableReqData, numberOfSeats: e.target.value })} maxLength={5} />
-                    </CTableDataCell>
-                    <CTableDataCell className="text-center">
-                      <CFormInput type="text" id="inputTrackNumber" value={tableReqData.numberOfSeats} onChange={(e) => setTableReqData({ ...tableReqData, numberOfSeats: e.target.value })} maxLength={5} />
-                    </CTableDataCell>
-                    <CTableDataCell className="text-center">
-                      <CFormSwitch id="formSwitchCheckChecked" defaultChecked="true" onChange={(e) => setTableReqData({ ...tableReqData, useYn: e.target.value })} />
-                    </CTableDataCell>
-                    <CTableDataCell className="text-center">
-                      <CButton color="info" shape="rounded-pill" className="mb-3" >
-                        추가
-                      </CButton>
-                    </CTableDataCell>
-                  </CTableRow>
-                  {albumDatas.contents && albumDatas.contents.length > 0 ? (
-                    albumDatas.contents.map((item, index) => (
-                      <CTableRow v-for="item in tableItems" key={index} onClick={(e) => goInfoClick(e, item.id)}>
+          {selCodeDatas.code ? (
+            <CCard className="mb-4">
+              <CCardHeader>코드상세</CCardHeader>
+              <CCardBody>
+                <CTable align="middle" >
+                  <CTableHead color="dark">
+                    <CTableRow>
+                      <CTableHeaderCell className="text-center">111</CTableHeaderCell>
+                      <CTableHeaderCell className="text-center">DISP</CTableHeaderCell>
+                      <CTableHeaderCell className="text-center">전시관리</CTableHeaderCell>
+                    </CTableRow>
+                  </CTableHead>
+                </CTable>
+                <CTable align="middle" >
+                  <CTableHead color="light">
+                    <CTableRow>
+                      <CTableHeaderCell className="text-center">No</CTableHeaderCell>
+                      <CTableHeaderCell className="text-center">CODE_NM</CTableHeaderCell>
+                      <CTableHeaderCell className="text-center">CODE_ETC_1</CTableHeaderCell>
+                      <CTableHeaderCell className="text-center">CODE_ETC_2</CTableHeaderCell>
+                      <CTableHeaderCell className="text-center">사용여부</CTableHeaderCell>
+                      <CTableHeaderCell className="text-center"></CTableHeaderCell>
+                    </CTableRow>
+                  </CTableHead>
+                  <CTableBody>
+                    <CTableRow v-for="item in tableItems" key="row222" >
+                      <CTableDataCell className="text-center">
+                        -
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        <CFormInput type="text" id="inputTrackNumber" value={tableReqData.numberOfSeats} onChange={(e) => setTableReqData({ ...tableReqData, numberOfSeats: e.target.value })} maxLength={5} />
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        <CFormInput type="text" id="inputTrackNumber" value={tableReqData.numberOfSeats} onChange={(e) => setTableReqData({ ...tableReqData, numberOfSeats: e.target.value })} maxLength={5} />
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        <CFormInput type="text" id="inputTrackNumber" value={tableReqData.numberOfSeats} onChange={(e) => setTableReqData({ ...tableReqData, numberOfSeats: e.target.value })} maxLength={5} />
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        <CFormSwitch id="formSwitchCheckChecked" defaultChecked="true" onChange={(e) => setTableReqData({ ...tableReqData, useYn: e.target.value })} />
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        <CButton color="info" shape="rounded-pill" className="mb-3" >
+                          추가
+                        </CButton>
+                      </CTableDataCell>
+                    </CTableRow>
+                    {codeDatas.map((item, index) => (
+                      <CTableRow v-for="item in tableItems" key={index} >
                         <CTableDataCell className="text-center">
                           <strong>{item.id}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <strong>{item.mediaName}</strong>
+                          <strong>{item.name}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <strong>{item.id}</strong>
+                          <strong>{item.etc1}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <strong>{item.id}</strong>
+                          <strong>{item.etc2}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           <CFormSwitch id="formSwitchCheckChecked" defaultChecked="true" onChange={(e) => setTableReqData({ ...tableReqData, useYn: e.target.value })} />
@@ -431,17 +430,16 @@ const CodeList = () => {
                         </CTableDataCell>
                       </CTableRow>
                     ))
-                  ) :
-                    (
-                      ''
-                    )
-                  }
-                </CTableBody>
-              </CTable>
-            </CCardBody>
-          </CCard>
-
-
+                    }
+                  </CTableBody>
+                </CTable>
+              </CCardBody>
+            </CCard>
+          ) :
+            (
+              ''
+            )
+          }
         </CCol>
       </CRow >
     </>
