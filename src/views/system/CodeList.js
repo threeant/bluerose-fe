@@ -366,9 +366,9 @@ const CodeList = () => {
                 <CTable align="middle" >
                   <CTableHead color="dark">
                     <CTableRow>
-                      <CTableHeaderCell className="text-center">111</CTableHeaderCell>
-                      <CTableHeaderCell className="text-center">DISP</CTableHeaderCell>
-                      <CTableHeaderCell className="text-center">전시관리</CTableHeaderCell>
+                      <CTableHeaderCell className="text-center">{selCodeDatas.id}</CTableHeaderCell>
+                      <CTableHeaderCell className="text-center">{selCodeDatas.code}</CTableHeaderCell>
+                      <CTableHeaderCell className="text-center">{selCodeDatas.description}</CTableHeaderCell>
                     </CTableRow>
                   </CTableHead>
                 </CTable>
