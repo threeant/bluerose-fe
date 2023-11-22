@@ -62,6 +62,8 @@ const CodeList = () => {
 
 
 
+
+
   /**********************************************************************
   * 비즈니스로직 영역
  **********************************************************************/
@@ -71,8 +73,32 @@ const CodeList = () => {
   // 상세 리스트
   const [codeDatas, setCodeDatas] = useState([]);
 
-  // 선텍데이터
+  // 선택데이터
   const [selCodeDatas, setSelCodeDatas] = useState({});
+
+  const [editedCodeMst, setEditedCodeMst] = useState(null);
+
+  //코드 마스터 등록
+  const [codeMstReqData, setCodeMstReqData] = useState(
+    {
+      "code": "",
+      "description": ""
+    }
+  );
+
+  const [codeMstUpdateData, setCodeMstUpdateData] = useState(
+    {
+      "id": "",
+      "code": "",
+      "description": ""
+    }
+  );
+
+  const handleMasterInputChange = (event) => {
+    const { id, value } = event.target;
+    const updatedItem = { ...editedCodeMst, [id]: value };
+    setEditedCodeMst(updatedItem);
+  };
 
 
   // 테이블 등록
@@ -84,7 +110,63 @@ const CodeList = () => {
     }
   );
 
+
+
+  //마스터 삭제
+  const clickRemoveCodeMst = (e, item) => {
+    e.preventDefault();
+    console.log('clickRemoveCodeMst')
+    console.log(item);
+
+  }
+
+  //마스터 수정 
+  const clickUpdateCodeMst = (e, item) => {
+    console.log('clickUpdateCodeMst')
+    console.log(item);
+    setCodeMstUpdateData(item);
+    e.preventDefault();
+    if (!item.code) {
+      alert('코드를 입력해 주세요.');
+      return;
+    }
+
+    if (!item.description) {
+      alert('코드 설명을 입력해주세요.');
+      return;
+    }
+
+    const result = window.confirm('해당 코드 마스터를 수정 하시겠습니까?');
+
+    if (!result) {
+      return;
+    }
+
+    submitUpdateCodeMst(item);
+  }
+
   //등록 클릭
+  const clickSaveCodeMst = (e) => {
+
+    e.preventDefault();
+    if (!codeMstReqData.code) {
+      alert('코드를 입력해 주세요.');
+      return;
+    }
+
+    if (!codeMstReqData.description) {
+      alert('코드 설명을 입력해주세요.');
+      return;
+    }
+
+    const result = window.confirm('해당 코드 마스터를 등록 하시겠습니까?');
+
+    if (!result) {
+      return;
+    }
+
+    submitReqCodeMst();
+  }
   const clickTableSong = (e) => {
     e.preventDefault();
 
@@ -104,31 +186,74 @@ const CodeList = () => {
       return;
     }
 
-    submitReqTable();
+    //submitReqTable();
 
   };
 
-  //곡 등록 하기 API
-  const submitReqTable = async () => {
+  //마스터 코드 등록 하기 API
+  const submitReqCodeMst = async () => {
+
 
     try {
-      const response = await axios.post('http://localhost:8080/api/tables', tableReqData, {
+      const response = await axios.post('http://localhost:8080/api/code/master', codeMstReqData, {
         headers: {
           'Content-Type': 'application/json',
         }
       });
 
-      console.log('API 응답:', response.data);
+      console.log(response);
+      if (response.data.statusCode) {
+        alert(response.data.resultMsg);
+        return;
+      }
 
       // 폼 데이터를 초기화합니다.
       alert('등록되었습니다.');
-      setTableReqData(
+      setCodeMstReqData(
         {
-          "numberOfSeats": "",
-          "settingYn": false,
-          "tableNumber": ""
+          "code": "",
+          "description": ""
         }
       );
+      submitSearchCodes();
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  };
+
+  //마스터 코드 수정 하기 API
+  const submitUpdateCodeMst = async () => {
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+
+    console.log(codeMstUpdateData);
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/code/master/' + codeMstUpdateData.id, codeMstUpdateData, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      console.log(response);
+      if (response.data.statusCode) {
+        alert(response.data.resultMsg);
+        return;
+      }
+
+      // 폼 데이터를 초기화합니다.
+      alert('수정되었습니다.');
+      setCodeMstReqData(
+        {
+          "code": "",
+          "description": ""
+        }
+      );
+      submitSearchCodes();
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -226,30 +351,7 @@ const CodeList = () => {
 
   };
 
-  const submitRegAlbum = async (e) => {
-    e.preventDefault();
 
-    console.log(codeSearch);
-
-    try {
-      const response = await axios.get('http://localhost:8080/api/albums', {
-        params: codeSearch
-      });
-
-      // API 응답에서 데이터 추출
-      const data = response.data;
-      // 데이터를 상태 변수에 저장
-      setCodeMasterDatas(data);
-
-      console.log(data)
-
-    } catch (error) {
-      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
-    }
-
-  };
 
   return (
     <>
@@ -296,13 +398,13 @@ const CodeList = () => {
                       -
                     </CTableDataCell>
                     <CTableDataCell className="text-center">
-                      <CFormInput type="text" id="inputTrackNumber" value={tableReqData.numberOfSeats} onChange={(e) => setTableReqData({ ...tableReqData, numberOfSeats: e.target.value })} maxLength={5} />
+                      <CFormInput type="text" id="inputTrackNumber" value={codeMstReqData.code} onChange={(e) => setCodeMstReqData({ ...codeMstReqData, code: e.target.value })} maxLength={20} />
                     </CTableDataCell>
                     <CTableDataCell className="text-center">
-                      <CFormInput type="text" id="inputTrackNumber" value={tableReqData.numberOfSeats} onChange={(e) => setTableReqData({ ...tableReqData, numberOfSeats: e.target.value })} maxLength={5} />
+                      <CFormInput type="text" id="inputTrackNumber" value={codeMstReqData.description} onChange={(e) => setCodeMstReqData({ ...codeMstReqData, description: e.target.value })} maxLength={20} />
                     </CTableDataCell>
                     <CTableDataCell className="text-center">
-                      <CButton color="info" shape="rounded-pill" className="mb-3" onClick={(e) => clickTableSong(e)}>
+                      <CButton color="info" shape="rounded-pill" className="mb-3" onClick={(e) => clickSaveCodeMst(e)}>
                         추가
                       </CButton>
                     </CTableDataCell>
@@ -314,16 +416,16 @@ const CodeList = () => {
                           <strong>{item.id}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <CFormInput type="text" id="inputCode" value={item.code} onChange={(e) => setTableReqData({ ...tableReqData, code: e.target.value })} maxLength={30} />
+                          <CFormInput type="text" id="inputCode" defaultValue={item.code} onChange={(e) => setCodeMasterDatas((prevData) => ({ ...prevData, contents: prevData.contents.map((content, i) => i === index ? { ...content, code: e.target.value } : content) }))} maxLength={20} />
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <CFormInput type="text" id="inputCode" value={item.description} onChange={(e) => setTableReqData({ ...tableReqData, description: e.target.value })} maxLength={30} />
+                          <CFormInput type="text" id="inputCode" defaultValue={item.description} onChange={(e) => setCodeMasterDatas((prevData) => ({ ...prevData, contents: prevData.contents.map((content, i) => i === index ? { ...content, description: e.target.value } : content) }))} maxLength={20} />
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <CButton color="success" shape="rounded-pill" className="mb-3" onClick={(e) => clickTableSong(e)}>
+                          <CButton color="success" shape="rounded-pill" className="mb-3" onClick={(e) => clickUpdateCodeMst(e, item)}>
                             수정
                           </CButton>
-                          <CButton color="dark" shape="rounded-pill" className="mb-3" onClick={(e) => clickTableSong(e)}>
+                          <CButton color="dark" shape="rounded-pill" className="mb-3" onClick={(e) => clickRemoveCodeMst(e, item)}>
                             삭제
                           </CButton>
                         </CTableDataCell>
