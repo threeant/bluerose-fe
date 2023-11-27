@@ -30,7 +30,7 @@ const AppSidebar = () => {
       }}
     >
       <CSidebarBrand className="d-none d-md-flex" to="/">
-        BLUEROSE
+        SUPERSONIC
       </CSidebarBrand>
       <CSidebarNav>
         <SimpleBar>

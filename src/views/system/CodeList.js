@@ -60,10 +60,6 @@ const CodeList = () => {
     navigate('/music/albumReg');
   }
 
-
-
-
-
   /**********************************************************************
   * 비즈니스로직 영역
  **********************************************************************/
@@ -76,8 +72,6 @@ const CodeList = () => {
   // 선택데이터
   const [selCodeDatas, setSelCodeDatas] = useState({});
 
-  const [editedCodeMst, setEditedCodeMst] = useState(null);
-
   //코드 마스터 등록
   const [codeMstReqData, setCodeMstReqData] = useState(
     {
@@ -86,32 +80,20 @@ const CodeList = () => {
     }
   );
 
-
-
-  const handleMasterInputChange = (event) => {
-    const { id, value } = event.target;
-    const updatedItem = { ...editedCodeMst, [id]: value };
-    setEditedCodeMst(updatedItem);
-  };
-
-
-  // 테이블 등록
-  const [tableReqData, setTableReqData] = useState(
+  //코드  등록
+  const [codeReqData, setCodeReqData] = useState(
     {
-      "numberOfSeats": "",
-      "settingYn": false,
-      "tableNumber": ""
+      "codeMstId": "",
+      "codeNm": "",
+      "codeEtc1": "",
+      "codeEtc2": "",
+      "useYn": true
     }
   );
 
 
-
-
   //마스터 수정 
   const clickUpdateCodeMst = (e, index) => {
-    console.log('clickUpdateCodeMst')
-    console.log(codeMasterDatas);
-    console.log(codeMasterDatas.contents[index]);
     var item = codeMasterDatas.contents[index];
 
 
@@ -157,26 +139,114 @@ const CodeList = () => {
 
     submitReqCodeMst();
   }
-  const clickTableSong = (e) => {
+
+  //마스터 수정 
+  const clickUpdateCode = (e, index) => {
+
+    var item = codeDatas[index];
+
     e.preventDefault();
-
-    if (!tableReqData.numberOfSeats) {
-      alert('테이블 번호를 입력해 주세요.');
+    if (!item.name) {
+      alert('코드를 입력해 주세요.');
       return;
     }
 
-    if (!tableReqData.tableNumber) {
-      alert('좌석수를 입력해주세요.');
-      return;
-    }
-
-    const result = window.confirm('해당 테이블을 등록 하시겠습니까?');
+    const result = window.confirm('해당 코드를 수정 하시겠습니까?');
 
     if (!result) {
       return;
     }
 
-    //submitReqTable();
+    submitUpdateCode(item);
+  }
+
+  // 코드 수정 하기 API
+  const submitUpdateCode = async (item) => {
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/code/' + item.id, item, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (response.data.statusCode) {
+        alert(response.data.resultMsg);
+        return;
+      }
+
+      // 폼 데이터를 초기화합니다.
+      alert('수정되었습니다.');
+      setCodeMstReqData(
+        {
+          "code": "",
+          "description": ""
+        }
+      );
+      submitSearchCodes();
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+
+  };
+
+  //등록 클릭
+  const clickSaveCode = (e) => {
+
+    e.preventDefault();
+    if (!codeReqData.codeNm) {
+      alert('코드명 입력해 주세요.');
+      return;
+    }
+
+    const result = window.confirm('해당 코드를 등록 하시겠습니까?');
+
+    if (!result) {
+      return;
+    }
+
+    submitReqCode();
+  }
+
+
+
+  //마스터 코드 등록 하기 API
+  const submitReqCode = async () => {
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/code', codeReqData, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (response.data.statusCode) {
+        alert(response.data.resultMsg);
+        return;
+      }
+
+
+      // 폼 데이터를 초기화합니다.
+      alert('등록되었습니다.');
+
+      const codeMstId = codeReqData.codeMstId;
+      setCodeReqData((prevCodeReqData) => ({
+        ...prevCodeReqData,
+        "codeNm": "",
+        "codeEtc1": "",
+        "codeEtc2": "",
+        "useYn": true
+      }));
+      submitSearchDetailCodes(codeMstId);
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
 
   };
 
@@ -191,7 +261,6 @@ const CodeList = () => {
         }
       });
 
-      console.log(response);
       if (response.data.statusCode) {
         alert(response.data.resultMsg);
         return;
@@ -215,12 +284,8 @@ const CodeList = () => {
 
   };
 
-  //마스터 코드 수정 하기 API
+  // 코드 마스터 수정 하기 API
   const submitUpdateCodeMst = async (item) => {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-
-
-    console.log(item);
 
     try {
       const response = await axios.post('http://localhost:8080/api/code/master/' + item.id, item, {
@@ -229,7 +294,6 @@ const CodeList = () => {
         }
       });
 
-      console.log(response);
       if (response.data.statusCode) {
         alert(response.data.resultMsg);
         return;
@@ -270,13 +334,11 @@ const CodeList = () => {
     e.preventDefault();
     codeSearch.page = page;
     submitSearchCodes();
-    console.log("===page =  : " + page);
   }
 
   //검색 API
   const submitSearchCodes = async () => {
 
-    console.log(codeSearch);
 
     try {
       const response = await axios.get('http://localhost:8080/api/code/search/master', {
@@ -289,7 +351,6 @@ const CodeList = () => {
       // 데이터를 상태 변수에 저장
       setCodeMasterDatas(data);
 
-      console.log(data)
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -303,18 +364,19 @@ const CodeList = () => {
   const showDetailClick = (e, data) => {
     // 페이지 이동 방지
     e.preventDefault();
-    console.log(data);
 
     if (data) {
       setSelCodeDatas(data);
       submitSearchDetailCodes(data.id);
+      setCodeReqData((prevCodeReqData) => ({
+        ...prevCodeReqData,
+        codeMstId: data.id
+      }));
     }
   };
 
   //검색 API
   const submitSearchDetailCodes = async (masterId) => {
-
-    console.log(masterId);
 
 
     try {
@@ -324,8 +386,6 @@ const CodeList = () => {
       const data = response.data;
       // 데이터를 상태 변수에 저장
       setCodeDatas(data);
-
-      console.log(data)
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -351,12 +411,9 @@ const CodeList = () => {
   //곡 삭제 API
   const submitDeletCodeMaster = async (codeMasterId) => {
 
-    console.log(codeMasterId);
-
     try {
       const response = await axios.delete('http://localhost:8080/api/code/master/' + codeMasterId);
 
-      console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
       alert('삭제되었습니다.');
@@ -387,17 +444,15 @@ const CodeList = () => {
   //곡 삭제 API
   const submitDeletCode = async (id) => {
 
-    console.log(id);
 
     try {
       const response = await axios.delete('http://localhost:8080/api/code/' + id);
 
-      console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
       alert('삭제되었습니다.');
-      submitSearchCodes();
-      setSelCodeDatas({});
+      const codeMstId = codeReqData.codeMstId;
+      submitSearchDetailCodes(codeMstId);
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -547,19 +602,19 @@ const CodeList = () => {
                         -
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
-                        <CFormInput type="text" id="inputTrackNumber" value={tableReqData.numberOfSeats} onChange={(e) => setTableReqData({ ...tableReqData, numberOfSeats: e.target.value })} maxLength={5} />
+                        <CFormInput type="text" id="inputName" value={codeReqData.codeNm} onChange={(e) => setCodeReqData({ ...codeReqData, codeNm: e.target.value })} maxLength={20} />
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
-                        <CFormInput type="text" id="inputTrackNumber" value={tableReqData.numberOfSeats} onChange={(e) => setTableReqData({ ...tableReqData, numberOfSeats: e.target.value })} maxLength={5} />
+                        <CFormInput type="text" id="inputEtc1" value={codeReqData.codeEtc1} onChange={(e) => setCodeReqData({ ...codeReqData, codeEtc1: e.target.value })} maxLength={20} />
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
-                        <CFormInput type="text" id="inputTrackNumber" value={tableReqData.numberOfSeats} onChange={(e) => setTableReqData({ ...tableReqData, numberOfSeats: e.target.value })} maxLength={5} />
+                        <CFormInput type="text" id="inputEtc2" value={codeReqData.codeEtc2} onChange={(e) => setCodeReqData({ ...codeReqData, codeEtc2: e.target.value })} maxLength={20} />
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
-                        <CFormSwitch id="formSwitchCheckChecked" defaultChecked="true" onChange={(e) => setTableReqData({ ...tableReqData, useYn: e.target.value })} />
+                        <CFormSwitch id="inputUseYn" checked={codeReqData.useYn} onChange={(e) => setCodeReqData({ ...codeReqData, useYn: e.target.checked })} />
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
-                        <CButton color="info" shape="rounded-pill" className="mb-3" >
+                        <CButton color="info" shape="rounded-pill" className="mb-3" onClick={(e) => clickSaveCode(e)}>
                           추가
                         </CButton>
                       </CTableDataCell>
@@ -570,18 +625,21 @@ const CodeList = () => {
                           <strong>{item.id}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <CFormInput type="text" id="inputCode" value={item.name} onChange={(e) => setCodeDatas((prevData) => prevData.map((content, i) => i === index ? { ...content, name: e.target.value } : content))} maxLength={20} />
+                          <CFormInput type="text" id={index + 'inputName'} value={item.name} onChange={(e) => setCodeDatas((prevData) => prevData.map((content, i) => i === index ? { ...content, name: e.target.value } : content))} maxLength={20} />
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <CFormInput type="text" id="inputCode" value={item.etc1} onChange={(e) => setCodeDatas((prevData) => prevData.map((content, i) => i === index ? { ...content, etc1: e.target.value } : content))} maxLength={20} />
+                          <CFormInput type="text" id={index + 'inputEtc1'} value={item.etc1} onChange={(e) => setCodeDatas((prevData) => prevData.map((content, i) => i === index ? { ...content, etc1: e.target.value } : content))} maxLength={20} />
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <CFormInput type="text" id="inputCode" value={item.etc2} onChange={(e) => setCodeDatas((prevData) => prevData.map((content, i) => i === index ? { ...content, etc2: e.target.value } : content))} maxLength={20} />
+                          <CFormInput type="text" id={index + 'inputEtc2'} value={item.etc2} onChange={(e) => setCodeDatas((prevData) => prevData.map((content, i) => i === index ? { ...content, etc2: e.target.value } : content))} maxLength={20} />
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <CFormSwitch id="formSwitchCheckChecked" defaultChecked={item.useYn} onChange={(e) => setCodeDatas((prevData) => prevData.map((content, i) => i === index ? { ...content, useYn: e.target.value } : content))} />
+                          <CFormSwitch id={index + 'useYn'} defaultChecked={item.useYn} onChange={(e) => setCodeDatas((prevData) => prevData.map((content, i) => i === index ? { ...content, useYn: e.target.checked } : content))} />
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
+                          <CButton color="success" shape="rounded-pill" className="mb-3" onClick={(e) => clickUpdateCode(e, index)}>
+                            수정
+                          </CButton>
                           <CButton color="dark" shape="rounded-pill" className="mb-3" onClick={(e) => clickDeletCode(e, item.id)}>
                             삭제
                           </CButton>
