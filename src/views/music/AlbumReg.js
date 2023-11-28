@@ -68,7 +68,57 @@ const AlbumReg = () => {
     style: '',       //스타일
     series: '',      //시리즈
     useYn: true,      //사용여부
+    image: null
   });
+
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const handleFileChange = (event) => {
+    // console.log(event);
+    // setAlbumData((prevAlbumData) => ({
+    //   ...prevAlbumData,
+    //   image: event.target.files[0]
+    // }));
+
+
+    const selectedImage = event.target.files[0];
+
+    if (selectedImage) {
+      // 이미지 파일인지 확인
+      if (selectedImage.type.startsWith('image/')) {
+        //setImage(selectedImage);
+
+        setAlbumData((prevAlbumData) => ({
+          ...prevAlbumData,
+          image: selectedImage
+        }));
+
+        // 이미지 미리보기 생성
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewUrl(reader.result);
+        };
+        reader.readAsDataURL(selectedImage);
+      } else {
+        // 이미지 파일이 아닌 경우 초기화
+        setPreviewUrl(null);
+        setAlbumData((prevAlbumData) => ({
+          ...prevAlbumData,
+          image: null
+        }));
+        alert('이미지 파일만 업로드할 수 있습니다.');
+      }
+    }
+
+  };
+
+  const handleRemoveImage = () => {
+    // 이미지 제거
+    setPreviewUrl(null);
+    setAlbumData((prevAlbumData) => ({
+      ...prevAlbumData,
+      image: null
+    }));
+  };
 
   //등록하기 API
   const submitRegAlbum = async (e) => {
@@ -81,6 +131,13 @@ const AlbumReg = () => {
       e.stopPropagation();
       return;
     }
+
+    const result = window.confirm('앨범을 등록하시겠습니까?');
+
+    if (!result) {
+      return;
+    }
+
 
     try {
       const response = await axios.post('http://localhost:8080/api/albums', albumData, {
@@ -104,9 +161,10 @@ const AlbumReg = () => {
         style: '',       //스타일
         series: '',      //시리즈
         useYn: true,      //사용여부
+        image: null
       });
       alert('등록되었습니다.');
-      navigate('/sample/sampleList');
+      navigate('/music/AlbumList');
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
       console.error('API 요청 실패:', error);
@@ -136,14 +194,26 @@ const AlbumReg = () => {
                   <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
                   <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.value })} />
                 </CCol>
-                <CCol xs={12}>
-                  <CImage rounded thumbnail align="center" src={ReactImg} width={150} height={150} />
+                <CCol xs={3}>
+                  {previewUrl ? (<CImage rounded thumbnail align="center" src={previewUrl} width={150} height={150} />) : (
+                    <CImage rounded thumbnail align="center" src={ReactImg} width={150} height={150} />
+                  )}
+                </CCol>
+                <CCol xs={9}>
                   <CCardBody>
                     <CCardText>
-                      <CFormInput type="file" id="formFile" />
+                      <CFormInput type="file" size="lg" accept="image/*" id="formFile" onChange={handleFileChange} />
                     </CCardText>
                   </CCardBody>
                 </CCol>
+                {/* <CCol xs={2}>
+                  <CCardBody>
+                    <CCardText>
+                      {previewUrl ? (
+                        <CButton color="secondary" onClick={handleRemoveImage}>삭제</CButton>) : ('')}
+                    </CCardText>
+                  </CCardBody>
+                </CCol> */}
 
                 <CCol xs={6}>
                   <CFormLabel htmlFor="lab_media">미디어*</CFormLabel>

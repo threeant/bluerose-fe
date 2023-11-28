@@ -395,7 +395,7 @@ const CodeList = () => {
 
   };
 
-  //곡 삭제 클릭
+  //코드 마스터 삭제 클릭
   const clickDeletCodeMaster = (e, codeMasterId) => {
     e.preventDefault();
 
@@ -408,7 +408,7 @@ const CodeList = () => {
     submitDeletCodeMaster(codeMasterId);
   };
 
-  //곡 삭제 API
+  //코드마스터 삭제 API
   const submitDeletCodeMaster = async (codeMasterId) => {
 
     try {

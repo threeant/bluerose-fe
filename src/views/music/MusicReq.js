@@ -107,7 +107,7 @@ const MusicReq = () => {
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-
+      console.log("현재??");
       console.log(data);
       setNowPlayingCondtionData(data);
 
@@ -296,20 +296,20 @@ const MusicReq = () => {
     }
 
 
-    submitClickConditonChange();
+    submitClickConditonChange(startYn);
   };
 
 
 
   //신청곡 시작 정지 조건 변경 API
-  const submitClickConditonChange = async () => {
+  const submitClickConditonChange = async (startYn) => {
 
 
     try {
 
       const response = await axios.post('http://localhost:8080/api/song-request/condition',
         {
-          "songRequestId": false
+          "requestSongAvailable": startYn
         }
         ,
         {
@@ -321,6 +321,8 @@ const MusicReq = () => {
       console.log('API 응답:', response.data);
 
       alert('변경되었습니다.');
+      refreshMusicReq(); //신청곡 조회
+      submitSearchNowPlayingCondition(); // 신청곡 상태조회
 
 
     } catch (error) {
@@ -401,7 +403,7 @@ const MusicReq = () => {
               <CRow className="justify-content-between">
                 <CCol xs={12}>
                   <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                    {nowPlayingConditionData ? (<CButton component="input" type="reset" color="danger" value="신청곡정지" onClick={(e) => clickConditonChange(e, false)} />)
+                    {nowPlayingConditionData.requestSongAvailable ? (<CButton component="input" type="reset" color="danger" value="신청곡정지" onClick={(e) => clickConditonChange(e, false)} />)
                       : (<CButton component="input" color="info" value="신청곡시작" onClick={(e) => clickConditonChange(e, true)} />)}
 
                   </div>

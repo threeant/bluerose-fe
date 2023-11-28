@@ -78,6 +78,46 @@ const AlbumInfo = () => {
 
   }
 
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const handleFileChange = (event) => {
+    // console.log(event);
+    // setAlbumData((prevAlbumData) => ({
+    //   ...prevAlbumData,
+    //   image: event.target.files[0]
+    // }));
+
+
+    const selectedImage = event.target.files[0];
+
+    if (selectedImage) {
+      // 이미지 파일인지 확인
+      if (selectedImage.type.startsWith('image/')) {
+        //setImage(selectedImage);
+
+        setAlbumData((prevAlbumData) => ({
+          ...prevAlbumData,
+          image: selectedImage
+        }));
+
+        // 이미지 미리보기 생성
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewUrl(reader.result);
+        };
+        reader.readAsDataURL(selectedImage);
+      } else {
+        // 이미지 파일이 아닌 경우 초기화
+        setPreviewUrl(null);
+        setAlbumData((prevAlbumData) => ({
+          ...prevAlbumData,
+          image: null
+        }));
+        alert('이미지 파일만 업로드할 수 있습니다.');
+      }
+    }
+
+  };
+
   /**********************************************************************
   * 비즈니스로직 영역
   **********************************************************************/
@@ -113,6 +153,10 @@ const AlbumInfo = () => {
       setAlbumData(data);
       console.log("앨범결과 ----")
       console.log(data);
+      if (data.imageUrl) {
+        setPreviewUrl(data.imageUrl);
+      }
+
       submitSearchSong();
 
     } catch (error) {
@@ -310,13 +354,17 @@ const AlbumInfo = () => {
                   </CCol>
                   <CCol xs={2} >
                     <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
-                    <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.value })} />
+                    <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.checked })} />
                   </CCol>
-                  <CCol xs={12}>
-                    <CImage rounded thumbnail align="center" src={ReactImg} width={150} height={150} />
+                  <CCol xs={3}>
+                    {previewUrl ? (<CImage rounded thumbnail align="center" src={previewUrl} width={150} height={150} />) : (
+                      <CImage rounded thumbnail align="center" src={ReactImg} width={150} height={150} />
+                    )}
+                  </CCol>
+                  <CCol xs={9}>
                     <CCardBody>
                       <CCardText>
-                        <CFormInput type="file" id="formFile" />
+                        <CFormInput type="file" size="lg" accept="image/*" id="formFile" onChange={handleFileChange} />
                       </CCardText>
                     </CCardBody>
                   </CCol>
