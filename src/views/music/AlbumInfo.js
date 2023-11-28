@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
@@ -79,6 +79,8 @@ const AlbumInfo = () => {
   }
 
   const [previewUrl, setPreviewUrl] = useState(null);
+  const fileInputRef = useRef(null);
+
   const handleFileChange = (event) => {
     // console.log(event);
     // setAlbumData((prevAlbumData) => ({
@@ -364,7 +366,7 @@ const AlbumInfo = () => {
                   <CCol xs={9}>
                     <CCardBody>
                       <CCardText>
-                        <CFormInput type="file" size="lg" accept="image/*" id="formFile" onChange={handleFileChange} />
+                        <CFormInput type="file" size="lg" accept="image/*" id="formFile" onChange={handleFileChange} ref={fileInputRef} />
                       </CCardText>
                     </CCardBody>
                   </CCol>
