@@ -366,7 +366,7 @@ const AlbumInfo = () => {
                   <CCol xs={9}>
                     <CCardBody>
                       <CCardText>
-                        <CFormInput type="file" size="lg" accept="image/*" id="formFile" onChange={handleFileChange} ref={fileInputRef} />
+                        <CFormInput type="file" size="lg" accept="image/*" id="formFile" onChange={handleFileChange} rref={fileInputRef} />
                       </CCardText>
                     </CCardBody>
                   </CCol>
