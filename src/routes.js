@@ -73,6 +73,10 @@ const DisplayInfo = React.lazy(() => import('./views/display/DisplayInfo'))
 const DisplayList = React.lazy(() => import('./views/display/DisplayList'))
 const DisplayReg = React.lazy(() => import('./views/display/DisplayReg'))
 
+const EventInfo = React.lazy(() => import('./views/manage/EventInfo'))
+const EventList = React.lazy(() => import('./views/manage/EventList'))
+const EventReg = React.lazy(() => import('./views/manage/EventReg'))
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/music', exact: true, name: 'Album' },
@@ -85,6 +89,9 @@ const routes = [
   { path: '/display/displayList', name: 'DisplayList', element: DisplayList },
   { path: '/display/displayInfo', name: 'DisplayInfo', element: DisplayInfo },
   { path: '/display/displayReg', name: 'DisplayReg', element: DisplayReg },
+  { path: '/manage/eventList', name: 'EventList', element: EventList },
+  { path: '/manage/eventInfo', name: 'EventInfo', element: EventInfo },
+  { path: '/manage/eventReg', name: 'EventReg', element: EventReg },
   { path: '/manage', name: 'TableList', element: TableList },
   { path: '/manage/tableList', name: 'TableList', element: TableList },
   { path: '/system', name: 'AdminList', element: AdminList },

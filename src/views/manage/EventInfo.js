@@ -34,7 +34,7 @@ import {
   CSpinner,
 } from '@coreui/react';
 import ReactImg from 'src/assets/images/image400.jpg'
-const AlbumInfo = () => {
+const EventInfo = () => {
 
   /**********************************************************************
    * 공통 영역
@@ -48,23 +48,23 @@ const AlbumInfo = () => {
    * 화면 영역
   **********************************************************************/
   const location = useLocation();
-  const { albumId } = location.state;
+  const { EventId } = location.state;
 
   //목록이동
   const goListClick = () => {
-    navigate('/music/albumList');
+    navigate('/music/EventList');
   };
   const [selectedDate, setSelectedDate] = useState(null);
   const handleDateChange = date => {
     const formattedDate = date.toISOString().slice(0, 10);
     setSelectedDate(date);
-    setAlbumData({ ...albumData, releaseDate: formattedDate })
+    setEventData({ ...EventData, releaseDate: formattedDate })
 
   }
 
   useEffect(() => {
 
-    submitSearchAlbum();
+    submitSearchEvent();
 
   }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
 
@@ -83,8 +83,8 @@ const AlbumInfo = () => {
 
   const handleFileChange = (event) => {
     // console.log(event);
-    // setAlbumData((prevAlbumData) => ({
-    //   ...prevAlbumData,
+    // setEventData((prevEventData) => ({
+    //   ...prevEventData,
     //   image: event.target.files[0]
     // }));
 
@@ -96,8 +96,8 @@ const AlbumInfo = () => {
       if (selectedImage.type.startsWith('image/')) {
         //setImage(selectedImage);
 
-        setAlbumData((prevAlbumData) => ({
-          ...prevAlbumData,
+        setEventData((prevEventData) => ({
+          ...prevEventData,
           image: selectedImage
         }));
 
@@ -110,8 +110,8 @@ const AlbumInfo = () => {
       } else {
         // 이미지 파일이 아닌 경우 초기화
         setPreviewUrl(null);
-        setAlbumData((prevAlbumData) => ({
-          ...prevAlbumData,
+        setEventData((prevEventData) => ({
+          ...prevEventData,
           image: null
         }));
         alert('이미지 파일만 업로드할 수 있습니다.');
@@ -127,7 +127,7 @@ const AlbumInfo = () => {
   const [validated, setValidated] = useState(false);
 
   //앨범 상세 
-  const [albumData, setAlbumData] = useState();
+  const [EventData, setEventData] = useState();
 
   // 곡조회리스트
   const [songDatas, setSongDatas] = useState([]);
@@ -144,15 +144,15 @@ const AlbumInfo = () => {
 
 
   //앨범 검색 API
-  const submitSearchAlbum = async () => {
+  const submitSearchEvent = async () => {
 
     try {
-      const response = await axios.get('http://localhost:8080/api/albums/' + albumId);
+      const response = await axios.get('http://localhost:8080/api/Events/' + EventId);
 
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-      setAlbumData(data);
+      setEventData(data);
       console.log("앨범결과 ----")
       console.log(data);
       if (data.imageUrl) {
@@ -173,7 +173,7 @@ const AlbumInfo = () => {
   const submitSearchSong = async () => {
 
     try {
-      const response = await axios.get('http://localhost:8080/api/albums/' + albumId + '/songs');
+      const response = await axios.get('http://localhost:8080/api/Events/' + EventId + '/songs');
 
       // API 응답에서 데이터 추출
       const data = response.data;
@@ -191,10 +191,10 @@ const AlbumInfo = () => {
   };
 
   //앨범 수정하기 API
-  const submitUpdateAlbum = async (e) => {
+  const submitUpdateEvent = async (e) => {
     e.preventDefault();
 
-    console.log(albumData);
+    console.log(EventData);
     setValidated(true);
     const form = e.currentTarget;
     if (form.checkValidity() === false) {
@@ -210,7 +210,7 @@ const AlbumInfo = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/api/albums/' + albumId, albumData, {
+      const response = await axios.post('http://localhost:8080/api/Events/' + EventId, EventData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -269,7 +269,7 @@ const AlbumInfo = () => {
   const submitReqSong = async () => {
 
     try {
-      const response = await axios.post('http://localhost:8080/api/albums/' + albumId + '/songs', songReqData, {
+      const response = await axios.post('http://localhost:8080/api/Events/' + EventId + '/songs', songReqData, {
         headers: {
           'Content-Type': 'application/json',
         }
@@ -344,19 +344,19 @@ const AlbumInfo = () => {
               <strong>앨범수정</strong> <small></small>
             </CCardHeader>
             <CCardBody>
-              {albumData ? (
+              {EventData ? (
                 <CForm
                   className="row g-3 needs-validation"
                   noValidate
                   validated={validated}
-                  onSubmit={submitUpdateAlbum}
+                  onSubmit={submitUpdateEvent}
                 >
                   <CCol xs={10} >
-                    <CFormLabel htmlFor="validationCustom04">ID : {albumId}</CFormLabel>
+                    <CFormLabel htmlFor="validationCustom04">ID : {EventId}</CFormLabel>
                   </CCol>
                   <CCol xs={2} >
                     <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
-                    <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.checked })} />
+                    <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={EventData.useYn} onChange={(e) => setEventData({ ...EventData, useYn: e.target.checked })} />
                   </CCol>
                   <CCol xs={3}>
                     {previewUrl ? (<CImage rounded thumbnail align="center" src={previewUrl} width={150} height={150} />) : (
@@ -373,7 +373,7 @@ const AlbumInfo = () => {
 
                   <CCol xs={6}>
                     <CFormLabel htmlFor="lab_media">미디어*</CFormLabel>
-                    <CFormSelect id="sel_media" value={albumData.media} onChange={(e) => setAlbumData({ ...albumData, media: e.target.value })}  >
+                    <CFormSelect id="sel_media" value={EventData.media} onChange={(e) => setEventData({ ...EventData, media: e.target.value })}  >
                       {midiaCD.map((item, index) => (
                         <option value={item.id} key={index}>{item.name}</option>
                       ))}
@@ -382,32 +382,32 @@ const AlbumInfo = () => {
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputLabel">Label</CFormLabel>
-                    <CFormInput type="text" id="inputLabel" value={albumData.label} onChange={(e) => setAlbumData({ ...albumData, label: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="inputLabel" value={EventData.label} onChange={(e) => setEventData({ ...EventData, label: e.target.value })} maxLength={100} />
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputName">앨범명*</CFormLabel>
-                    <CFormInput type="text" id="inputName" value={albumData.name} required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="inputName" value={EventData.name} required onChange={(e) => setEventData({ ...EventData, name: e.target.value })} maxLength={100} />
                     <CFormFeedback invalid>앨범명을 입력해주세요.</CFormFeedback>
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputAartist">아티스트*</CFormLabel>
-                    <CFormInput type="text" id="inputAartist" value={albumData.artist} required onChange={(e) => setAlbumData({ ...albumData, artist: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="inputAartist" value={EventData.artist} required onChange={(e) => setEventData({ ...EventData, artist: e.target.value })} maxLength={100} />
                     <CFormFeedback invalid>아티스트를 입력해주세요.</CFormFeedback>
                   </CCol>
 
                   <CCol md={12}>
                     <CFormLabel htmlFor="inputSeries">Series</CFormLabel>
-                    <CFormInput type="text" id="inputSeries" value={albumData.series} onChange={(e) => setAlbumData({ ...albumData, series: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="inputSeries" value={EventData.series} onChange={(e) => setEventData({ ...EventData, series: e.target.value })} maxLength={100} />
                   </CCol>
 
                   <CCol xs={12}>
                     <CFormLabel htmlFor="inputFormat">Format</CFormLabel>
-                    <CFormTextarea id="inputFormat" rows="3" value={albumData.format} onChange={(e) => setAlbumData({ ...albumData, format: e.target.value })} maxLength={250}  ></CFormTextarea>
+                    <CFormTextarea id="inputFormat" rows="3" value={EventData.format} onChange={(e) => setEventData({ ...EventData, format: e.target.value })} maxLength={250}  ></CFormTextarea>
                   </CCol>
                   <CCol xs={6}>
                     <CFormLabel htmlFor="inputCountry">발매국가*</CFormLabel>
                     <div >
-                      <CFormSelect id="inputCountry" value={albumData.countryCD} onChange={(e) => setAlbumData({ ...albumData, countryCD: e.target.value })}>
+                      <CFormSelect id="inputCountry" value={EventData.countryCD} onChange={(e) => setEventData({ ...EventData, countryCD: e.target.value })}>
                         {cntryCD.map((item, index) => (
                           <option value={item.id} key={index}>{item.name}</option>
                         ))}
@@ -430,18 +430,18 @@ const AlbumInfo = () => {
                           minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
                           maxDate={new Date()} // maxDate 이후 날짜 선택 불가
                           className="DatePicker"
-                          value={albumData.releaseDate}
+                          value={EventData.releaseDate}
                         />
                       </div>
                     </div>
                   </CCol>
                   <CCol md={12}>
                     <CFormLabel htmlFor="txt_genre">장르</CFormLabel>
-                    <CFormInput type="text" id="txt_genre" value={albumData.musicGenre} onChange={(e) => setAlbumData({ ...albumData, musicGenre: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="txt_genre" value={EventData.musicGenre} onChange={(e) => setEventData({ ...EventData, musicGenre: e.target.value })} maxLength={100} />
                   </CCol>
                   <CCol md={12}>
                     <CFormLabel htmlFor="txt_style">Style</CFormLabel>
-                    <CFormInput type="text" id="txt_style" value={albumData.style} onChange={(e) => setAlbumData({ ...albumData, style: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="txt_style" value={EventData.style} onChange={(e) => setEventData({ ...EventData, style: e.target.value })} maxLength={100} />
                   </CCol>
                   <div className="d-grid gap-2">
                     <CRow className="justify-content-between">
@@ -466,7 +466,7 @@ const AlbumInfo = () => {
         <CCardHeader>
           <strong>곡</strong> <small></small>
         </CCardHeader>
-        {albumData ? (
+        {EventData ? (
           <CCardBody>
             <CRow>
               <CCol xs={1}>
@@ -536,4 +536,4 @@ const AlbumInfo = () => {
 };
 
 
-export default AlbumInfo;
+export default EventInfo;

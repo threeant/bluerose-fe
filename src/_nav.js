@@ -98,18 +98,13 @@ const _nav = [
   {
     component: CNavGroup,
     name: '이벤트관리',
-    to: '/music',
+    to: '/manage',
     icon: <CIcon icon={cilBirthdayCake} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: '이벤트관리',
-        to: '/',
-      },
-      {
-        component: CNavItem,
-        name: '참여자관리',
-        to: '/',
+        to: '/manage/eventList',
       },
     ],
   },
