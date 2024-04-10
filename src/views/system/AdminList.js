@@ -3,7 +3,8 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import axiosInstance from '../../common/axiosInstance';
+
 import { getCodeList } from '../../common/utils'
 import {
   CAvatar,
@@ -94,7 +95,7 @@ const AlbumList = () => {
   * 비즈니스로직 영역
  **********************************************************************/
   //리스트
-  const [albumDatas, setAlbumDatas] = useState({ contents: [] });
+  const [albumDatas, setAdminDatas] = useState({ contents: [] });
 
   //검색조건
   const [albumSearch, setAlbumSearch] = useState({
@@ -111,24 +112,24 @@ const AlbumList = () => {
   //조회하기
   const submitSearch = (e) => {
     e.preventDefault();
-    submitSearchAlbums();
+    submitSearchAdmin();
   }
 
   //페이징
   const clickPage = (e, page) => {
     e.preventDefault();
     albumSearch.page = page;
-    submitSearchAlbums();
+    submitSearchAdmin();
     console.log("===page =  : " + page);
   }
 
   //검색 API
-  const submitSearchAlbums = async () => {
+  const submitSearchAdmin = async () => {
 
     console.log(albumSearch);
 
     try {
-      const response = await axios.get('http://localhost:8080/api/albums', {
+      const response = await axiosInstance.get('/api/admin', {
         params: albumSearch,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -136,7 +137,7 @@ const AlbumList = () => {
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-      setAlbumDatas(data);
+      setAdminDatas(data);
 
       console.log(data)
 
@@ -154,14 +155,14 @@ const AlbumList = () => {
     console.log(albumSearch);
 
     try {
-      const response = await axios.get('http://localhost:8080/api/albums', {
+      const response = await axiosInstance.get('/api/albums', {
         params: albumSearch
       });
 
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-      setAlbumDatas(data);
+      setAdminDatas(data);
 
       console.log(data)
 
@@ -180,7 +181,7 @@ const AlbumList = () => {
           <CCard className="mb-4">
             <CCardHeader><strong>관리자검색</strong></CCardHeader>
             <CCardBody>
-              <CForm className="row" onSubmit={submitSearchAlbums}>
+              <CForm className="row" onSubmit={submitSearchAdmin}>
                 <CRow className="mb-3">
                   <CCol xs={1}>
                     <CFormLabel htmlFor="inputName" className="col-form-label">아이디</CFormLabel>

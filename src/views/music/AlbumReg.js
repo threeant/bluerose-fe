@@ -3,12 +3,12 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
 import { getCodeList } from '../../common/utils'
 import {
   cilCalendar,
   cifUs,
 } from '@coreui/icons';
+import axiosInstance from '../../common/axiosInstance';
 
 import {
   CButton,
@@ -140,7 +140,7 @@ const AlbumReg = () => {
 
 
     try {
-      const response = await axios.post('http://localhost:8080/api/albums', albumData, {
+      const response = await axiosInstance.post('/api/albums', albumData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }

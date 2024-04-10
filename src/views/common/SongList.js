@@ -5,6 +5,8 @@ import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { getCodeList } from '../../common/utils'
+import PaginationComponent from './PaginationComponent';
+
 import {
   CAvatar,
   CButton,
@@ -29,6 +31,8 @@ import {
 } from '@coreui/react'
 import PropTypes from 'prop-types';
 
+import axiosInstance from '../../common/axiosInstance';
+
 import {
   cilCalendar
 } from '@coreui/icons'
@@ -36,7 +40,7 @@ import {
 
 
 
-const SongList = ({ openModal }) => {
+const SongList = ({ openModal, sendDataToParent }) => {
   /**********************************************************************
    * 공통코드 영역
   **********************************************************************/
@@ -52,6 +56,10 @@ const SongList = ({ openModal }) => {
 
   const [selectedDate, setSelectedDate] = useState(null); //등록일 from
   const [selectedDate2, setSelectedDate2] = useState(null); // 등록일 to
+
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
+  const [totalPages, setTotalPages] = useState(0); // 현재 페이지 상태
+
 
 
   // 날짜가 선택될 때 호출될 콜백 함수
@@ -80,7 +88,7 @@ const SongList = ({ openModal }) => {
       "musicGenre": "",
       "name": "",
       "page": 1,
-      "size": 999,
+      "size": 10,
       "startReleaseDate": "",
       "mediaCode": ""
     });
@@ -98,6 +106,11 @@ const SongList = ({ openModal }) => {
   //검색조건
   const [songSearch, setSongSearch] = useState({});
 
+  // 각 체크박스의 상태를 저장할 배열 상태
+  const [checkboxStates, setCheckboxStates] = useState(Array(songDatas.contents.length).fill(false));
+
+
+
   //조회하기
   const submitSearch = (e) => {
     e.preventDefault();
@@ -112,41 +125,37 @@ const SongList = ({ openModal }) => {
     console.log("===page =  : " + page);
   }
 
+
+
   //검색조건
   const [albumSearch, setAlbumSearch] = useState({});
 
-  //신청곡등록
-  const submitRegSongReq = async (e) => {
-    e.preventDefault();
-
-    console.log(albumSearch);
-
-    try {
-      const response = await axios.get('http://localhost:8080/api/albums', {
-        params: albumSearch
-      });
-
-      // API 응답에서 데이터 추출
-      const data = response.data;
-      // 데이터를 상태 변수에 저장
-
-      console.log(data)
-
-    } catch (error) {
-      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
-    }
-
+  //페이지 변경
+  const handlePageChange = (page) => {
+    console.log('현재페이지 ');
+    console.log(page);
+    setCurrentPage(page); // 페이지 변경 시 현재 페이지 상태 업데이트
+    submitSearchSongs(page);
   };
 
+  
+
   //검색 API
-  const submitSearchSongs = async () => {
+  const submitSearchSongs = async (page) => {
 
     console.log(songSearch);
 
+    if(page > -1){
+      setSongSearch(prevState => ({
+        ...prevState,
+        page: page
+      }));
+
+      songSearch.page = page;
+    }
+
     try {
-      const response = await axios.get('http://localhost:8080/api/songs', {
+      const response = await axiosInstance.get('/api/songs', {
         params: songSearch,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -156,7 +165,8 @@ const SongList = ({ openModal }) => {
       // 데이터를 상태 변수에 저장
       setSongDatas(data);
 
-      console.log(data)
+      console.log(data);
+      setTotalPages(data.totalPages)
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -174,19 +184,25 @@ const SongList = ({ openModal }) => {
 
 
   //체크박스체크
-  const chkSongClick = (e, id) => {
+  const chkSongClick = (e, item, index) => {
     // 페이지 이동 방지
-    var songChkData = {
-      "songId": id,
-      "tableId": 0
-    };
+    // var songChkData = {
+    //   "songId": id,
+    //   "tableId": 0
+    // };
     console.log(e.target.checked);
     if (e.target.checked) {
-      setSongChkDatas((prevData) => [...prevData, songChkData]);
+      setSongChkDatas((prevData) => [...prevData, item]);
     } else {
-      setSongChkDatas((prevData) => prevData.filter(item => item.songId !== id));
+      setSongChkDatas((prevData) => prevData.filter(item => item.songId !== item.id));
     }
+
+    const updatedCheckboxStates = [...checkboxStates];
+    updatedCheckboxStates[index] = !updatedCheckboxStates[index];
+    setCheckboxStates(updatedCheckboxStates);
   };
+
+  
 
   //추가
   const submitRegAlbum = async (e) => {
@@ -194,7 +210,7 @@ const SongList = ({ openModal }) => {
     console.log(songChkDatas);
 
     if (songChkDatas.length == 0) {
-      alert('신청할 데이터를 선택해주세요');
+      alert('곡을 선택해주세요');
       return;
     } else {
       const result = window.confirm('해당곡을 등록 하시겠습니까?');
@@ -210,24 +226,17 @@ const SongList = ({ openModal }) => {
       return;
     }
 
-    try {
-      const response = await axios.post('http://localhost:8080/api/song-request', songChkDatas, {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
+    setSongChkDatas([]);
+    setCheckboxStates(Array(songDatas.contents.length).fill(false));
+    
+    
 
-      console.log('API 응답:', response.data);
+    sendDataToParent(songChkDatas);
 
-      alert('등록되었습니다.');
+    
 
-      openModal(false);
 
-    } catch (error) {
-      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
-    }
+    //openModal(false);
 
   };
 
@@ -354,11 +363,12 @@ const SongList = ({ openModal }) => {
                           <input
                             id={'chk_' + index}
                             type="checkbox"
-                            onChange={(e) => chkSongClick(e, item.id)}
+                            onChange={(e) => chkSongClick(e, item, index)}
+                            checked={checkboxStates[index]}
                           />
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <strong>{item.id}</strong>
+                        <label htmlFor={'chk_' + index}><strong>{item.songId}</strong></label>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           <strong>{item.mediaName}</strong>
@@ -370,10 +380,10 @@ const SongList = ({ openModal }) => {
                           {item.artist}
                         </CTableDataCell>
                         <CTableDataCell className="text-left">
-                          {item.trackName}
+                          <label htmlFor={'chk_' + index}> <strong>{item.trackName}</strong></label>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {item.trackNumber}
+                          {item.trackInfo}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           {item.runtime}
@@ -394,20 +404,11 @@ const SongList = ({ openModal }) => {
               <br />
               {songDatas.contents && songDatas.contents.length > 0 ? (
                 <CRow>
-                  <CCol md={{ span: 8, offset: 5 }}>
-                    <CPagination aria-label="Page navigation example">
-                      <CPaginationItem aria-label="Previous" disabled={!songDatas.first} onClick={(e) => clickPage(e, 1)}>
-                        <span aria-hidden="true">&laquo;</span>
-                      </CPaginationItem>
-                      {Array.from({ length: songDatas.totalPages }, (_, index) => (
-                        <CPaginationItem key={index} className={songDatas.number == index + 1 ? 'active' : ''} onClick={(e) => clickPage(e, index + 1)}>{index + 1}</CPaginationItem>
-                      ))}
-                      <CPaginationItem aria-label="Next" disabled={!songDatas.last}>
-                        <span aria-hidden="true">&raquo;</span>
-                      </CPaginationItem>
-                    </CPagination>
+                  <CCol md={{ span: 5, offset: 5 }}>
+                  <PaginationComponent totalPages={totalPages} currentPage={currentPage} onPageChange={handlePageChange} />
+                    
                   </CCol>
-                  <CCol md={1}>
+                  <CCol md={2}>
                     총 {songDatas.totalCount}건
                   </CCol>
                 </CRow>
@@ -422,6 +423,7 @@ const SongList = ({ openModal }) => {
 
 SongList.propTypes = {
   openModal: PropTypes.func, // openModal 프로퍼티의 타입을 지정
+  sendDataToParent: PropTypes.func,
 };
 
 export default SongList

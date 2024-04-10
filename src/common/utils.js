@@ -1,4 +1,20 @@
 // utils.js
+import React from 'react';
+import { useNavigate } from 'react-router-dom'
+
+export const isAuthenticated = () => {
+    const accessToken = sessionStorage.getItem('accessToken'); // 세션 스토리지에서 토큰을 가져옴
+  
+    // 토큰이 있고 만료되지 않았다면 인증된 상태로 간주
+    if (accessToken) {
+      // 여기에서 토큰의 만료 여부를 확인하는 로직을 추가하세요
+      // 예: 토큰의 만료 시간과 현재 시간을 비교
+      return true; // 현재는 단순히 토큰이 있는지만 확인
+    }
+  
+    return false;
+  };
+
 
 //공통코드 호출
 export function getCodeList(codeNm) {
@@ -27,6 +43,29 @@ export function getCodeList(codeNm) {
     }
 
     return rtnCodeList;
+}
+
+export function throwError(error,navigate) {
+    const statusCode = error.response.status;
+    console.log('>>>error');
+    console.log(error)
+    
+
+    // 오류 코드에 따른 분기 처리
+    switch (statusCode) {
+    case 401:
+        navigate('/login');
+        break;
+      case 404:
+        navigate('/404');
+        break;
+      case 500:
+        navigate('/500');
+        break;
+      default:
+        navigate('/error');
+    }
+
 }
 
 /******************************************************************************

@@ -6,10 +6,10 @@ import {
   cilSync
 } from '@coreui/icons'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
 import { getCodeList, getCurrentDate, getAddDate } from '../../common/utils'
 import SongList from '../common/SongList'; // MyModal 컴포넌트의 경로를 알맞게 설정
 import AlbumInfo from '../common/AlbumInfo'
+import axiosInstance from '../../common/axiosInstance';
 import {
   CAvatar,
   CButton,
@@ -58,6 +58,7 @@ const MusicReq = () => {
   **********************************************************************/
   useEffect(() => {
     refreshMusicReq(); //신청곡 조회
+    
     submitSearchNowPlayingCondition(); // 신청곡 상태조회
   }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
 
@@ -100,7 +101,7 @@ const MusicReq = () => {
 
 
     try {
-      const response = await axios.get('http://localhost:8080/api/song-request/condition', {
+      const response = await axiosInstance.get('/api/song-request/condition', {
         headers: { 'Content-Type': 'application/json' }
       });
 
@@ -140,7 +141,7 @@ const MusicReq = () => {
 
 
     try {
-      const response = await axios.get('http://localhost:8080/api/song-request', {
+      const response = await axiosInstance.get('/api/song-request', {
         params: {
           "date": dateStr
         },
@@ -167,7 +168,7 @@ const MusicReq = () => {
 
 
     try {
-      const response = await axios.get('http://localhost:8080/api/song-request/now-playing', {
+      const response = await axiosInstance.get('/api/song-request/now-playing', {
         params: {
           "date": dateStr
         },
@@ -209,7 +210,7 @@ const MusicReq = () => {
     console.log(musicReqId);
 
     try {
-      const response = await axios.post('http://localhost:8080/api/song-request/now-playing/register',
+      const response = await axiosInstance.post('/api/song-request/now-playing/register',
         {
           "songRequestId": musicReqId
         }
@@ -255,7 +256,7 @@ const MusicReq = () => {
     console.log(musicReqId);
 
     try {
-      const response = await axios.delete('http://localhost:8080/api/song-request/' + musicReqId);
+      const response = await axiosInstance.delete('/api/song-request/' + musicReqId);
 
       console.log('API 응답:', response.data);
 
@@ -307,7 +308,7 @@ const MusicReq = () => {
 
     try {
 
-      const response = await axios.post('http://localhost:8080/api/song-request/condition',
+      const response = await axiosInstance.post('/api/song-request/condition',
         {
           "requestSongAvailable": startYn
         }
@@ -353,7 +354,7 @@ const MusicReq = () => {
 
 
     try {
-      const response = await axios.post('http://localhost:8080/api/song-request/now-playing/complete');
+      const response = await axiosInstance.post('/api/song-request/now-playing/complete');
 
       console.log('API 응답:', response.data);
 
@@ -371,6 +372,39 @@ const MusicReq = () => {
 
   }
 
+ // 신청곡 추가 callback
+  const handleDataFromSongList = async(datas) => {
+    // 부모 컴포넌트에서 전달받은 데이터 처리
+    console.log('Data from child:', datas);
+    console.log(datas);
+    var songIdArr = [];
+      for(var i = 0 ; i < datas.length; i++){
+      songIdArr[i] = {
+        "songId": datas[i].songId,
+        "tableId": 1
+      };
+    }
+
+    try {
+      const response = await axiosInstance.post('/api/song-request', songIdArr, {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+      console.log('API 응답:', response.data);
+
+      // 폼 데이터를 초기화합니다.
+      alert(' 추가 되었습니다.');
+      refreshMusicReq(); //신청곡 조회
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+    
+  };
+
+
   return (
     <>
       <CModal
@@ -382,7 +416,7 @@ const MusicReq = () => {
         <CModalHeader>
           <CModalTitle id="OptionalSizesExample1">신청곡 추가</CModalTitle>
         </CModalHeader>
-        <CModalBody><SongList openModal={controllSongModal} /></CModalBody>
+        <CModalBody><SongList openModal={controllSongModal} sendDataToParent={handleDataFromSongList}/></CModalBody>
       </CModal>
       <CModal
         size="xl"
@@ -503,28 +537,28 @@ const MusicReq = () => {
                     musicReqDatas.map((item, index) => (
                       <CTableRow v-for="item in tableItems" key={index} >
                         <CTableDataCell className="text-center">
-                          <strong>{item.id}</strong>
+                          <strong>{index+1}</strong>
                         </CTableDataCell>
-                        <CTableDataCell className="text-center">
+                        <CTableDataCell className="text-left">
                           <strong><a href='/' onClick={(e) => popAlbumInfoClick(e, item.albumId)}>{item.albumName}</a></strong>
                         </CTableDataCell>
-                        <CTableDataCell className="text-center">
+                        <CTableDataCell className="text-left">
                           {item.artist}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           {item.trackNumber}
                         </CTableDataCell>
-                        <CTableDataCell className="text-center">
+                        <CTableDataCell className="text-left">
                           {item.title}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {item.tableNumber == '0' ? '관리자' : item.tableNumber}
+                          {item.tableName == '0' ? '관리자' : item.tableName}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <CButton color="success" shape="rounded-pill" className="mb-3" onClick={(e) => clickSelectMusicReq(e, item.id)}>
+                          <CButton color="success" shape="rounded-pill" className="mb-3" onClick={(e) => clickSelectMusicReq(e, item.songRequestId)}>
                             선곡
                           </CButton>
-                          <CButton color="dark" shape="rounded-pill" className="mb-3" onClick={(e) => clickDeletMusicReq(e, item.id)}>
+                          <CButton color="dark" shape="rounded-pill" className="mb-3" onClick={(e) => clickDeletMusicReq(e, item.songRequestId)}>
                             삭제
                           </CButton>
                         </CTableDataCell>

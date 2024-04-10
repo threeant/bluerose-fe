@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useNavigate, useLocation } from 'react-router-dom'
-import axios from 'axios'
+import axiosInstance from '../../common/axiosInstance';
+
+
 import CIcon from '@coreui/icons-react'
 import {
   CButton,
@@ -42,7 +44,7 @@ const TableList = () => {
     const value = e.target.value;
 
     if (value.length <= 3) {
-      setTableReqData({ ...tableReqData, tableNumber: e.target.value });
+      setTableReqData({ ...tableReqData, tableName: e.target.value });
     }
 
   }
@@ -58,7 +60,7 @@ const TableList = () => {
     {
       "numberOfSeats": "",
       "settingYn": false,
-      "tableNumber": ""
+      "tableName": ""
     }
   );
 
@@ -67,7 +69,7 @@ const TableList = () => {
   const submitSearchTable = async () => {
 
     try {
-      const response = await axios.get('http://localhost:8080/api/tables');
+      const response = await axiosInstance.get('/api/tables');
 
       // API 응답에서 데이터 추출
       const data = response.data;
@@ -94,10 +96,12 @@ const TableList = () => {
       return;
     }
 
-    if (!tableReqData.tableNumber) {
+    if (!tableReqData.tableName) {
       alert('좌석수를 입력해주세요.');
       return;
     }
+
+
 
     const result = window.confirm('해당 테이블을 등록 하시겠습니까?');
 
@@ -110,33 +114,40 @@ const TableList = () => {
   };
 
 
-  //곡 등록 하기 API
+  //등록 하기 API
   const submitReqTable = async () => {
 
     try {
-      const response = await axios.post('http://localhost:8080/api/tables', tableReqData, {
+      const response = await axiosInstance.post('/api/tables', tableReqData, {
         headers: {
           'Content-Type': 'application/json',
         }
       });
 
       console.log('API 응답:', response.data);
+      console.log(response.data);
+      if (response.status === 200) {
+        
+        // 폼 데이터를 초기화합니다.
+        alert('등록되었습니다.');
+        submitSearchTable();
+        setTableReqData(
+          {
+            "numberOfSeats": "",
+            "settingYn": false,
+            "tableName": ""
+          }
+        );
+      } else {
+        alert('오류 발생');
+      }
 
-      // 폼 데이터를 초기화합니다.
-      alert('등록되었습니다.');
-      submitSearchTable();
-      setTableReqData(
-        {
-          "numberOfSeats": "",
-          "settingYn": false,
-          "tableNumber": ""
-        }
-      );
+      
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
       console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      alert(error.response.data.message);
     }
 
   };
@@ -160,7 +171,7 @@ const TableList = () => {
 
 
     try {
-      const response = await axios.delete('http://localhost:8080/api/tables/' + tableId);
+      const response = await axiosInstance.delete('/api/tables/' + tableId);
 
       console.log('API 응답:', response.data);
 
@@ -211,10 +222,10 @@ const TableList = () => {
                 <CFormInput type="text" id="staNoReq" value="-" readOnly plainText />
               </CCol>
               <CCol xs={5}>
-                <CFormInput type="text" id="inputTrackNumber" value={tableReqData.numberOfSeats} onChange={(e) => setTableReqData({ ...tableReqData, numberOfSeats: e.target.value })} maxLength={5} />
+                <CFormInput type="text" id="inputTableName" value={tableReqData.tableName} onChange={(e) => setTableReqData({ ...tableReqData, tableName: e.target.value })} maxLength={5} />
               </CCol>
               <CCol xs={3}>
-                <CFormInput type="number" id="inputTrackName" value={tableReqData.tableNumber} onChange={setNumberTableCnt} />
+                <CFormInput type="number" id="inputTrackNumber" value={tableReqData.numberOfSeats} onChange={(e) => setTableReqData({ ...tableReqData, numberOfSeats: e.target.value })} />
               </CCol>
               <CCol xs={2}>
                 <CFormInput type="text" id="inputTrackRuntime" value="-" readOnly plainText />
@@ -231,10 +242,11 @@ const TableList = () => {
                   <CFormInput type="text" id={'txtNoReq${index}'} value={tableDatas.length - index} readOnly plainText />
                 </CCol>
                 <CCol xs={5}>
-                  <CFormInput type="text" id={'txtNumberOfSeats${index}'} value={item.numberOfSeats} readOnly plainText />
+                  <CFormInput type="text" id={'txtTableNumber${index}'} value={item.tableName} readOnly plainText />
+                  
                 </CCol>
                 <CCol xs={3}>
-                  <CFormInput type="text" id={'txtTableNumber${index}'} value={item.tableNumber} readOnly plainText />
+                  <CFormInput type="text" id={'txtNumberOfSeats${index}'} value={item.numberOfSeats} readOnly plainText />
                 </CCol>
                 <CCol xs={2}>
                   <CFormInput type="text" id={'txtSettingYn${index}'} value={item.settingYn} readOnly plainText />

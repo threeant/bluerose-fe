@@ -29,7 +29,7 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: '메인관리',
+    name: '메인관리*',
     to: '/display',
     icon: <CIcon icon={cilMobileLandscape} customClassName="nav-icon" />,
     items: [
@@ -62,7 +62,7 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: '대용량업로드',
+        name: '대용량업로드*',
         to: '/music/albumUpload',
       },
     ],
@@ -124,19 +124,19 @@ const _nav = [
     to: '/system/CodeList',
     icon: <CIcon icon={cilFolderOpen} customClassName="nav-icon" />,
   },
-  {
-    component: CNavTitle,
-    name: 'SAMPLE',
-  },
-  {
-    component: CNavItem,
-    name: '로그인',
-    to: '/login',
-    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-    badge: {
-      color: 'info',
-    },
-  }
+  // {
+  //   component: CNavTitle,
+  //   name: 'SAMPLE',
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: '로그인',
+  //   to: '/login',
+  //   icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+  //   badge: {
+  //     color: 'info',
+  //   },
+  // }
 ]
 
 export default _nav

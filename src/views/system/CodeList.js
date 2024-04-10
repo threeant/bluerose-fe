@@ -5,6 +5,7 @@ import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { getCodeList } from '../../common/utils'
+import axiosInstance from '../../common/axiosInstance';
 import {
   CAvatar,
   CButton,
@@ -164,7 +165,7 @@ const CodeList = () => {
   const submitUpdateCode = async (item) => {
 
     try {
-      const response = await axios.post('http://localhost:8080/api/code/' + item.id, item, {
+      const response = await axiosInstance.post('/api/code/' + item.id, item, {
         headers: {
           'Content-Type': 'application/json',
         }
@@ -217,7 +218,7 @@ const CodeList = () => {
   const submitReqCode = async () => {
 
     try {
-      const response = await axios.post('http://localhost:8080/api/code', codeReqData, {
+      const response = await axiosInstance.post('/api/code', codeReqData, {
         headers: {
           'Content-Type': 'application/json',
         }
@@ -255,7 +256,7 @@ const CodeList = () => {
 
 
     try {
-      const response = await axios.post('http://localhost:8080/api/code/master', codeMstReqData, {
+      const response = await axiosInstance.post('/api/code/master', codeMstReqData, {
         headers: {
           'Content-Type': 'application/json',
         }
@@ -288,7 +289,7 @@ const CodeList = () => {
   const submitUpdateCodeMst = async (item) => {
 
     try {
-      const response = await axios.post('http://localhost:8080/api/code/master/' + item.id, item, {
+      const response = await axiosInstance.post('/api/code/master/' + item.id, item, {
         headers: {
           'Content-Type': 'application/json',
         }
@@ -341,7 +342,7 @@ const CodeList = () => {
 
 
     try {
-      const response = await axios.get('http://localhost:8080/api/code/search/master', {
+      const response = await axiosInstance.get('/api/code/search/master', {
         params: codeSearch,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -380,7 +381,7 @@ const CodeList = () => {
 
 
     try {
-      const response = await axios.get('http://localhost:8080/api/code//searchAll/' + masterId);
+      const response = await axiosInstance.get('/api/code/searchAll/' + masterId);
 
       // API 응답에서 데이터 추출
       const data = response.data;
@@ -412,7 +413,7 @@ const CodeList = () => {
   const submitDeletCodeMaster = async (codeMasterId) => {
 
     try {
-      const response = await axios.delete('http://localhost:8080/api/code/master/' + codeMasterId);
+      const response = await axiosInstance.delete('/api/code/master/' + codeMasterId);
 
 
       // 폼 데이터를 초기화합니다.
@@ -446,7 +447,7 @@ const CodeList = () => {
 
 
     try {
-      const response = await axios.delete('http://localhost:8080/api/code/' + id);
+      const response = await axiosInstance.delete('/api/code/' + id);
 
 
       // 폼 데이터를 초기화합니다.

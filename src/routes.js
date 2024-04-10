@@ -57,6 +57,7 @@ const SampleForm = React.lazy(() => import('./views/sample/SampleForm'))
 const AlbumInfo = React.lazy(() => import('./views/music/AlbumInfo'))
 const AlbumList = React.lazy(() => import('./views/music/AlbumList'))
 const AlbumReg = React.lazy(() => import('./views/music/AlbumReg'))
+const AlbumUpload = React.lazy(() => import('./views/music/AlbumUpload'))
 
 
 const MusicReq = React.lazy(() => import('./views/music/MusicReq'))
@@ -83,6 +84,7 @@ const routes = [
   { path: '/music/albumList', name: 'AlbumList', element: AlbumList },
   { path: '/music/albumInfo', name: 'AlbumInfo', element: AlbumInfo },
   { path: '/music/albumReg', name: 'AlbumReg', element: AlbumReg },
+  { path: '/music/albumUpload', name: 'AlbumUpload', element: AlbumUpload },
   { path: '/music/musicReq', name: 'MusicReq', element: MusicReq },
   { path: '/music/musicReqHisList', name: 'MusicReqHisList', element: MusicReqHisList },
   { path: '/music/musicReqHisInfo', name: 'MusicReqHisInfo', element: MusicReqHisInfo },

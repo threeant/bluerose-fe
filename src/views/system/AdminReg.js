@@ -3,7 +3,8 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import axiosInstance from '../../common/axiosInstance';
+
 import { getCodeList } from '../../common/utils'
 import {
   cilCalendar,
@@ -51,30 +52,31 @@ const AdminReg = () => {
   const handleDateChange = date => {
     const formattedDate = date.toISOString().slice(0, 10);
     setSelectedDate(date);
-    setAlbumData({ ...albumData, releaseDate: formattedDate })
+    setAdminData({ ...adminData, releaseDate: formattedDate })
   }
   const [validated, setValidated] = useState(false);
 
-  const [albumData, setAlbumData] = useState({
-    //image : '',        //이미지
-    name: '',        //앨범명
-    artist: '',      //아티스트
-    label: '',       //라벨
-    format: '',      //포맷
-    releaseDate: '',      //발매일
-    musicGenre: '',      //장르
-    countryCD: '9',        //발매국가
-    mediaCD: '1',        //미디어
-    style: '',       //스타일
-    series: '',      //시리즈
-    useYn: true,      //사용여부
+  const [adminData, setAdminData] = useState({
+      "etc": "",
+      "id": "",
+      "name": "",
+      "password": "",
+      "passwordChk": "",
+      "useYn" : true
+      
   });
 
   //등록하기 API
   const submitRegAlbum = async (e) => {
     e.preventDefault();
 
-    console.log(albumData);
+    console.log(adminData);
+
+    const result = window.confirm('해당 관리자를 등록 하시겠습니까?');
+
+    if (!result) {
+      return;
+    }
     setValidated(true);
     const form = e.currentTarget;
     if (form.checkValidity() === false) {
@@ -82,31 +84,34 @@ const AdminReg = () => {
       return;
     }
 
+    if(adminData.password != adminData.passwordChk){
+      alert('비밀번호와 비밀번호 확인이 일치하지 않습니다');
+      setAdminData((prevData) => ({
+        ...prevData,
+        passwordChk: '',
+      }));
+      setValidated(false);
+      return;
+    }
+
     try {
-      const response = await axios.post('http://localhost:8080/api/albums', albumData, {
+      const response = await axiosInstance.post('/api/admin', adminData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         }
       });
 
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      setAlbumData({
-        name: '',        //앨범명
-        artist: '',      //아티스트
-        label: '',       //라벨
-        format: '',      //포맷
-        releaseDate: '2023-10-28',      //발매일
-        musicGenre: '',      //장르
-        countryCD: '9',        //발매국가
-        mediaCD: '1',        //미디어
-        style: '',       //스타일
-        series: '',      //시리즈
-        useYn: true,      //사용여부
-      });
+      setAdminData({
+        "etc": "",
+        "id": "",
+        "name": "",
+        "password": ""
+    });
       alert('등록되었습니다.');
-      navigate('/sample/sampleList');
+      navigate('/system/AdminList');
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
       console.error('API 요청 실패:', error);
@@ -129,36 +134,36 @@ const AdminReg = () => {
                 validated={validated}
                 onSubmit={submitRegAlbum}
               >
-                <CCol xs={10} >
+                {/* <CCol xs={10} >
                   <CFormLabel></CFormLabel>
                 </CCol>
                 <CCol xs={2} >
                   <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
-                  <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.value })} />
-                </CCol>
+                  <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={adminData.useYn} onChange={(e) => setAdminData({ ...adminData, useYn: e.target.value })} />
+                </CCol> */}
                 <CCol xs={6}>
-                  <CFormLabel htmlFor="inputName">아이디*</CFormLabel>
-                  <CFormInput type="text" id="inputName" required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} maxLength={10} />
+                  <CFormLabel htmlFor="inputId">아이디*</CFormLabel>
+                  <CFormInput type="text" id="inputId" required onChange={(e) => setAdminData({ ...adminData, id: e.target.value })} maxLength={10} />
                   <CFormFeedback invalid>아이디를 입력해주세요.</CFormFeedback>
                 </CCol>
                 <CCol xs={6}>
-                  <CFormLabel htmlFor="inputLabel">이름*</CFormLabel>
-                  <CFormInput type="text" id="inputLabel" required onChange={(e) => setAlbumData({ ...albumData, label: e.target.value })} maxLength={10} />
+                  <CFormLabel htmlFor="inputName">이름*</CFormLabel>
+                  <CFormInput type="text" id="inputName" required onChange={(e) => setAdminData({ ...adminData, name: e.target.value })} maxLength={10} />
                   <CFormFeedback invalid>이름을 입력해주세요.</CFormFeedback>
                 </CCol>
                 <CCol xs={6}>
-                  <CFormLabel htmlFor="inputName">비밀번호*</CFormLabel>
-                  <CFormInput type="password" id="inputName" required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} maxLength={20} />
+                  <CFormLabel htmlFor="inputPw">비밀번호*</CFormLabel>
+                  <CFormInput type="password" id="inputPw" required onChange={(e) => setAdminData({ ...adminData, password: e.target.value })} maxLength={20} />
                   <CFormFeedback invalid>비밀번호을 입력해주세요.</CFormFeedback>
                 </CCol>
                 <CCol xs={6}>
-                  <CFormLabel htmlFor="inputAartist">비밀번호확인*</CFormLabel>
-                  <CFormInput type="password" id="inputAartist" required onChange={(e) => setAlbumData({ ...albumData, artist: e.target.value })} maxLength={20} />
+                  <CFormLabel htmlFor="inputPwChk">비밀번호확인*</CFormLabel>
+                  <CFormInput type="password" id="inputPwChk" required onChange={(e) => setAdminData({ ...adminData, passwordChk: e.target.value })} maxLength={20} />
                   <CFormFeedback invalid>비밀번호확인을 입력해주세요.</CFormFeedback>
                 </CCol>
                 <CCol xs={12}>
-                  <CFormLabel htmlFor="inputFormat">비고</CFormLabel>
-                  <CFormTextarea id="inputFormat" rows="3" onChange={(e) => setAlbumData({ ...albumData, format: e.target.value })} ></CFormTextarea>
+                  <CFormLabel htmlFor="inputEtc">비고</CFormLabel>
+                  <CFormTextarea id="inputEtc" rows="3" onChange={(e) => setAdminData({ ...adminData, etc: e.target.value })} ></CFormTextarea>
                 </CCol>
                 <div className="d-grid gap-2">
                   <CRow className="justify-content-between">

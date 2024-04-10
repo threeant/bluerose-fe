@@ -3,7 +3,9 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import axiosInstance from '../../common/axiosInstance';
+
+
 import { getCodeList } from '../../common/utils'
 import {
   CAvatar,
@@ -127,7 +129,7 @@ const MusicReqHisList = () => {
     console.log(albumSearch);
 
     try {
-      const response = await axios.get('http://localhost:8080/api/song-request/api/song-request/history', {
+      const response = await axiosInstance.get('/api/song-request/api/song-request/history', {
         params: albumSearch,
         headers: { 'Content-Type': 'application/json' }
       });

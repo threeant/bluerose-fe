@@ -3,7 +3,8 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import axios from 'axios'
+import axiosInstance from '../../common/axiosInstance';
+
 import { getCodeList } from '../../common/utils'
 import {
   cilCalendar,
@@ -105,7 +106,7 @@ const AdminInfo = () => {
   const submitSearchAlbum = async () => {
 
     try {
-      const response = await axios.get('http://localhost:8080/api/albums/' + albumId);
+      const response = await axiosInstance.get('/api/albums/' + albumId);
 
       // API 응답에서 데이터 추출
       const data = response.data;
@@ -127,7 +128,7 @@ const AdminInfo = () => {
   const submitSearchSong = async () => {
 
     try {
-      const response = await axios.get('http://localhost:8080/api/albums/' + albumId + '/songs');
+      const response = await axiosInstance.get('/api/albums/' + albumId + '/songs');
 
       // API 응답에서 데이터 추출
       const data = response.data;
@@ -164,7 +165,7 @@ const AdminInfo = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/api/albums/' + albumId, albumData, {
+      const response = await axiosInstance.post('/api/albums/' + albumId, albumData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -223,7 +224,7 @@ const AdminInfo = () => {
   const submitReqSong = async () => {
 
     try {
-      const response = await axios.post('http://localhost:8080/api/albums/' + albumId + '/songs', songReqData, {
+      const response = await axiosInstance.post('/api/albums/' + albumId + '/songs', songReqData, {
         headers: {
           'Content-Type': 'application/json',
         }
@@ -270,7 +271,7 @@ const AdminInfo = () => {
     console.log(songId);
 
     try {
-      const response = await axios.delete('http://localhost:8080/api/songs/' + songId);
+      const response = await axiosInstance.delete('/api/songs/' + songId);
 
       console.log('API 응답:', response.data);
 

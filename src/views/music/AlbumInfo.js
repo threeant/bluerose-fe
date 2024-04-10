@@ -10,6 +10,8 @@ import {
   cifUs,
 } from '@coreui/icons';
 
+import axiosInstance from '../../common/axiosInstance';
+
 import {
   CButton,
   CCard,
@@ -147,7 +149,7 @@ const AlbumInfo = () => {
   const submitSearchAlbum = async () => {
 
     try {
-      const response = await axios.get('http://localhost:8080/api/albums/' + albumId);
+      const response = await axiosInstance.get('/api/albums/' + albumId);
 
       // API 응답에서 데이터 추출
       const data = response.data;
@@ -173,7 +175,7 @@ const AlbumInfo = () => {
   const submitSearchSong = async () => {
 
     try {
-      const response = await axios.get('http://localhost:8080/api/albums/' + albumId + '/songs');
+      const response = await axiosInstance.get('/api/albums/' + albumId + '/songs');
 
       // API 응답에서 데이터 추출
       const data = response.data;
@@ -210,7 +212,7 @@ const AlbumInfo = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/api/albums/' + albumId, albumData, {
+      const response = await axiosInstance.post('/api/albums/' + albumId, albumData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -269,7 +271,7 @@ const AlbumInfo = () => {
   const submitReqSong = async () => {
 
     try {
-      const response = await axios.post('http://localhost:8080/api/albums/' + albumId + '/songs', songReqData, {
+      const response = await axiosInstance.post('/api/albums/' + albumId + '/songs', songReqData, {
         headers: {
           'Content-Type': 'application/json',
         }
@@ -316,7 +318,7 @@ const AlbumInfo = () => {
     console.log(songId);
 
     try {
-      const response = await axios.delete('http://localhost:8080/api/songs/' + songId);
+      const response = await axiosInstance.delete('/api/songs/' + songId);
 
       console.log('API 응답:', response.data);
 

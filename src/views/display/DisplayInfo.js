@@ -7,11 +7,12 @@ import {
   cilCaretTop,
   cilCaretBottom
 } from '@coreui/icons'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation} from 'react-router-dom'
 import axios from 'axios'
 import { getCodeList, getCurrentDate, getAddDate } from '../../common/utils'
 import SongList from '../common/SongList'; // MyModal 컴포넌트의 경로를 알맞게 설정
 import AlbumInfo from '../common/AlbumInfo'
+import axiosInstance from '../../common/axiosInstance';
 import {
   CAvatar,
   CButton,
@@ -49,27 +50,27 @@ const DisplayInfo = () => {
   /**********************************************************************
    * 공통코드 영역
   **********************************************************************/
-  const navigate = useNavigate();
+  const location = useLocation();
+  const {displayId} = location.state;
 
+  
+  const navigate = useNavigate();
+  const [dispCD] = useState(getCodeList('DISP')); // 전시CD
   const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
   const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
 
-  //앨범아이디
-  const [albumId, setAlbumId] = useState('2');
 
 
   /**********************************************************************
    * 화면 영역
   **********************************************************************/
-
-
-
   useEffect(() => {
-    setAlbumId('1');
-    refreshDisplayInfo();
-    submitSearchAlbum();
+    console.log('displayId>>>> ' + displayId)
+    submitSearchDisplay();
+    submitSearchDisplaySongList();
 
-  }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
+  }, [displayId]); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
+
 
   const goFormClick = () => { //등록화면이동
     navigate('/music/albumReg');
@@ -86,8 +87,8 @@ const DisplayInfo = () => {
   //앨범 팝업 추가 버튼
   const popAlbumInfoClick = (e, pAlbumId) => {
     e.preventDefault();
-    setAlbumId('1');
-    setVisibleAlbum(!visibleAlbum);
+    //setAlbumId('1');
+    //setVisibleAlbum(!visibleAlbum);
   }
 
   //목록이동
@@ -102,37 +103,36 @@ const DisplayInfo = () => {
   /**********************************************************************
   * 비즈니스로직 영역
  **********************************************************************/
-  //앨범 유효성검사
+  //전시 유효성검사
   const [validated, setValidated] = useState(false);
 
-  //앨범 상세 
-  const [albumData, setAlbumData] = useState();
-  //신청곡리스트
-  const [displayInfoDatas, setDisplayInfoDatas] = useState({ contents: [] });
+  //전시 상세 
+  const [displayData, setDisplayData] = useState();
+  //리스트
+  const [displaySongDatas, setDisplaySongDatas] = useState([]);
 
   //플레잉곡
   const [nowPlayingData, setNowPlayingData] = useState({});
 
+  //전시 상세 
+  const [displayUpdateData, setDisplayUpdateData] = useState();
+
 
   const handleMoveUp = (index) => {
     if (index > 0) {
-      const newData = [...displayInfoDatas];
+      const newData = [...displaySongDatas];
       [newData[index - 1], newData[index]] = [newData[index], newData[index - 1]];
-      setDisplayInfoDatas(newData);
+      setDisplaySongDatas(newData);
     }
   };
 
   const handleMoveDown = (index) => {
-    if (index < displayInfoDatas.length - 1) {
-      const newData = [...displayInfoDatas];
+    if (index < displaySongDatas.length - 1) {
+      const newData = [...displaySongDatas];
       [newData[index], newData[index + 1]] = [newData[index + 1], newData[index]];
-      setDisplayInfoDatas(newData);
+      setDisplaySongDatas(newData);
     }
   };
-
-
-
-
 
   //초기화후 조회
   const refreshDisplayInfo = async () => {
@@ -143,22 +143,22 @@ const DisplayInfo = () => {
     }
     */
 
-    submitSearchDisplayInfo(dateStr);
-    submitSearchNowPlaying(dateStr);
+    submitSearchDisplaySongList(dateStr);
+    
 
   };
 
-  //앨범 검색 API
-  const submitSearchAlbum = async () => {
+  //전시상세 API
+  const submitSearchDisplay = async () => {
 
     try {
-      const response = await axios.get('http://localhost:8080/api/albums/' + albumId);
+      const response = await axiosInstance.get('/api/display/' + displayId);
 
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-      setAlbumData(data);
-      console.log("앨범결과 ----")
+      setDisplayData(data);
+      console.log("상세결과 ----")
       console.log(data);
 
     } catch (error) {
@@ -172,51 +172,21 @@ const DisplayInfo = () => {
 
 
 
-  //신청곡 리스트 검색 API
-  const submitSearchDisplayInfo = async (dateStr) => {
+  //전시곡 리스트 검색 API
+  const submitSearchDisplaySongList = async (dateStr) => {
 
 
     try {
-      const response = await axios.get('http://localhost:8080/api/song-request', {
-        params: {
-          "date": dateStr
-        },
+      const response = await axiosInstance.get('/api/display/' + displayId + '/display-content', {
         headers: { 'Content-Type': 'application/json' }
       });
 
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-      setDisplayInfoDatas(data);
+      setDisplaySongDatas(data);
 
-      console.log(data)
-
-    } catch (error) {
-      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
-    }
-
-  }
-
-  //신청곡 리스트 검색 API
-  const submitSearchNowPlaying = async (dateStr) => {
-
-
-    try {
-      const response = await axios.get('http://localhost:8080/api/song-request/now-playing', {
-        params: {
-          "date": dateStr
-        },
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      // API 응답에서 데이터 추출
-      const data = response.data;
-      // 데이터를 상태 변수에 저장
-      setNowPlayingData(data);
-
-      console.log(data)
+      console.log(data);
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -226,55 +196,9 @@ const DisplayInfo = () => {
 
   }
 
-  //신청곡 선곡 클릭
-  const clickSelectDisplayInfo = (e, DisplayInfoId) => {
-    e.preventDefault();
-
-    const result = window.confirm('해당곡을 선곡 하시겠습니까?');
-
-    if (!result) {
-      return;
-    }
-
-    submitSelectDisplayInfo(DisplayInfoId);
-  };
-
-
-  //신청곡 선곡 API
-  const submitSelectDisplayInfo = async (DisplayInfoId) => {
-
-    console.log(DisplayInfoId);
-
-    try {
-      const response = await axios.post('http://localhost:8080/api/song-request/now-playing/register',
-        {
-          "songRequestId": DisplayInfoId
-        }
-        ,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
-
-      console.log('API 응답:', response.data);
-
-      // 폼 데이터를 초기화합니다.
-      alert('선곡되었습니다.');
-      refreshDisplayInfo();
-
-
-
-    } catch (error) {
-      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
-    }
-
-  }
-
+  
   //신청곡 삭제 클릭
-  const clickDeletDisplayInfo = (e, DisplayInfoId) => {
+  const clickDeletDisplayInfo = (e, displayContentId) => {
     e.preventDefault();
 
     const result = window.confirm('해당곡을 삭제 하시겠습니까?');
@@ -283,16 +207,17 @@ const DisplayInfo = () => {
       return;
     }
 
-    submitDeletSong(DisplayInfoId);
+    submitDeletDisplay(displayContentId);
   };
 
   //곡 삭제 API
-  const submitDeletSong = async (DisplayInfoId) => {
+  const submitDeletDisplay = async (displayContentId) => {
 
-    console.log(DisplayInfoId);
+    console.log(displayContentId);
 
     try {
-      const response = await axios.delete('http://localhost:8080/api/song-request/' + DisplayInfoId);
+      const response = await axiosInstance.delete('/api/display/' + displayId 
+                                          + '/display-content/' + displayContentId);
 
       console.log('API 응답:', response.data);
 
@@ -335,7 +260,7 @@ const DisplayInfo = () => {
 
 
     try {
-      const response = await axios.post('http://localhost:8080/api/song-request/now-playing/complete');
+      const response = await axiosInstance.post('/api/song-request/now-playing/complete');
 
       console.log('API 응답:', response.data);
 
@@ -354,11 +279,22 @@ const DisplayInfo = () => {
 
   }
 
-  //앨범 수정하기 API
-  const submitUpdateAlbum = async (e) => {
+  //전시 수정하기 API
+  const submitUpdateDisplay = async (e) => {
     e.preventDefault();
 
-    console.log(albumData);
+    console.log(displayData);
+
+    setDisplayUpdateData({
+      codeId : displayData.codeId
+      , displayCount : displayData.displayNum
+      , sort :  displayData.sort
+      , title : displayData.title
+      , useYn : displayData.useYn
+
+    })
+
+    console.log(displayUpdateData);
     setValidated(true);
     const form = e.currentTarget;
     if (form.checkValidity() === false) {
@@ -374,7 +310,7 @@ const DisplayInfo = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/api/albums/' + albumId, albumData, {
+      const response = await axiosInstance.post('/api/display/' + displayId, displayUpdateData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -391,6 +327,71 @@ const DisplayInfo = () => {
       alert('네트워크 오류 ');
     }
   }
+  const handleDataFromSongList = async(datas) => {
+    // 부모 컴포넌트에서 전달받은 데이터 처리
+    console.log('Data from child:', datas);
+    console.log(datas);
+    var songIdArr = [];
+      for(var i = 0 ; i < datas.length; i++){
+      songIdArr[i] = datas[i].songId;
+    }
+
+  var newSongDatas = {"songIds": songIdArr};
+    console.log(newSongDatas);
+    console.log('setNewSongDatas >>> ')
+
+
+    try {
+      const response = await axiosInstance.post('/api/display/' + displayId + '/display-content', newSongDatas, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      console.log('API 응답:', response.data);
+
+      // 폼 데이터를 초기화합니다.
+      alert('수정되었습니다.');
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.error('API 요청 실패:', error);
+      alert('네트워크 오류 ');
+    }
+    
+  };
+
+
+  const handleDataFromSongList2 = (datas) => {
+    // 부모 컴포넌트에서 전달받은 데이터 처리
+    console.log('Data from child:', datas);
+    console.log(datas);
+
+    console.log(displaySongDatas);
+
+  datas.map((item)=>{
+    console.log(item)
+    var newData = {
+      "albumId": item.albumId,
+      "albumName": item.albumName,
+      "artist": item.artist,
+      "displayContentId": '',
+      "displayItemId": item.displayId,
+      "runtime": item.runtime,
+      "songId": item.songId,
+      "trackInfo": item.trackInfo,
+      "trackName": item.trackName,
+      "newYn" : true
+    }
+    setDisplaySongDatas((prevData) => [...prevData, newData]);
+  })
+    
+    console.log(displaySongDatas);
+    console.log('displaySongDatas >>> ')
+    
+  };
+
+
+
 
   return (
     <>
@@ -401,9 +402,9 @@ const DisplayInfo = () => {
         aria-labelledby="OptionalSizesExample2"
       >
         <CModalHeader>
-          <CModalTitle id="OptionalSizesExample1">신청곡 추가</CModalTitle>
+          <CModalTitle id="OptionalSizesExample1">전시곡 추가</CModalTitle>
         </CModalHeader>
-        <CModalBody><SongList openModal={controllSongModal} /></CModalBody>
+        <CModalBody><SongList openModal={controllSongModal} sendDataToParent={handleDataFromSongList}/></CModalBody>
       </CModal>
       <CModal
         size="xl"
@@ -414,39 +415,48 @@ const DisplayInfo = () => {
         <CModalHeader>
           <CModalTitle id="OptionalSizesExample3">앨범정보</CModalTitle>
         </CModalHeader>
-        <CModalBody><AlbumInfo openModal={controllAlbumModal} albumId={albumId} /></CModalBody>
+        <CModalBody><AlbumInfo openModal={controllAlbumModal} displayId={displayId} /></CModalBody>
       </CModal>
       <CRow>
         <CCol>
           <CCard className="mb-4">
             <CCardHeader><strong>전시수정</strong></CCardHeader>
             <CCardBody>
-              {albumData ? (
+              {displayData ? (
                 <CForm
                   className="row g-3 needs-validation"
                   noValidate
                   validated={validated}
-                  onSubmit={submitUpdateAlbum}
+                  onSubmit={submitUpdateDisplay}
                 >
                   <CCol xs={10} >
-                    <CFormLabel htmlFor="validationCustom04">ID : {albumId}</CFormLabel>
+                    <CFormLabel htmlFor="validationCustom04">ID : {displayId}</CFormLabel>
                   </CCol>
                   <CCol xs={2} >
                     <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
-                    <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.value })} />
+                    <CFormSwitch label="사용여부" id="formSwitchCheckChecked"  defaultChecked={displayData.useYn} onChange={(e) => setDisplayData({ ...displayData, useYn: e.target.checked })} />
                   </CCol>
 
 
-                  <CCol xs={8}>
+                  <CCol xs={12}>
                     <CFormLabel htmlFor="inputName">제목*</CFormLabel>
-                    <CFormInput type="text" id="inputName" value={albumData.name} required onChange={(e) => setAlbumData({ ...albumData, name: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="inputName" value={displayData.title} required onChange={(e) => setDisplayData({ ...displayData, title: e.target.value })} maxLength={100} />
                     <CFormFeedback invalid>앨범명을 입력해주세요.</CFormFeedback>
                   </CCol>
-                  <CCol xs={4}>
-                    <CFormLabel htmlFor="inputAartist">노출곡수*</CFormLabel>
-                    <CFormInput type="text" id="inputAartist" value={albumData.artist} required onChange={(e) => setAlbumData({ ...albumData, artist: e.target.value })} maxLength={100} />
-                    <CFormFeedback invalid>아티스트를 입력해주세요.</CFormFeedback>
-                  </CCol>
+                  <CCol xs={6}>
+                  <CFormLabel htmlFor="inputName">노출곡수*</CFormLabel>
+                  <CFormInput type="number" id="inputDisplayCount" value={displayData.displayNum}  required onChange={(e) => setDisplayData({ ...displayData, displayNum: e.target.value })} maxLength={100} />
+                  <CFormFeedback invalid>노출곡 갯수를 입력해주세요.</CFormFeedback>
+                </CCol>
+                  <CCol xs={6}>
+                  <CFormLabel htmlFor="inputName">전시타입*</CFormLabel>
+                  <CFormSelect id="sel_media" defaultValue={displayData.displayItemId} onChange={(e) => setDisplayData({ ...displayData, codeId: e.target.value })}  >
+                    {dispCD.map((item, index) => (
+                      <option value={item.id} key={index}>{item.name}</option>
+                    ))}
+                  </CFormSelect>
+                  <CFormFeedback invalid>제목을 입력해주세요.</CFormFeedback>
+                </CCol>
                   <div className="d-grid gap-2">
                     <CRow className="justify-content-between">
                       <CCol xs={12}>
@@ -466,7 +476,7 @@ const DisplayInfo = () => {
           </CCard>
 
           <CCard className="mb-4">
-            <CCardHeader><strong>곡목록</strong> {displayInfoDatas.contents && displayInfoDatas.contents.length > 0 ? (<small>총 {displayInfoDatas.contents.length
+            <CCardHeader><strong>곡목록</strong> {displaySongDatas && displaySongDatas.length > 0 ? (<small>총 {displaySongDatas.length
             }건</small>) : ('')}</CCardHeader>
             <CCardBody>
               <div className="d-grid gap-2">
@@ -496,36 +506,46 @@ const DisplayInfo = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {displayInfoDatas && displayInfoDatas.length > 0 ? (
-                    displayInfoDatas.map((item, index) => (
+                  {displaySongDatas && displaySongDatas.length > 0 ? (
+                    displaySongDatas.map((item, index) => (
                       <CTableRow v-for="item in tableItems" key={index} >
                         <CTableDataCell className="text-center">
-                          <strong>{item.id}</strong>
+                          {/* <strong>{index+1}</strong> */}
+                          <strong>{item.displayContentId}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <strong><a href='/' onClick={(e) => popAlbumInfoClick(e, item.albumId)}>{item.albumName}</a></strong>
+                          <strong><a href='/' onClick={(e) => popAlbumInfoClick(e, item.displayId)}>{item.albumName}</a></strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           {item.artist}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {item.trackNumber}
+                          {item.trackInfo}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {item.title}
+                          {item.trackName}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
+                        {index != 0  ? (
                           <CButton color="info" variant="outline" onClick={() => handleMoveUp(index)} disabled={index === 0}>
                             <CIcon icon={cilCaretTop} title="Download file" />
                           </CButton>
-                          <CButton color="info" variant="outline" onClick={() => handleMoveDown(index)} disabled={index === displayInfoDatas.length - 1}>
+                          ) : ('')}
+
+                        {index+1  != displaySongDatas.length  ? (
+                          <CButton color="info" variant="outline" onClick={() => handleMoveDown(index)} disabled={index === displaySongDatas.length - 1}>
                             <CIcon icon={cilCaretBottom} title="Download file" />
                           </CButton>
+                          ) : ('')}
+
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <CButton color="dark" shape="rounded-pill" className="mb-3" onClick={(e) => clickDeletDisplayInfo(e, item.id)}>
-                            삭제
-                          </CButton>
+                        {item.newYn != true ? (
+                          <CButton color="dark" shape="rounded-pill" className="mb-3" onClick={(e) => clickDeletDisplayInfo(e, item.displayContentId)}>
+                          삭제
+                        </CButton>
+                        ) : ('[신규]')}
+                          
                         </CTableDataCell>
                       </CTableRow>
                     ))

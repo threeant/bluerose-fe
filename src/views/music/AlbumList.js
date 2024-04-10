@@ -4,7 +4,9 @@ import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { getCodeList } from '../../common/utils'
+import { getCodeList, throwError } from '../../common/utils'
+import axiosInstance from '../../common/axiosInstance';
+import PaginationComponent from '../common/PaginationComponent';
 import {
   CAvatar,
   CButton,
@@ -46,6 +48,9 @@ const AlbumList = () => {
   const [selectedDate, setSelectedDate] = useState(null); //등록일 from
   const [selectedDate2, setSelectedDate2] = useState(null); // 등록일 to
 
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
+  const [totalPages, setTotalPages] = useState(0); // 현재 페이지 상태
+
 
   // 날짜가 선택될 때 호출될 콜백 함수
   const handleDateChange = date => {
@@ -60,6 +65,18 @@ const AlbumList = () => {
     setAlbumSearch({ ...albumSearch, endReleaseDate: formattedDate })
   }
 
+  //검색조건
+  const [albumSearch, setAlbumSearch] = useState({
+    "artist": "",
+    "endReleaseDate": "",
+    "musicGenre": "",
+    "name": "",
+    "page": 0,
+    "size": 15,
+    "startReleaseDate": "",
+    "mediaCode": ""
+  });
+
   //초기화
   const clickReset = date => {
 
@@ -72,7 +89,7 @@ const AlbumList = () => {
       "musicGenre": "",
       "name": "",
       "page": 1,
-      "size": 1,
+      "size": 15,
       "startReleaseDate": "",
       "mediaCode": ""
     });
@@ -98,39 +115,39 @@ const AlbumList = () => {
   //리스트
   const [albumDatas, setAlbumDatas] = useState({ contents: [] });
 
-  //검색조건
-  const [albumSearch, setAlbumSearch] = useState({
-    "artist": "",
-    "endReleaseDate": "",
-    "musicGenre": "",
-    "name": "",
-    "page": 0,
-    "size": 10,
-    "startReleaseDate": "",
-    "mediaCode": ""
-  });
-
+  
   //조회하기
   const submitSearch = (e) => {
     e.preventDefault();
     submitSearchAlbums();
   }
 
-  //페이징
-  const clickPage = (e, page) => {
-    e.preventDefault();
-    albumSearch.page = page;
-    submitSearchAlbums();
-    console.log("===page =  : " + page);
-  }
+  //페이지 변경
+  const handlePageChange = (page) => {
+    console.log('현재페이지 ');
+    console.log(page);
+    setCurrentPage(page); // 페이지 변경 시 현재 페이지 상태 업데이트
+    submitSearchAlbums(page);
+  };
 
   //검색 API
-  const submitSearchAlbums = async () => {
+  const submitSearchAlbums = async (page) => {
+
+    if(page > -1){
+      setAlbumSearch(prevState => ({
+        ...prevState,
+        page: page
+      }));
+
+      albumSearch.page = page;
+    }
+
+    
 
     console.log(albumSearch);
 
     try {
-      const response = await axios.get('http://localhost:8080/api/albums', {
+      const response = await axiosInstance.get('/api/albums', {
         params: albumSearch,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -140,12 +157,14 @@ const AlbumList = () => {
       // 데이터를 상태 변수에 저장
       setAlbumDatas(data);
 
-      console.log(data)
+      console.log(data);
+      setTotalPages(data.totalPages);
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
       console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      throwError(error,navigate);
+      //alert('네트워크 오류 ');
     }
 
   };
@@ -156,7 +175,7 @@ const AlbumList = () => {
     console.log(albumSearch);
 
     try {
-      const response = await axios.get('http://localhost:8080/api/albums', {
+      const response = await axiosInstance.get('/api/albums', {
         params: albumSearch
       });
 
@@ -287,7 +306,6 @@ const AlbumList = () => {
                   <CTableRow>
                     <CTableHeaderCell className="text-center">No</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">미디어</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center"></CTableHeaderCell>
                     <CTableHeaderCell className="text-center">앨범명</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">아티스트</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">발매일</CTableHeaderCell>
@@ -303,13 +321,10 @@ const AlbumList = () => {
                         <CTableDataCell className="text-center">
                           <strong>{item.mediaName}</strong>
                         </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          <CAvatar size="md" src="/static/media/8.35ee8919ea545620a475.jpg" />
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
+                        <CTableDataCell className="text-left">
                           <a href='/' onClick={(e) => goInfoClick(e, item.id)}>{item.name}</a>
                         </CTableDataCell>
-                        <CTableDataCell className="text-center">
+                        <CTableDataCell className="text-left">
                           {item.artist}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
@@ -332,7 +347,8 @@ const AlbumList = () => {
               {albumDatas.contents && albumDatas.contents.length > 0 ? (
                 <CRow>
                   <CCol md={{ span: 6, offset: 5 }}>
-                    <CPagination aria-label="Page navigation example">
+                  <PaginationComponent totalPages={totalPages} currentPage={currentPage} onPageChange={handlePageChange} />
+                    {/* <CPagination aria-label="Page navigation example">
                       <CPaginationItem aria-label="Previous" disabled={!albumDatas.first} onClick={(e) => clickPage(e, 1)}>
                         <span aria-hidden="true">&laquo;</span>
                       </CPaginationItem>
@@ -342,7 +358,7 @@ const AlbumList = () => {
                       <CPaginationItem aria-label="Next" disabled={!albumDatas.last}>
                         <span aria-hidden="true">&raquo;</span>
                       </CPaginationItem>
-                    </CPagination>
+                    </CPagination> */}
                   </CCol>
                   <CCol md={1}>
                     총 {albumDatas.totalCount}건
