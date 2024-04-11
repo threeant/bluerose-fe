@@ -6,10 +6,12 @@ import {
   cilSync
 } from '@coreui/icons'
 import { useNavigate } from 'react-router-dom'
-import { getCodeList, getCurrentDate, getAddDate } from '../../common/utils'
+import { getCodeList, getCurrentDate, throwError } from '../../common/utils'
 import SongList from '../common/SongList'; // MyModal 컴포넌트의 경로를 알맞게 설정
 import AlbumInfo from '../common/AlbumInfo'
 import axiosInstance from '../../common/axiosInstance';
+import { Client } from "@stomp/stompjs";
+import appConfig from '../../common/appConfig';
 import {
   CAvatar,
   CButton,
@@ -52,16 +54,70 @@ const MusicReq = () => {
   //앨범아이디
   const [albumId, setAlbumId] = useState();
 
+  const [stompClient, setStompClient] = useState(null); // 소켓클라이언트
+  
+
 
   /**********************************************************************
    * 화면 영역
   **********************************************************************/
   useEffect(() => {
+    setSocket();
     refreshMusicReq(); //신청곡 조회
     
     submitSearchNowPlayingCondition(); // 신청곡 상태조회
   }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
 
+
+
+  const setSocket = async  () => {
+    console.log('>>>>!!?');
+    const stompConfig = {
+      connectHeaders: {},
+      brokerURL: appConfig.wsUrl,
+      debug: function (str) {
+        console.log('STOMP ADMIN: ' + str);
+      },
+      // reconnectDelay: 200,
+      forceBinaryWSFrames: true,
+      appendMissingNULLonIncoming: true,
+      onConnect: function (frame) {
+          console.log('Connected to server.');
+          console.log('connected >>>> ADMIN');
+            
+      },
+      onStompError: (frame) => {
+        console.log('Additional details: ' + frame.body);
+      },
+      onMessage: function (message) {
+        // 서버로부터 메시지를 수신할 때의 처리
+        console.log('>>>여깁니다 받았Received message:', message.body);
+      }
+    };
+
+    const client = new Client(stompConfig);
+    setStompClient(client);
+    client.activate();
+    
+    client.onConnect = (frame) => {
+      client.subscribe('/topic/request-song', function (message) {
+        console.log('>>>>ADMIN !>>');
+        console.log(JSON.parse(message.body));
+        var rtnTxt = JSON.parse(message.body);
+        //parentFunction(rtnTxt.type);
+       
+        
+        if(rtnTxt.type == 'APP_REQUEST_SONG'){
+          console.log('DISPLAY : ADMIN_UPDATE_PLAYING!!! >> '+rtnTxt.requestSongSize);
+         // var newRequestSongSize = rtnTxt.requestSongSize;
+         refreshMusicReq();
+
+          //(1)admin 에서 헤더 새 신청곡 갯수 update  (2)admin 신청곡 리스트 update 
+          
+        }
+      });
+    }
+  }
   const goFormClick = () => { //등록화면이동
     navigate('/music/albumReg');
   }
@@ -114,10 +170,9 @@ const MusicReq = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
-
   }
 
 
@@ -157,8 +212,8 @@ const MusicReq = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   }
@@ -184,8 +239,8 @@ const MusicReq = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   }
@@ -231,8 +286,8 @@ const MusicReq = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   }
@@ -266,8 +321,8 @@ const MusicReq = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -328,8 +383,8 @@ const MusicReq = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   }
@@ -366,8 +421,8 @@ const MusicReq = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   }
@@ -398,8 +453,8 @@ const MusicReq = () => {
       refreshMusicReq(); //신청곡 조회
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
     
   };

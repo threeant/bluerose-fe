@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState , useEffect} from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { getCodeList } from '../../common/utils'
+import { throwError } from '../../common/utils'
 import axiosInstance from '../../common/axiosInstance';
 import {
   cilCaretTop,
@@ -66,14 +66,18 @@ const DisplayList = () => {
   * 비즈니스로직 영역
  **********************************************************************/
   //리스트
-  const [tempDisplayDatas, setTempDisplayDatas] = useState({ contents: [] });
   const [displayDatas, setDisplayDatas] = useState({ contents: [] });
 
   //검색조건
   const [albumSearch, setAlbumSearch] = useState({
     "page": 1,
-    "size": 1000
+    "size": 9999
   });
+
+  useEffect(() => {
+    submitSearchDisplay();
+
+  },[]);
 
   //조회하기
   const submitSearch = (e) => {
@@ -90,8 +94,7 @@ const DisplayList = () => {
   }
 
   //검색 API
-  const submitSearchDisplay = async (e) => {
-    e.preventDefault();
+  const submitSearchDisplay = async () => {
     console.log(albumSearch);
 
     try {
@@ -103,40 +106,60 @@ const DisplayList = () => {
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-      setTempDisplayDatas(data);
+      setDisplayDatas(data);
 
       console.log(data);
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
+
+
     }
 
   };
 
-  const submitRegAlbum = async (e) => {
+  //전시순서변경
+  const updateSort = async (e) => {
     e.preventDefault();
+    const result = window.confirm('전시순서를 변경하시겠습니까?');
 
-    console.log(albumSearch);
+    if (!result) {
+      return;
+    }
+    
+    var contents = displayDatas.contents;
+    console.log(displayDatas.contents);
+    var updateContents = [];
+    for(var i = 0; i< contents.length; i++){
+      updateContents.push(contents[i].displayItemId);
+    }
 
+    console.log(updateContents);
     try {
-      const response = await axiosInstance.get('/api/albums', {
-        
+      const response = await axiosInstance.post('/api/display/sort', 
+        updateContents
+      ,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
 
       // API 응답에서 데이터 추출
-      const data = response.data;
+      const data = response;
       // 데이터를 상태 변수에 저장
-      setTempDisplayDatas(data);
-      setDisplayDatas(data);
-
-      console.log(data)
+      
+      console.log(data);
+      if(data.status == '200'){
+        alert('변경되었습니다.');
+      }
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -152,7 +175,7 @@ const DisplayList = () => {
     // Ensure that the currentIndex is within valid bounds
     if (currentIndex > 0) {
       // Create a copy of the contents array to avoid directly modifying state
-      const newContents = [...tempDisplayDatas.contents];
+      const newContents = [...displayDatas.contents];
   
       // Swap the current item with the previous item
       [newContents[currentIndex], newContents[currentIndex - 1]] = [
@@ -161,8 +184,8 @@ const DisplayList = () => {
       ];
   
       // Update the state with the modified contents
-      setTempDisplayDatas({
-        ...tempDisplayDatas,
+      setDisplayDatas({
+        ...displayDatas,
         contents: newContents
       });
     }
@@ -173,9 +196,9 @@ const DisplayList = () => {
     e.preventDefault();
   
     // Ensure that the currentIndex is within valid bounds
-    if (currentIndex < tempDisplayDatas.contents.length - 1) {
+    if (currentIndex < displayDatas.contents.length - 1) {
       // Create a copy of the contents array to avoid directly modifying state
-      const newContents = [...tempDisplayDatas.contents];
+      const newContents = [...displayDatas.contents];
   
       // Swap the current item with the next item
       [newContents[currentIndex], newContents[currentIndex + 1]] = [
@@ -184,8 +207,8 @@ const DisplayList = () => {
       ];
   
       // Update the state with the modified contents
-      setTempDisplayDatas({
-        ...tempDisplayDatas,
+      setDisplayDatas({
+        ...displayDatas,
         contents: newContents
       });
     }
@@ -199,18 +222,18 @@ const DisplayList = () => {
           <CCard className="mb-4">
             <CCardHeader>메인항목리스트</CCardHeader>
             <CCardBody>
-              <CForm className="row" onSubmit={submitSearchDisplay}>
+              <CForm className="row" >
                 <div className="d-grid gap-2">
                   <CRow className="justify-content-between">
                   <CCol xs={3}>
                       <div className="d-grid gap-2 d-md-flex">
                         <CButton component="input" type="button" color="success" value="등록하기" onClick={goFormClick} />
-                        <CButton component="input" type="button" color="danger" value="전시순서변경" onClick={goFormClick} />
+                        <CButton component="input" type="button" color="danger" value="전시순서변경" onClick={updateSort} />
                       </div>
                     </CCol>
                     <CCol xs={9}>
                       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <CButton component="input" color="primary" type="submit" value="조회하기" />
+                        <CButton component="input" color="primary" type="button" value="조회하기" onClick={submitSearch}/>
                       </div>
                     </CCol>
                   </CRow>
@@ -228,8 +251,8 @@ const DisplayList = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {tempDisplayDatas.contents && tempDisplayDatas.contents.length > 0 ? (
-                    tempDisplayDatas.contents.map((item, index) => (
+                  {displayDatas.contents && displayDatas.contents.length > 0 ? (
+                    displayDatas.contents.map((item, index) => (
                       <CTableRow v-for="item in tableItems" key={index} >
                         <CTableDataCell className="text-center">
                           <strong>{item.displayItemId}</strong>
@@ -244,7 +267,7 @@ const DisplayList = () => {
                           </CButton>
                           
                         ) : ('')}
-                        {index+1  != tempDisplayDatas.contents.length  ? (
+                        {index+1  != displayDatas.contents.length  ? (
                           <CButton color="info" variant="outline" onClick={(e) => handleMoveDown(e, index)}>
                             <CIcon icon={cilCaretBottom} title="DOWN" />
                           </CButton>
@@ -254,7 +277,8 @@ const DisplayList = () => {
                           {item.songCount}/{item.displayNum}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <CFormSwitch defaultChecked={item.useYn} disabled />
+                          {/* <CFormSwitch defaultChecked={item.useYn} disabled /> */}
+                          <CFormCheck  defaultChecked={item.useYn} disabled/>
                         </CTableDataCell>
                       </CTableRow>
                     ))
@@ -270,29 +294,29 @@ const DisplayList = () => {
                 </CTableBody>
               </CTable>
               <br />
-              {tempDisplayDatas.contents && tempDisplayDatas.contents.length > 0 ? (
+              {displayDatas.contents && displayDatas.contents.length > 0 ? (
                 <CRow>
                   {/* <CCol md={{ span: 6, offset: 5 }}>
                     <CPagination aria-label="Page navigation example">
-                      <CPaginationItem aria-label="Previous" disabled={tempDisplayDatas.first} onClick={(e) => clickPage(e, 1)}>
+                      <CPaginationItem aria-label="Previous" disabled={displayDatas.first} onClick={(e) => clickPage(e, 1)}>
                         <span aria-hidden="true">&laquo;</span>
                       </CPaginationItem>
-                      {Array.from({ length: tempDisplayDatas.totalPages }, (_, index) => (
+                      {Array.from({ length: displayDatas.totalPages }, (_, index) => (
                         <CPaginationItem
                         key={`page-${index + 1}`}
-                        className={index + 1 === tempDisplayDatas.number ? 'active' : ''}
+                        className={index + 1 === displayDatas.number ? 'active' : ''}
                         onClick={(e) => clickPage(e, index + 1)}
                       >
                         {index + 1}</CPaginationItem>
                       ))}
-                      <CPaginationItem aria-label="Next" disabled={tempDisplayDatas.last}>
+                      <CPaginationItem aria-label="Next" disabled={displayDatas.last}>
                         <span aria-hidden="true">&raquo;</span>
                       </CPaginationItem>
                     </CPagination>
                   </CCol> */}
                   <CCol md={12}>
                   <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                    총 {tempDisplayDatas.totalCount}건
+                    총 {displayDatas.totalCount}건
                     </div>
                   </CCol>
                 </CRow>

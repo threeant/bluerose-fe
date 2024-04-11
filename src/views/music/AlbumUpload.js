@@ -6,7 +6,7 @@ import axiosInstance from '../../common/axiosInstance';
 import {
   cilDataTransferDown
 } from '@coreui/icons';
-
+import { throwError } from '../../common/utils'
 
 import {
   CButton,
@@ -79,8 +79,8 @@ const SampleForm = () => {
       //navigate('/sample/sampleList');
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
       
     }
     setLoadingYn(false);

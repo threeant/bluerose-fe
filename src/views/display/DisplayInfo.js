@@ -9,7 +9,7 @@ import {
 } from '@coreui/icons'
 import { useNavigate, useLocation} from 'react-router-dom'
 import axios from 'axios'
-import { getCodeList, getCurrentDate, getAddDate } from '../../common/utils'
+import { getCodeList, getCurrentDate, throwError } from '../../common/utils'
 import SongList from '../common/SongList'; // MyModal 컴포넌트의 경로를 알맞게 설정
 import AlbumInfo from '../common/AlbumInfo'
 import axiosInstance from '../../common/axiosInstance';
@@ -107,7 +107,7 @@ const DisplayInfo = () => {
   const [validated, setValidated] = useState(false);
 
   //전시 상세 
-  const [displayData, setDisplayData] = useState();
+  //onst [displayData, setDisplayData] = useState();
   //리스트
   const [displaySongDatas, setDisplaySongDatas] = useState([]);
 
@@ -115,7 +115,7 @@ const DisplayInfo = () => {
   const [nowPlayingData, setNowPlayingData] = useState({});
 
   //전시 상세 
-  const [displayUpdateData, setDisplayUpdateData] = useState();
+  const [displayUpdateData, setDisplayUpdateData] = useState({});
 
 
   const handleMoveUp = (index) => {
@@ -157,14 +157,21 @@ const DisplayInfo = () => {
       // API 응답에서 데이터 추출
       const data = response.data;
       // 데이터를 상태 변수에 저장
-      setDisplayData(data);
+      //setDisplayData(data);
       console.log("상세결과 ----")
       console.log(data);
+      setDisplayUpdateData({
+        codeId : data.displayTypeId
+        , displayCount : data.displayNum
+        , sort :  data.sort
+        , title : data.title
+        , useYn : data.useYn
+      })
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -190,8 +197,8 @@ const DisplayInfo = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   }
@@ -227,8 +234,8 @@ const DisplayInfo = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -272,8 +279,8 @@ const DisplayInfo = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
 
@@ -283,16 +290,16 @@ const DisplayInfo = () => {
   const submitUpdateDisplay = async (e) => {
     e.preventDefault();
 
-    console.log(displayData);
+    //console.log(displayData);
 
-    setDisplayUpdateData({
-      codeId : displayData.codeId
-      , displayCount : displayData.displayNum
-      , sort :  displayData.sort
-      , title : displayData.title
-      , useYn : displayData.useYn
+    // setDisplayUpdateData({
+    //   codeId : displayData.codeId
+    //   , displayCount : displayData.displayNum
+    //   , sort :  displayData.sort
+    //   , title : displayData.title
+    //   , useYn : displayData.useYn
 
-    })
+    // })
 
     console.log(displayUpdateData);
     setValidated(true);
@@ -323,8 +330,8 @@ const DisplayInfo = () => {
       setValidated(false);
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
   }
   const handleDataFromSongList = async(datas) => {
@@ -351,13 +358,56 @@ const DisplayInfo = () => {
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('수정되었습니다.');
+      alert('추가되었습니다.');
+      refreshDisplayInfo();
+      
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
     
+  };
+  //전시순서변경
+  const updateSort = async (e) => {
+    e.preventDefault();
+    const result = window.confirm('전시순서를 변경하시겠습니까?');
+
+    if (!result) {
+      return;
+    }
+    
+    var contents = displaySongDatas;
+    console.log(contents);
+    var updateContents = [];
+    for(var i = 0; i< contents.length; i++){
+      updateContents.push(contents[i].displayContentId);
+    }
+
+    console.log(updateContents);
+    try {
+      const response = await axiosInstance.patch('/api/display/'+displayId+'/display-content', 
+        {displayContentIds : updateContents}
+        ,{headers: {
+          'Content-Type': 'application/json',
+        }}
+      );
+
+      // API 응답에서 데이터 추출
+      const data = response;
+      // 데이터를 상태 변수에 저장
+      
+      console.log(data);
+      if(data.status == '200'){
+        alert('변경되었습니다.');
+      }
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.log(error);
+      throwError(error,navigate);
+    }
+
   };
 
 
@@ -392,7 +442,6 @@ const DisplayInfo = () => {
 
 
 
-
   return (
     <>
       <CModal
@@ -422,7 +471,7 @@ const DisplayInfo = () => {
           <CCard className="mb-4">
             <CCardHeader><strong>전시수정</strong></CCardHeader>
             <CCardBody>
-              {displayData ? (
+              {displayUpdateData ? (
                 <CForm
                   className="row g-3 needs-validation"
                   noValidate
@@ -434,23 +483,23 @@ const DisplayInfo = () => {
                   </CCol>
                   <CCol xs={2} >
                     <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
-                    <CFormSwitch label="사용여부" id="formSwitchCheckChecked"  defaultChecked={displayData.useYn} onChange={(e) => setDisplayData({ ...displayData, useYn: e.target.checked })} />
+                    <CFormSwitch label="사용여부" id="formSwitchCheckChecked"  defaultChecked={displayUpdateData.useYn} onChange={(e) => setDisplayUpdateData({ ...displayUpdateData, useYn: e.target.checked })} />
                   </CCol>
 
 
                   <CCol xs={12}>
                     <CFormLabel htmlFor="inputName">제목*</CFormLabel>
-                    <CFormInput type="text" id="inputName" value={displayData.title} required onChange={(e) => setDisplayData({ ...displayData, title: e.target.value })} maxLength={100} />
+                    <CFormInput type="text" id="inputName" value={displayUpdateData.title} required onChange={(e) => setDisplayUpdateData({ ...displayUpdateData, title: e.target.value })} maxLength={100} />
                     <CFormFeedback invalid>앨범명을 입력해주세요.</CFormFeedback>
                   </CCol>
                   <CCol xs={6}>
                   <CFormLabel htmlFor="inputName">노출곡수*</CFormLabel>
-                  <CFormInput type="number" id="inputDisplayCount" value={displayData.displayNum}  required onChange={(e) => setDisplayData({ ...displayData, displayNum: e.target.value })} maxLength={100} />
+                  <CFormInput type="number" id="inputDisplayCount" value={displayUpdateData.displayCount}  required onChange={(e) => setDisplayUpdateData({ ...displayUpdateData, displayCount: e.target.value })} maxLength={100} />
                   <CFormFeedback invalid>노출곡 갯수를 입력해주세요.</CFormFeedback>
                 </CCol>
                   <CCol xs={6}>
                   <CFormLabel htmlFor="inputName">전시타입*</CFormLabel>
-                  <CFormSelect id="sel_media" defaultValue={displayData.displayItemId} onChange={(e) => setDisplayData({ ...displayData, codeId: e.target.value })}  >
+                  <CFormSelect id="sel_media" value={displayUpdateData.codeId} onChange={(e) => setDisplayUpdateData({ ...displayUpdateData, codeId: e.target.value })}  >
                     {dispCD.map((item, index) => (
                       <option value={item.id} key={index}>{item.name}</option>
                     ))}
@@ -484,7 +533,7 @@ const DisplayInfo = () => {
                   <CCol xs={12}>
                     <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                       <CButton component="input" type="reset" color="secondary" value="전시곡 추가" onClick={popMusicAddClick} />
-                      <CButton component="input" color="primary" type="submit" value="수정하기" />
+                      <CButton component="input" color="primary" type="submit" value="순서변경하기" onClick={updateSort}/>
                       <CButton color="light" onClick={refreshDisplayInfo}>
                         <CIcon icon={cilSync} title="Download file" />
                       </CButton>
@@ -526,13 +575,13 @@ const DisplayInfo = () => {
                           {item.trackName}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                        {index != 0  ? (
+                        {index !== 0  ? (
                           <CButton color="info" variant="outline" onClick={() => handleMoveUp(index)} disabled={index === 0}>
                             <CIcon icon={cilCaretTop} title="Download file" />
                           </CButton>
                           ) : ('')}
 
-                        {index+1  != displaySongDatas.length  ? (
+                        {index+1  !== displaySongDatas.length  ? (
                           <CButton color="info" variant="outline" onClick={() => handleMoveDown(index)} disabled={index === displaySongDatas.length - 1}>
                             <CIcon icon={cilCaretBottom} title="Download file" />
                           </CButton>
@@ -540,7 +589,7 @@ const DisplayInfo = () => {
 
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                        {item.newYn != true ? (
+                        {item.newYn !== true ? (
                           <CButton color="dark" shape="rounded-pill" className="mb-3" onClick={(e) => clickDeletDisplayInfo(e, item.displayContentId)}>
                           삭제
                         </CButton>

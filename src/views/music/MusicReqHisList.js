@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import axiosInstance from '../../common/axiosInstance';
 
 
-import { getCodeList } from '../../common/utils'
+import { throwError } from '../../common/utils'
 import {
   CAvatar,
   CButton,
@@ -46,24 +46,42 @@ const MusicReqHisList = () => {
   const [selectedDate, setSelectedDate] = useState(null); //등록일 from
   const [selectedDate2, setSelectedDate2] = useState(null); // 등록일 to
 
+  //검색조건
+  const [albumSearch, setAlbumSearch] = useState({
+    "startDate": "",
+    "endDate": "",
+    "page": 1,
+    "size": 15
+  });
+
 
   // 날짜가 선택될 때 호출될 콜백 함수
   const handleDateChange = date => {
+    console.log(date);
     setSelectedDate(date);
     const formattedDate = date.toISOString().slice(0, 10);
-    setAlbumSearch({ ...albumSearch, startDate: formattedDate })
+    console.log(formattedDate);
+    //setAlbumSearch({ ...albumSearch, startDate: formattedDate });
+    setAlbumSearch(prevState => ({
+      ...prevState,
+      startDate: formattedDate
+    }));
 
   }
   const handleDateChange2 = date => {
     setSelectedDate2(date);
     const formattedDate = date.toISOString().slice(0, 10);
-    setAlbumSearch({ ...albumSearch, endDate: formattedDate })
+    setAlbumSearch(prevState => ({
+      ...prevState,
+      endDate: formattedDate
+    }));
   }
 
   useEffect(() => {
     // 7일 전 날짜 계산
     const todayDate = new Date();
     const pastDate = new Date(todayDate.getTime() - 7 * 24 * 60 * 60 * 1000); // 7일 전 날짜 계산
+    
     handleDateChange(pastDate);
     handleDateChange2(todayDate);
   }, []);
@@ -100,13 +118,7 @@ const MusicReqHisList = () => {
   //리스트
   const [albumDatas, setAlbumDatas] = useState({ contents: [] });
 
-  //검색조건
-  const [albumSearch, setAlbumSearch] = useState({
-    "startDate": "",
-    "endDate": "",
-    "page": 1,
-    "size": 1
-  });
+  
 
   //조회하기
   const submitSearch = (e) => {
@@ -143,8 +155,8 @@ const MusicReqHisList = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -175,6 +187,7 @@ const MusicReqHisList = () => {
                           minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
                           maxDate={new Date()} // maxDate 이후 날짜 선택 불가
                           className="DatePicker"
+                          value={albumSearch.startDate}
                         />
                       </div>
                       <div style={{ whiteSpace: 'pre-wrap', display: 'grid', placeItems: 'center' }}>
@@ -192,6 +205,7 @@ const MusicReqHisList = () => {
                           minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
                           maxDate={new Date()} // maxDate 이후 날짜 선택 불가
                           className="DatePicker"
+                          value={albumSearch.endDate}
                         />
                       </div>
                     </div>

@@ -3,7 +3,7 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
-import { getCodeList } from '../../common/utils'
+import { getCodeList , throwError} from '../../common/utils'
 import {
   cilCalendar,
   cifUs,
@@ -167,8 +167,8 @@ const AlbumReg = () => {
       navigate('/music/AlbumList');
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };

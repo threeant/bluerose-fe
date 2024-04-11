@@ -5,7 +5,7 @@ import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 import axiosInstance from '../../common/axiosInstance';
 
-import { getCodeList } from '../../common/utils'
+import { getCodeList,throwError } from '../../common/utils'
 import {
   CAvatar,
   CButton,
@@ -73,7 +73,7 @@ const MusicReqHisList = () => {
       "musicGenre": "",
       "name": "",
       "page": 1,
-      "size": 1,
+      "size": 15,
       "startReleaseDate": "",
       "mediaCode": ""
     });
@@ -106,7 +106,7 @@ const MusicReqHisList = () => {
     "musicGenre": "",
     "name": "",
     "page": 0,
-    "size": 10,
+    "size": 15,
     "startReleaseDate": "",
     "mediaCode": ""
   });
@@ -145,8 +145,8 @@ const MusicReqHisList = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -170,8 +170,8 @@ const MusicReqHisList = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };

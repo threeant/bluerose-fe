@@ -29,7 +29,7 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: '메인관리*',
+    name: '메인관리',
     to: '/display',
     icon: <CIcon icon={cilMobileLandscape} customClassName="nav-icon" />,
     items: [

@@ -4,7 +4,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
-import { getCodeList } from '../../common/utils'
+import { getCodeList, throwError } from '../../common/utils'
 import {
   cilCalendar,
   cifUs,
@@ -115,8 +115,8 @@ const AlbumInfo = ({ openModal, albumId }) => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -136,8 +136,8 @@ const AlbumInfo = ({ openModal, albumId }) => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -175,8 +175,8 @@ const AlbumInfo = ({ openModal, albumId }) => {
       setValidated(false);
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -243,8 +243,8 @@ const AlbumInfo = ({ openModal, albumId }) => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -279,8 +279,8 @@ const AlbumInfo = ({ openModal, albumId }) => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };

@@ -26,8 +26,8 @@ export function getCodeList(codeNm) {
     // JSON 문자열을 파싱하여 JavaScript 객체로 변환
     const codeList = JSON.parse(jsonCodeData);
 
-    if (!codeList) {
-        throw new Error('권한이 없습니다.(로그인을 해주세요)');
+    if (codeList == null || !codeList) {
+        return [];
     }
 
     // userData 객체 사용
@@ -56,13 +56,16 @@ export function throwError(error,navigate) {
     case 401:
         navigate('/login');
         break;
-      case 404:
+    case 404:
         navigate('/404');
         break;
-      case 500:
+    case 500:
         navigate('/500');
         break;
-      default:
+    case 503:
+        navigate('/login');
+        break;
+    default:
         navigate('/error');
     }
 

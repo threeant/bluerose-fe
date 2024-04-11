@@ -4,8 +4,8 @@ import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 import axiosInstance from '../../common/axiosInstance';
-
-import { getCodeList } from '../../common/utils'
+import PaginationComponent from '../common/PaginationComponent';
+import { getCodeList, throwError } from '../../common/utils'
 import {
   CAvatar,
   CButton,
@@ -48,6 +48,10 @@ const AlbumList = () => {
   const [selectedDate, setSelectedDate] = useState(null); //등록일 from
   const [selectedDate2, setSelectedDate2] = useState(null); // 등록일 to
 
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
+  const [totalPages, setTotalPages] = useState(0); // 현재 페이지 상태
+
+
 
   // 날짜가 선택될 때 호출될 콜백 함수
   const handleDateChange = date => {
@@ -88,7 +92,7 @@ const AlbumList = () => {
 
     // 새로운 동작 실행
     // 예시: id를 이용한 페이지 이동 또는 다른 동작 수행
-    navigate('/system/AdminInfo', { state: { albumId: id } });
+    navigate('/system/AdminInfo', { state: { adminId: id } });
   };
 
   /**********************************************************************
@@ -103,7 +107,7 @@ const AlbumList = () => {
     "endReleaseDate": "",
     "musicGenre": "",
     "name": "",
-    "page": 0,
+    "page": 1,
     "size": 10,
     "startReleaseDate": "",
     "mediaCode": ""
@@ -123,10 +127,27 @@ const AlbumList = () => {
     console.log("===page =  : " + page);
   }
 
+    //페이지 변경
+    const handlePageChange = (page) => {
+      console.log('현재페이지 ');
+      console.log(page);
+      setCurrentPage(page); // 페이지 변경 시 현재 페이지 상태 업데이트
+      submitSearchAdmin(page);
+    };
+
   //검색 API
-  const submitSearchAdmin = async () => {
+  const submitSearchAdmin = async (page) => {
 
     console.log(albumSearch);
+
+    if(page > -1){
+      setAlbumSearch(prevState => ({
+        ...prevState,
+        page: page
+      }));
+
+      albumSearch.page = page;
+    }
 
     try {
       const response = await axiosInstance.get('/api/admin', {
@@ -140,11 +161,12 @@ const AlbumList = () => {
       setAdminDatas(data);
 
       console.log(data)
+      setTotalPages(data.totalPages);
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -168,8 +190,8 @@ const AlbumList = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -252,7 +274,7 @@ const AlbumList = () => {
                           {item.name}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {item.useYn}
+                        <CFormCheck  defaultChecked={item.useYn} disabled/>
                         </CTableDataCell>
                       </CTableRow>
                     ))
@@ -271,17 +293,7 @@ const AlbumList = () => {
               {albumDatas.contents && albumDatas.contents.length > 0 ? (
                 <CRow>
                   <CCol md={{ span: 6, offset: 5 }}>
-                    <CPagination aria-label="Page navigation example">
-                      <CPaginationItem aria-label="Previous" disabled={!albumDatas.first} onClick={(e) => clickPage(e, 1)}>
-                        <span aria-hidden="true">&laquo;</span>
-                      </CPaginationItem>
-                      {Array.from({ length: albumDatas.totalPages }, (_, index) => (
-                        <CPaginationItem key={index} active onClick={(e) => clickPage(e, index + 1)}>{index + 1}</CPaginationItem>
-                      ))}
-                      <CPaginationItem aria-label="Next" disabled={!albumDatas.last}>
-                        <span aria-hidden="true">&raquo;</span>
-                      </CPaginationItem>
-                    </CPagination>
+                  <PaginationComponent totalPages={totalPages} currentPage={currentPage} onPageChange={handlePageChange} />
                   </CCol>
                   <CCol md={1}>
                     총 {albumDatas.totalCount}건

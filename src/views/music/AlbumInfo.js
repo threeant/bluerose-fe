@@ -4,7 +4,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
-import { getCodeList } from '../../common/utils'
+import { getCodeList, throwError } from '../../common/utils'
 import {
   cilCalendar,
   cifUs,
@@ -50,11 +50,15 @@ const AlbumInfo = () => {
    * 화면 영역
   **********************************************************************/
   const location = useLocation();
-  const { albumId } = location.state;
+  const { albumId, listSearch } = location.state;
 
   //목록이동
   const goListClick = () => {
-    navigate('/music/albumList');
+    
+    //const newQuery = encodeURIComponent(listSearch);
+    navigate('/music/albumList', { state: { searchParam : listSearch}});
+
+    //, { state: { albumId: id , listSearch : albumSearch} }
   };
   const [selectedDate, setSelectedDate] = useState(null);
   const handleDateChange = date => {
@@ -165,8 +169,8 @@ const AlbumInfo = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -186,8 +190,8 @@ const AlbumInfo = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -225,8 +229,8 @@ const AlbumInfo = () => {
       setValidated(false);
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -293,8 +297,8 @@ const AlbumInfo = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -329,8 +333,8 @@ const AlbumInfo = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -361,7 +365,7 @@ const AlbumInfo = () => {
                     <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.checked })} />
                   </CCol>
                   <CCol xs={3}>
-                    {previewUrl ? (<CImage rounded thumbnail align="center" src={previewUrl} width={150} height={150} />) : (
+                    {previewUrl ? (<CImage rounded thumbnail align="center" src={'http://localhost:3000/files/images/sample01.png'} width={150} height={150} />) : (
                       <CImage rounded thumbnail align="center" src={ReactImg} width={150} height={150} />
                     )}
                   </CCol>

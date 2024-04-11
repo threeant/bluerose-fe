@@ -4,7 +4,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { getCodeList } from '../../common/utils'
+import { getCodeList, throwError } from '../../common/utils'
 import axiosInstance from '../../common/axiosInstance';
 import {
   CAvatar,
@@ -188,8 +188,8 @@ const CodeList = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -245,8 +245,8 @@ const CodeList = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -279,8 +279,8 @@ const CodeList = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -312,8 +312,8 @@ const CodeList = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -355,8 +355,8 @@ const CodeList = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -390,8 +390,8 @@ const CodeList = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -423,8 +423,8 @@ const CodeList = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -457,8 +457,8 @@ const CodeList = () => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
@@ -554,7 +554,7 @@ const CodeList = () => {
               {codeMasterDatas.contents && codeMasterDatas.contents.length > 0 ? (
                 <CRow>
                   <CCol md={{ span: 6, offset: 5 }}>
-                    <CPagination aria-label="Page navigation example">
+                    {/* <CPagination aria-label="Page navigation example">
                       <CPaginationItem aria-label="Previous" disabled={!codeMasterDatas.first} onClick={(e) => clickPage(e, 1)}>
                         <span aria-hidden="true">&laquo;</span>
                       </CPaginationItem>
@@ -564,7 +564,7 @@ const CodeList = () => {
                       <CPaginationItem aria-label="Next" disabled={!codeMasterDatas.last}>
                         <span aria-hidden="true">&raquo;</span>
                       </CPaginationItem>
-                    </CPagination>
+                    </CPagination> */}
                   </CCol>
                   <CCol md={1}>
                     총 {codeMasterDatas.totalCount}건

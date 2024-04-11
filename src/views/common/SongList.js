@@ -4,7 +4,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { getCodeList } from '../../common/utils'
+import { getCodeList , throwError} from '../../common/utils'
 import PaginationComponent from './PaginationComponent';
 
 import {
@@ -59,20 +59,26 @@ const SongList = ({ openModal, sendDataToParent }) => {
 
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
   const [totalPages, setTotalPages] = useState(0); // 현재 페이지 상태
+  const [songChkDatas, setSongChkDatas] = useState([]); //전달할 선택데이터
 
 
 
   // 날짜가 선택될 때 호출될 콜백 함수
   const handleDateChange = date => {
     setSelectedDate(date);
-    const formattedDate = date.toISOString().slice(0, 10);
-    setSongSearch({ ...songSearch, startReleaseDate: formattedDate })
+    if(date){
+      const formattedDate = date.toISOString().slice(0, 10);
+      setSongSearch({ ...songSearch, startReleaseDate: formattedDate })
+    }
 
   }
   const handleDateChange2 = date => {
     setSelectedDate2(date);
-    const formattedDate = date.toISOString().slice(0, 10);
-    setSongSearch({ ...songSearch, endReleaseDate: formattedDate })
+    if(date){
+      const formattedDate = date.toISOString().slice(0, 10);
+      setSongSearch({ ...songSearch, endReleaseDate: formattedDate })
+    }
+    
   }
 
   //초기화
@@ -90,8 +96,15 @@ const SongList = ({ openModal, sendDataToParent }) => {
       "page": 1,
       "size": 10,
       "startReleaseDate": "",
-      "mediaCode": ""
+      "mediaCode": "",
+      "albumName" : ""
     });
+
+    setCurrentPage(1);
+    setTotalPages(0);
+    setCheckboxStates(Array(songDatas.contents.length).fill(false));
+    setSongDatas({ contents: [] });
+    setSelectAll(false);
   }
 
 
@@ -136,13 +149,15 @@ const SongList = ({ openModal, sendDataToParent }) => {
     console.log(page);
     setCurrentPage(page); // 페이지 변경 시 현재 페이지 상태 업데이트
     submitSearchSongs(page);
+    setCheckboxStates(Array(songDatas.contents.length).fill(false));
+    setSelectAll(false);
   };
 
   
 
   //검색 API
   const submitSearchSongs = async (page) => {
-
+    setSongChkDatas([]);
     console.log(songSearch);
 
     if(page > -1){
@@ -170,14 +185,13 @@ const SongList = ({ openModal, sendDataToParent }) => {
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.error('API 요청 실패:', error);
-      alert('네트워크 오류 ');
+      console.log(error);
+      throwError(error,navigate);
     }
 
   };
 
-  const [songChkDatas, setSongChkDatas] = useState([]);
-
+ 
   useEffect(() => {
     clickReset();
   }, []);
@@ -190,17 +204,50 @@ const SongList = ({ openModal, sendDataToParent }) => {
     //   "songId": id,
     //   "tableId": 0
     // };
-    console.log(e.target.checked);
     if (e.target.checked) {
       setSongChkDatas((prevData) => [...prevData, item]);
     } else {
-      setSongChkDatas((prevData) => prevData.filter(item => item.songId !== item.id));
+      setSongChkDatas((prevDatas) => prevDatas.filter(prevData => prevData.songId !== item.songId));
     }
-
     const updatedCheckboxStates = [...checkboxStates];
     updatedCheckboxStates[index] = !updatedCheckboxStates[index];
     setCheckboxStates(updatedCheckboxStates);
+    setSelectAll(updatedCheckboxStates.every((state) => state));
   };
+
+   const [selectAll, setSelectAll] = useState(false);
+
+   /**
+    * 전체선택 박스
+    */
+  const handleMasterCheckboxChange = () => {
+    setSelectAll(!selectAll);
+    setCheckboxStates(Array(songDatas.contents.length).fill(!selectAll));
+    if(selectAll == false){
+      var contents = songDatas.contents;
+      console.log(contents);
+      var allChkDataArr = [];
+      if(contents){
+        for(var i = 0 ; i < contents.length; i++){
+          allChkDataArr.push(contents[i]);
+        }
+        setSongChkDatas(allChkDataArr);
+        console.log('allChkDataArr >>');
+        console.log(allChkDataArr);
+      }
+      
+    }else{
+      setSongChkDatas([]);
+    }
+  };
+
+  // const handleCheckboxChange = (index) => {
+  //   const newCheckboxStates = [...checkboxStates];
+  //   newCheckboxStates[index] = !newCheckboxStates[index];
+  //   setCheckboxStates(newCheckboxStates);
+  //   setSelectAll(newCheckboxStates.every((state) => state));
+  // };
+
 
   
 
@@ -227,6 +274,7 @@ const SongList = ({ openModal, sendDataToParent }) => {
     }
 
     setSongChkDatas([]);
+    setSelectAll(false);
     setCheckboxStates(Array(songDatas.contents.length).fill(false));
     
     
@@ -278,7 +326,7 @@ const SongList = ({ openModal, sendDataToParent }) => {
                     <CFormLabel htmlFor="inputName" className="col-form-label">앨범명</CFormLabel>
                   </CCol>
                   <CCol xs={5}>
-                    <CFormInput type="text" id="inputName" aria-label="앨범명" placeholder="전체" onChange={(e) => setSongSearch({ ...songSearch, name: e.target.value })} />
+                    <CFormInput type="text" id="inputName" aria-label="앨범명" placeholder="전체" onChange={(e) => setSongSearch({ ...songSearch, albumName: e.target.value })} />
                   </CCol>
                 </CRow>
                 <CRow className="mb-3">
@@ -345,14 +393,23 @@ const SongList = ({ openModal, sendDataToParent }) => {
               <CTable align="middle" className="mb-0 border" hover responsive>
                 <CTableHead color="light">
                   <CTableRow>
-                    <CTableHeaderCell className="text-center"></CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">
+                        <input
+
+                            id={'chk_total'}
+                            type="checkbox"
+                            onChange={handleMasterCheckboxChange}
+                            checked={selectAll}
+                        />
+                  
+                    </CTableHeaderCell>
                     <CTableHeaderCell className="text-center">No</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">미디어</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">앨범명</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">아티스트</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">곡명</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">Track Number</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">Running Time</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Track<br/>Number</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Running<br/>Time</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
