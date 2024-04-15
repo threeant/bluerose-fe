@@ -24,8 +24,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({
     id: '',
-    password: '',
-    tableId : 1
+    password: ''
   });
 
 
@@ -42,7 +41,7 @@ const Login = () => {
     // 로그인 API 호출 또는 서버로 요청
     try {
       
-      const response = await axios.post( appConfig.apiUrl + '/auth/login', userData, {
+      const response = await axios.post( appConfig.apiUrl + '/auth/admin/login', userData, {
         headers: {
           //'Content-Type': 'multipart/form-data',
           'Content-Type': 'application/json',
