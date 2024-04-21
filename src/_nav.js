@@ -62,7 +62,7 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: '대용량업로드*',
+        name: '대용량업로드',
         to: '/music/albumUpload',
       },
     ],
@@ -95,19 +95,19 @@ const _nav = [
     to: '/manage/tableList',
     icon: <CIcon icon={cilSofa} customClassName="nav-icon" />,
   },
-  {
-    component: CNavGroup,
-    name: '이벤트관리',
-    to: '/manage',
-    icon: <CIcon icon={cilBirthdayCake} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: '이벤트관리',
-        to: '/manage/eventList',
-      },
-    ],
-  },
+  // {
+  //   component: CNavGroup,
+  //   name: '이벤트관리',
+  //   to: '/manage',
+  //   icon: <CIcon icon={cilBirthdayCake} customClassName="nav-icon" />,
+  //   items: [
+  //     {
+  //       component: CNavItem,
+  //       name: '이벤트관리',
+  //       to: '/manage/eventList',
+  //     },
+  //   ],
+  // },
   {
     component: CNavTitle,
     name: '시스템관리',

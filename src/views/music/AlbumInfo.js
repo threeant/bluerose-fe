@@ -254,7 +254,7 @@ const AlbumInfo = () => {
       return;
     } else {
       if (/^\d{0,2}:\d{0,2}$/.test(songReqData.runtime) == false) {
-        alert('Running Time을 알맞게 입력해주세요 [00:00] 형식 /');
+        alert('Running Time을 알맞게 입력해주세요 [00:00] 형식 ');
         return;
       }
     }
@@ -365,8 +365,8 @@ const AlbumInfo = () => {
                     <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.checked })} />
                   </CCol>
                   <CCol xs={3}>
-                    {previewUrl ? (<CImage rounded thumbnail align="center" src={'http://localhost:3000/files/images/sample01.png'} width={150} height={150} />) : (
-                      <CImage rounded thumbnail align="center" src={ReactImg} width={150} height={150} />
+                    {previewUrl ? (<CImage rounded thumbnail align="center" src={previewUrl} width={150} height={150} />) : (
+                      <CImage rounded thumbnail align="center" src={process.env.PUBLIC_URL + '/basicImg/w_lp2.png'} width={150} height={150} />
                     )}
                   </CCol>
                   <CCol xs={9}>
@@ -378,8 +378,8 @@ const AlbumInfo = () => {
                   </CCol>
 
                   <CCol xs={6}>
-                    <CFormLabel htmlFor="lab_media">미디어*</CFormLabel>
-                    <CFormSelect id="sel_media" value={albumData.media} onChange={(e) => setAlbumData({ ...albumData, media: e.target.value })}  >
+                    <CFormLabel htmlFor="lab_media">미디어* </CFormLabel>
+                    <CFormSelect id="sel_media" value={albumData.mediaCD} onChange={(e) => setAlbumData({ ...albumData, mediaCD: e.target.value })}  >
                       {midiaCD.map((item, index) => (
                         <option value={item.id} key={index}>{item.name}</option>
                       ))}

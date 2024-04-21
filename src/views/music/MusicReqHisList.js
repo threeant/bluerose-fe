@@ -141,7 +141,7 @@ const MusicReqHisList = () => {
     console.log(albumSearch);
 
     try {
-      const response = await axiosInstance.get('/api/song-request/api/song-request/history', {
+      const response = await axiosInstance.get('/api/song-request/history', {
         params: albumSearch,
         headers: { 'Content-Type': 'application/json' }
       });

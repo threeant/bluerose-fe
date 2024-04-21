@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
@@ -64,12 +64,18 @@ const AlbumReg = () => {
     releaseDate: '',      //발매일
     musicGenre: '',      //장르
     countryCD: '9',        //발매국가
-    mediaCD: '1',        //미디어
+    mediaCD: midiaCD[0].id,        //미디어
     style: '',       //스타일
     series: '',      //시리즈
     useYn: true,      //사용여부
     image: null
   });
+
+  useEffect(() => {
+    console.log(midiaCD);
+    console.log(midiaCD[0].id)
+
+  },[]);
 
   const [previewUrl, setPreviewUrl] = useState(null);
   const handleFileChange = (event) => {
@@ -157,7 +163,7 @@ const AlbumReg = () => {
         releaseDate: '2023-10-28',      //발매일
         musicGenre: '',      //장르
         countryCD: '9',        //발매국가
-        mediaCD: '1',        //미디어
+        mediaCD: midiaCD[0].id,        //미디어
         style: '',       //스타일
         series: '',      //시리즈
         useYn: true,      //사용여부
@@ -196,7 +202,7 @@ const AlbumReg = () => {
                 </CCol>
                 <CCol xs={3}>
                   {previewUrl ? (<CImage rounded thumbnail align="center" src={previewUrl} width={150} height={150} />) : (
-                    <CImage rounded thumbnail align="center" src={ReactImg} width={150} height={150} />
+                    <CImage rounded thumbnail align="center" src={process.env.PUBLIC_URL + '/basicImg/w_lp2.png'} width={150} height={150} />
                   )}
                 </CCol>
                 <CCol xs={9}>
@@ -217,7 +223,7 @@ const AlbumReg = () => {
 
                 <CCol xs={6}>
                   <CFormLabel htmlFor="lab_media">미디어*</CFormLabel>
-                  <CFormSelect id="sel_media" defaultValue={albumData.media} onChange={(e) => setAlbumData({ ...albumData, media: e.target.value })}  >
+                  <CFormSelect id="sel_media" defaultValue={albumData.mediaCD} onChange={(e) => setAlbumData({ ...albumData, mediaCD: e.target.value })}  >
                     {midiaCD.map((item, index) => (
                       <option value={item.id} key={index}>{item.name}</option>
                     ))}
@@ -251,7 +257,7 @@ const AlbumReg = () => {
                 <CCol xs={6}>
                   <CFormLabel htmlFor="inputCountry">발매국가*</CFormLabel>
                   <div >
-                    <CFormSelect id="inputCountry" onChange={(e) => setAlbumData({ ...albumData, country: e.target.value })}>
+                    <CFormSelect id="inputCountry" onChange={(e) => setAlbumData({ ...albumData, countryCD: e.target.value })}>
                       {cntryCD.map((item, index) => (
                         <option value={item.id} key={index}>{item.name}</option>
                       ))}

@@ -86,12 +86,11 @@ const AppHeaderDropdown = () => {
         if(rtnTxt.type == 'APP_REQUEST_SONG'){
           console.log('DISPLAY : ADMIN_UPDATE_PLAYING!!! >> '+rtnTxt.requestSongSize);
           var newRequestSongSize = rtnTxt.requestSongSize;
-          const currentURL = window.location.href;
-          console.log('Current URL:', currentURL);
-          if(currentURL.indexOf('/music/musicReqHisList') > -1 
-            || currentURL.indexOf('/music/musicReq') == -1){
-              setRequestSongSize(prevRequestSongSize => prevRequestSongSize + newRequestSongSize);
-          }
+          //const currentURL = window.location.href;
+          //console.log('Current URL:', currentURL);
+          
+          setRequestSongSize(prevRequestSongSize => prevRequestSongSize + newRequestSongSize);
+        
           addToast(exampleToast(newRequestSongSize));
           
 
@@ -176,7 +175,7 @@ const AppHeaderDropdown = () => {
   return (
     <CDropdown variant="nav-item">
        <CDropdownToggle placement="bottom-end" className="py-0" caret={false}>
-        <CAvatar src={avatar8} size="md" status={requestSongSize > 1 ? "danger" : ''}/>
+        <CAvatar src={process.env.PUBLIC_URL + '/basicImg/topLp.png'} size="md" status={requestSongSize > 1 ? "danger" : ''}/>
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
         <CDropdownHeader className="bg-light fw-semibold py-2"><CIcon icon={cilBell} className="me-2" />Updates</CDropdownHeader>

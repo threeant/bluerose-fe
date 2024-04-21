@@ -145,14 +145,15 @@ const AlbumList = () => {
   useEffect(() => {
     
     const dataFromStorage = JSON.parse(localStorage.getItem('alblumListSearch'));
-    console.log('alblumListSearch>>');
-    console.log(dataFromStorage);
+
     if (dataFromStorage) {
       setAlbumSearch(dataFromStorage);
       handlePageChange(dataFromStorage.page);
       setAlbumSearchFlg(true);
       localStorage.removeItem('alblumListSearch');
       
+    }else{
+      submitSearchAlbums(0);
     }
 
   }, []);

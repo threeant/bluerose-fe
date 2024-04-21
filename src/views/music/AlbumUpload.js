@@ -31,7 +31,7 @@ const SampleForm = () => {
   const [excelFile, setExcelFile] = useState(null);
   const [loadingYn, setLoadingYn] = useState(false);
   const [resultYn, setResultYn] = useState(false);
-  const [resultUrl, setResultUrl] = useState(false);
+  const [resultUrl, setResultUrl] = useState('');
 
   
 
@@ -92,8 +92,9 @@ const SampleForm = () => {
   //양식다운로드
   const downloadForm = (url) => {
     // 다운로드할 파일의 경로
-    const filePath = resultUrl; // 예시 파일 경로
-
+    const filePath = process.env.PUBLIC_URL + '/files/excel/form/excelUploadForm.xlsx'; // 예시 파일 경로
+    console.log('filePath');
+    console.log(filePath);
     // 파일 다운로드
     const downloadLink = document.createElement('a');
     downloadLink.href = filePath;
@@ -104,6 +105,28 @@ const SampleForm = () => {
     document.body.removeChild(downloadLink);
   };
 
+  //실패목록다운로드
+  const downloadFailForm = (url) => {
+    // 다운로드할 파일의 경로
+    var fileIndex = resultUrl.indexOf('/files/excel');
+    const filePath = process.env.PUBLIC_URL + resultUrl.substring(fileIndex); // 예시 파일 경로
+ 
+    // 파일 다운로드
+    const downloadLink = document.createElement('a');
+    downloadLink.href = filePath;
+    downloadLink.download = filePath.substr(filePath.lastIndexOf('/') + 1);
+    document.body.appendChild(downloadLink);
+    console.log(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  };
+
+  const refreshPage = () => {
+
+    window.location.reload(); // 페이지 새로고침
+  }
+  
+
   return (
     <CContainer>
       <CRow>
@@ -112,7 +135,7 @@ const SampleForm = () => {
           <CCard className="mb-4">
           
             <CCardHeader>
-              <strong>대용량업로드</strong> <small>양식에 맞게 등록해 주세요.</small>
+              <strong>대용량업로드</strong> <small>{loadingYn ? '진행중인 경우 새로고침을 하지마세요.' : '양식에 맞게 등록해 주세요.' }</small>
             </CCardHeader>
             <CCardBody>
               <CForm
@@ -125,7 +148,7 @@ const SampleForm = () => {
                 <CCol xs={12}>
                   <CCardBody>
                     <CCardText>
-                      <CFormInput type="file" id="formFile" accept=".xlsx, .xls" onChange={handleImageChange}/>
+                      <CFormInput type="file" id="formFile" accept=".xlsx, .xls" onChange={handleImageChange} disabled={loadingYn}/>
                     </CCardText>
                   </CCardBody>
                 </CCol>
@@ -138,12 +161,18 @@ const SampleForm = () => {
                       <CButton color="light" onClick={downloadForm}>
                         <CIcon icon={cilDataTransferDown} title="Download file"  ></CIcon> 양식다운로드
                       </CButton>
-                        {loadingYn ? <CButton color="primary" disabled>
+                      {loadingYn ? (
+                            <CButton color="primary" disabled>
                               <CSpinner as="span" size="sm" aria-hidden="true" />
                               진행중...
-                            </CButton> 
-                            : <CButton component="input" color="primary" type="submit" value="등록하기" />
-                        }
+                            </CButton>
+                          ) : (
+                            resultYn ? (
+                              <CButton component="input" color="danger" onClick={refreshPage} value="다시 등록하기" />
+                            ) : (
+                              <CButton component="input" color="primary" type="submit" value="등록하기" />
+                            )
+                          )}
                       </div>
                     </CCol>
                   </CRow>
@@ -181,7 +210,7 @@ const SampleForm = () => {
                   <CRow className="justify-content-between">
                     <CCol xs={12}>
                       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                      <CButton color="primary" onClick={downloadForm}>
+                      <CButton color="primary" onClick={downloadFailForm}>
                         <CIcon icon={cilDataTransferDown} title="Download file"  ></CIcon> 실패목록 다운로드
                       </CButton>
                       </div>

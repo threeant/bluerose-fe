@@ -483,7 +483,7 @@ const DisplayInfo = () => {
                   </CCol>
                   <CCol xs={2} >
                     <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
-                    <CFormSwitch label="사용여부" id="formSwitchCheckChecked"  defaultChecked={displayUpdateData.useYn} onChange={(e) => setDisplayUpdateData({ ...displayUpdateData, useYn: e.target.checked })} />
+                    <CFormSwitch label="사용여부" id="formSwitchCheckChecked"  checked={displayUpdateData.useYn}  onChange={(e) => setDisplayUpdateData({ ...displayUpdateData, useYn: e.target.checked })} />
                   </CCol>
 
 

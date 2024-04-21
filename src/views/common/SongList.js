@@ -68,7 +68,7 @@ const SongList = ({ openModal, sendDataToParent }) => {
     setSelectedDate(date);
     if(date){
       const formattedDate = date.toISOString().slice(0, 10);
-      setSongSearch({ ...songSearch, startReleaseDate: formattedDate })
+      setSongSearch({ ...songSearch, startCreateDate: formattedDate })
     }
 
   }
@@ -76,7 +76,7 @@ const SongList = ({ openModal, sendDataToParent }) => {
     setSelectedDate2(date);
     if(date){
       const formattedDate = date.toISOString().slice(0, 10);
-      setSongSearch({ ...songSearch, endReleaseDate: formattedDate })
+      setSongSearch({ ...songSearch, endCreateDate: formattedDate })
     }
     
   }
@@ -90,12 +90,12 @@ const SongList = ({ openModal, sendDataToParent }) => {
     setSongSearch({
       "artist": "",
       "trackName": "",
-      "endReleaseDate": "",
+      "endCreateDate": "",
       "musicGenre": "",
       "name": "",
       "page": 1,
       "size": 10,
-      "startReleaseDate": "",
+      "startCreateDate": "",
       "mediaCode": "",
       "albumName" : ""
     });
@@ -196,9 +196,9 @@ const SongList = ({ openModal, sendDataToParent }) => {
     clickReset();
   }, []);
 
-
+  const [selectAll, setSelectAll] = useState(false);
   //체크박스체크
-  const chkSongClick = (e, item, index) => {
+  const chkSongClick = async(e, item, index) => {
     // 페이지 이동 방지
     // var songChkData = {
     //   "songId": id,
@@ -210,12 +210,13 @@ const SongList = ({ openModal, sendDataToParent }) => {
       setSongChkDatas((prevDatas) => prevDatas.filter(prevData => prevData.songId !== item.songId));
     }
     const updatedCheckboxStates = [...checkboxStates];
+    console.log(updatedCheckboxStates);
     updatedCheckboxStates[index] = !updatedCheckboxStates[index];
     setCheckboxStates(updatedCheckboxStates);
-    setSelectAll(updatedCheckboxStates.every((state) => state));
+    //setSelectAll(updatedCheckboxStates.every((state) => state));
   };
 
-   const [selectAll, setSelectAll] = useState(false);
+   
 
    /**
     * 전체선택 박스
@@ -302,7 +303,7 @@ const SongList = ({ openModal, sendDataToParent }) => {
                   </CCol>
                   <CCol xs={5}>
                     <CFormSelect id="inputMedia" aria-label="미디어" onChange={(e) => setSongSearch({ ...songSearch, mediaCode: e.target.value })}>
-                      <option>-전체-</option>
+                      <option value={''}>-전체-</option>
                       {midiaCD.map((item, index) => (
                         <option value={item.id} key={index}>{item.name}</option>
                       ))}
