@@ -86,17 +86,26 @@ const AppHeaderDropdown = () => {
         if(rtnTxt.type == 'APP_REQUEST_SONG'){
           console.log('DISPLAY : ADMIN_UPDATE_PLAYING!!! >> '+rtnTxt.requestSongSize);
           var newRequestSongSize = rtnTxt.requestSongSize;
-          //const currentURL = window.location.href;
-          //console.log('Current URL:', currentURL);
+          const currentURL = window.location.href;
+          console.log('Current URL:', currentURL);
           
           setRequestSongSize(prevRequestSongSize => prevRequestSongSize + newRequestSongSize);
         
           addToast(exampleToast(newRequestSongSize));
+
+          if(currentURL.indexOf('music/musicReqHisList') < 0 && currentURL.indexOf('music/musicReq') > -1){
+
+            setRequestSongSize(0);
+            
+          }
           
 
 
           //(1)admin 에서 헤더 새 신청곡 갯수 update  (2)admin 신청곡 리스트 update 
           
+        }else if(rtnTxt.type == 'REFRESH'){
+          console.log('----');
+          console.log(rtnTxt);
         }
       });
     }

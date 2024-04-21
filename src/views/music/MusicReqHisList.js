@@ -59,7 +59,8 @@ const MusicReqHisList = () => {
   const handleDateChange = date => {
     console.log(date);
     setSelectedDate(date);
-    const formattedDate = date.toISOString().slice(0, 10);
+    const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)); // 로컬 시간대로 조정
+    const formattedDate = localDate.toISOString().slice(0, 10);
     console.log(formattedDate);
     //setAlbumSearch({ ...albumSearch, startDate: formattedDate });
     setAlbumSearch(prevState => ({
@@ -70,7 +71,8 @@ const MusicReqHisList = () => {
   }
   const handleDateChange2 = date => {
     setSelectedDate2(date);
-    const formattedDate = date.toISOString().slice(0, 10);
+    const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)); // 로컬 시간대로 조정
+    const formattedDate = localDate.toISOString().slice(0, 10);
     setAlbumSearch(prevState => ({
       ...prevState,
       endDate: formattedDate
@@ -102,14 +104,14 @@ const MusicReqHisList = () => {
     handleDateChange2(todayDate);
   }
 
-  const goInfoClick = (e, id) => {
+  const goInfoClick = (e, date) => {
     // 페이지 이동 방지
     e.preventDefault();
-    console.log('goInfoClick : ' + id);
+    console.log('goInfoClick : ' + date);
 
     // 새로운 동작 실행
     // 예시: id를 이용한 페이지 이동 또는 다른 동작 수행
-    navigate('/music/albumInfo', { state: { albumId: id } });
+    navigate('/music/musicReqHisInfo', { state: { dateStr :  date} });
   };
 
   /**********************************************************************
@@ -234,12 +236,12 @@ const MusicReqHisList = () => {
                 <CTableBody>
                   {albumDatas.contents && albumDatas.contents.length > 0 ? (
                     albumDatas.contents.map((item, index) => (
-                      <CTableRow v-for="item in tableItems" key={index} onClick={(e) => goInfoClick(e, item.id)}>
+                      <CTableRow v-for="item in tableItems" key={index} >
                         <CTableDataCell className="text-center">
-                          <strong>{item.index}</strong>
+                          <strong>{index + 1}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <a href='/' onClick={(e) => goInfoClick(e, item.id)}>{item.date}</a>
+                          <a href='/' onClick={(e) => goInfoClick(e, item.date)}>{item.date}</a>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           {item.numberOfSongRequested}

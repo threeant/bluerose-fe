@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import axiosInstance from '../../common/axiosInstance';
 
 import { getCodeList,throwError } from '../../common/utils'
@@ -32,7 +32,7 @@ import {
   cilCalendar
 } from '@coreui/icons'
 
-const MusicReqHisList = () => {
+const MusicReqHisInfo = () => {
   /**********************************************************************
    * 공통코드 영역
   **********************************************************************/
@@ -44,28 +44,14 @@ const MusicReqHisList = () => {
   /**********************************************************************
    * 화면 영역
   **********************************************************************/
-  const [selectedDate, setSelectedDate] = useState(null); //등록일 from
-  const [selectedDate2, setSelectedDate2] = useState(null); // 등록일 to
+  //const { searchParam} = location.state;
+  
 
 
-  // 날짜가 선택될 때 호출될 콜백 함수
-  const handleDateChange = date => {
-    setSelectedDate(date);
-    const formattedDate = date.toISOString().slice(0, 10);
-    setAlbumSearch({ ...albumSearch, startReleaseDate: formattedDate })
 
-  }
-  const handleDateChange2 = date => {
-    setSelectedDate2(date);
-    const formattedDate = date.toISOString().slice(0, 10);
-    setAlbumSearch({ ...albumSearch, endReleaseDate: formattedDate })
-  }
 
   //초기화
   const clickReset = date => {
-
-    setSelectedDate(null);
-    setSelectedDate2(null);
 
     setAlbumSearch({
       "artist": "",
@@ -99,6 +85,10 @@ const MusicReqHisList = () => {
   //리스트
   const [albumDatas, setAlbumDatas] = useState({ contents: [] });
 
+
+
+  
+
   //검색조건
   const [albumSearch, setAlbumSearch] = useState({
     "artist": "",
@@ -110,6 +100,13 @@ const MusicReqHisList = () => {
     "startReleaseDate": "",
     "mediaCode": ""
   });
+
+  const location = useLocation();
+  const dateStr = location.state.dateStr;
+
+  useEffect(() => {
+    console.log(dateStr);
+  }, []);
 
   //조회하기
   const submitSearch = (e) => {
@@ -181,104 +178,11 @@ const MusicReqHisList = () => {
       <CRow>
         <CCol>
           <CCard className="mb-4">
-            <CCardHeader>앨범검색</CCardHeader>
+            <CCardHeader>{dateStr} 신청곡 목록</CCardHeader>
             <CCardBody>
               <CForm className="row" onSubmit={submitSearchAlbums}>
-                <CRow className="mb-3">
-                  <CCol xs={1}>
-                    <CFormLabel htmlFor="inputMedia" className="col-form-label">미디어</CFormLabel>
-                  </CCol>
-                  <CCol xs={5}>
-                    <CFormSelect id="inputMedia" aria-label="미디어" onChange={(e) => setAlbumSearch({ ...albumSearch, mediaCode: e.target.value })}>
-                      <option>-전체-</option>
-                      {midiaCD.map((item, index) => (
-                        <option value={item.id} key={index}>{item.name}</option>
-                      ))}
-                    </CFormSelect>
-                  </CCol>
-                  <CCol xs={1}>
-                    <CFormLabel htmlFor="inputMusicGenre" className="col-form-label" >장르</CFormLabel>
-                  </CCol>
-                  <CCol xs={5}>
-                    <CFormInput type="text" id="inputMusicGenre" aria-label="장르" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, musicGenre: e.target.value })} />
-                  </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                  <CCol xs={1}>
-                    <CFormLabel htmlFor="inputName" className="col-form-label">앨범명</CFormLabel>
-                  </CCol>
-                  <CCol xs={5}>
-                    <CFormInput type="text" id="inputName" aria-label="앨범명" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, name: e.target.value })} />
-                  </CCol>
-                  <CCol xs={1}>
-                    <CFormLabel htmlFor="inputArtist" className="col-form-label">아티스트</CFormLabel>
-                  </CCol>
-                  <CCol md={5}>
-                    <CFormInput type="text" id="inputArtist" aria-label="아티스트" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, artist: e.target.value })} />
-                  </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                  {/* <CCol xs={1}>
-                    <CFormLabel htmlFor="txt_country" className="col-form-label">발매국가</CFormLabel>
-                  </CCol>
-                  <CCol xs={5}>
-                    <CFormSelect id="txt_country" aria-label="발매국가" onChange={(e) => setAlbumSearch({ ...albumSearch, artist: e.target.value })}>
-                      <option>-전체-</option>
-                      {cntryCD.map((item, index) => (
-                        <option value={item.id} key={index}>{item.name}</option>
-                      ))}
-                    </CFormSelect>
-                  </CCol> */}
-                  <CCol md={1}>
-                    <CFormLabel htmlFor="inputEmail3" className="col-form-label">등록일</CFormLabel>
-                  </CCol>
-                  <CCol md={5}>
-                    <div style={{ display: 'flex' }}>
-                      <div style={{ display: 'grid', placeItems: 'center', marginRight: 5 }}>
-                        <CIcon className="text-secondary" icon={cilCalendar} size="lg" />
-                      </div>
-                      <div>
-                        <DatePicker
-                          selected={selectedDate}
-                          onChange={handleDateChange}
-                          dateFormat={'yyyy-MM-dd'} // 날짜 형태
-                          shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
-                          minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
-                          maxDate={new Date()} // maxDate 이후 날짜 선택 불가
-                          className="DatePicker"
-                        />
-                      </div>
-                      <div style={{ whiteSpace: 'pre-wrap', display: 'grid', placeItems: 'center' }}>
-                        <span> ~ </span>
-                      </div>
-                      <div style={{ display: 'grid', placeItems: 'center', marginRight: 5 }}>
-                        <CIcon className="text-secondary" icon={cilCalendar} size="lg" />
-                      </div>
-                      <div>
-                        <DatePicker
-                          selected={selectedDate2}
-                          onChange={handleDateChange2}
-                          dateFormat={'yyyy-MM-dd'} // 날짜 형태
-                          shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
-                          minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
-                          maxDate={new Date()} // maxDate 이후 날짜 선택 불가
-                          className="DatePicker"
-                        />
-                      </div>
-                    </div>
-                  </CCol>
-                </CRow>
                 <div className="d-grid gap-2">
                   <CRow className="justify-content-between">
-                    <CCol xs={4}>
-                      <CButton component="input" type="button" color="danger" value="등록하기" onClick={goFormClick} />
-                    </CCol>
-                    <CCol xs={4}>
-                      <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <CButton component="input" type="reset" color="light" value="초기화" onClick={clickReset} />
-                        <CButton component="input" color="primary" type="submit" value="조회하기" />
-                      </div>
-                    </CCol>
                   </CRow>
                 </div>
               </CForm>
@@ -287,11 +191,12 @@ const MusicReqHisList = () => {
                 <CTableHead color="light">
                   <CTableRow>
                     <CTableHeaderCell className="text-center">No</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">미디어</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center"></CTableHeaderCell>
                     <CTableHeaderCell className="text-center">앨범명</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">아티스트</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">발매일</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">TrackNumber</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Title</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">테이블번호</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">신청시간</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -302,16 +207,19 @@ const MusicReqHisList = () => {
                           <strong>{item.id}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <strong>{item.mediaName}</strong>
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          <CAvatar size="md" src="/static/media/8.35ee8919ea545620a475.jpg" />
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          <a href='/' onClick={(e) => goInfoClick(e, item.id)}>{item.name}</a>
+                          {item.name}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           {item.artist}
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          {item.name}
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          {item.name}
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          {item.name}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           {item.releaseDate}
@@ -358,4 +266,4 @@ const MusicReqHisList = () => {
   )
 }
 
-export default MusicReqHisList
+export default MusicReqHisInfo

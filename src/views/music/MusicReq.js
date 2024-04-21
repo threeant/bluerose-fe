@@ -66,10 +66,19 @@ const MusicReq = () => {
     refreshMusicReq(); //신청곡 조회
     
     submitSearchNowPlayingCondition(); // 신청곡 상태조회
+    
+    //callHeader();
   }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
 
 
-
+  const callHeader = () => {//헤더 초기화 하도록
+      const response = axiosInstance.get('/api/callRefresh', {
+        "code": "string",
+        "msg": "string"
+    },{
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
   const setSocket = async  () => {
     console.log('>>>>!!?');
     const stompConfig = {
@@ -111,6 +120,8 @@ const MusicReq = () => {
           console.log('DISPLAY : ADMIN_UPDATE_PLAYING!!! >> '+rtnTxt.requestSongSize);
          // var newRequestSongSize = rtnTxt.requestSongSize;
          refreshMusicReq();
+
+         console.log('SONG_REQ!!!!!!!!!!');
 
           //(1)admin 에서 헤더 새 신청곡 갯수 update  (2)admin 신청곡 리스트 update 
           

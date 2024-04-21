@@ -56,14 +56,19 @@ const AlbumList = () => {
 
   // 날짜가 선택될 때 호출될 콜백 함수
   const handleDateChange = date => {
+    //console.log(date);
     setSelectedDate(date);
-    const formattedDate = date.toISOString().slice(0, 10);
+    const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)); // 로컬 시간대로 조정
+    const formattedDate = localDate.toISOString().slice(0, 10);
+    
+    console.log(formattedDate);
     setAlbumSearch({ ...albumSearch, startReleaseDate: formattedDate })
 
   }
   const handleDateChange2 = date => {
     setSelectedDate2(date);
-    const formattedDate = date.toISOString().slice(0, 10);
+    const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)); // 로컬 시간대로 조정
+    const formattedDate = localDate.toISOString().slice(0, 10);
     setAlbumSearch({ ...albumSearch, endReleaseDate: formattedDate })
   }
 
@@ -179,7 +184,7 @@ const AlbumList = () => {
 
     
 
-    //console.log(albumSearch);
+    console.log(albumSearch);
 
     try {
       const response = await axiosInstance.get('/api/albums', {
