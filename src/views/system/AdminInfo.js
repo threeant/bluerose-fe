@@ -185,12 +185,12 @@ const AdminInfo = () => {
                   </CCol>
                 <CCol xs={6}>
                   <CFormLabel htmlFor="inputId">아이디*</CFormLabel>
-                  <CFormInput type="text" id="inputId" required value={adminData.adminId} onChange={(e) => setAdminData({ ...adminData, adminId: e.target.value })} maxLength={10} />
+                  <CFormInput type="text" id="inputId" disabled='true' required value={adminData.adminId} onChange={(e) => setAdminData({ ...adminData, adminId: e.target.value })} maxLength={10} />
                   <CFormFeedback invalid>아이디를 입력해주세요.</CFormFeedback>
                 </CCol>
                 <CCol xs={6}>
                   <CFormLabel htmlFor="inputName">이름*</CFormLabel>
-                  <CFormInput type="text" id="inputName" value={adminData.name} required onChange={(e) => setAdminData({ ...adminData, name: e.target.value })} maxLength={10} />
+                  <CFormInput type="text" id="inputName"  value={adminData.name} required onChange={(e) => setAdminData({ ...adminData, name: e.target.value })} maxLength={10} />
                   <CFormFeedback invalid>이름을 입력해주세요.</CFormFeedback>
                 </CCol>
                 <CCol xs={6}>

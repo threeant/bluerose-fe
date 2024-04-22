@@ -158,7 +158,7 @@ const TableList = () => {
   const clickDeletTable = (e, tableId) => {
     e.preventDefault();
 
-    const result = window.confirm('해당곡을 삭제 하시겠습니까?');
+    const result = window.confirm('해당 테이블을 삭제 하시겠습니까?');
 
     if (!result) {
       return;

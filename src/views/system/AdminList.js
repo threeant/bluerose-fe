@@ -39,45 +39,24 @@ const AlbumList = () => {
   **********************************************************************/
   const navigate = useNavigate();
 
-  const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
-  const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
-
   /**********************************************************************
    * 화면 영역
   **********************************************************************/
-  const [selectedDate, setSelectedDate] = useState(null); //등록일 from
-  const [selectedDate2, setSelectedDate2] = useState(null); // 등록일 to
 
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
   const [totalPages, setTotalPages] = useState(0); // 현재 페이지 상태
 
 
-
-  // 날짜가 선택될 때 호출될 콜백 함수
-  const handleDateChange = date => {
-    setSelectedDate(date);
-    const formattedDate = date.toISOString().slice(0, 10);
-    setAlbumSearch({ ...albumSearch, startReleaseDate: formattedDate })
-
-  }
-  const handleDateChange2 = date => {
-    setSelectedDate2(date);
-    const formattedDate = date.toISOString().slice(0, 10);
-    setAlbumSearch({ ...albumSearch, endReleaseDate: formattedDate })
-  }
-
   //초기화
   const clickReset = date => {
 
     setAlbumSearch({
-      "artist": "",
-      "endReleaseDate": "",
-      "musicGenre": "",
       "name": "",
+      "id": "",
       "page": 1,
-      "size": 1,
-      "startReleaseDate": "",
-      "mediaCode": ""
+      "useYn": null,
+      "size": 10,
+      
     });
   }
 
@@ -103,27 +82,24 @@ const AlbumList = () => {
 
   //검색조건
   const [albumSearch, setAlbumSearch] = useState({
-    "artist": "",
-    "endReleaseDate": "",
-    "musicGenre": "",
     "name": "",
+    "id": "",
     "page": 1,
+    "useYn": null,
     "size": 10,
-    "startReleaseDate": "",
-    "mediaCode": ""
   });
 
   //조회하기
   const submitSearch = (e) => {
     e.preventDefault();
-    submitSearchAdmin();
+    submitSearchAdmin(1);
   }
 
   //페이징
   const clickPage = (e, page) => {
     e.preventDefault();
     albumSearch.page = page;
-    submitSearchAdmin();
+    submitSearchAdmin(page);
     console.log("===page =  : " + page);
   }
 
@@ -171,6 +147,11 @@ const AlbumList = () => {
 
   };
 
+  const handleRadioChange = (e) => {
+    const value = e.target.value === "true" ? true : e.target.value === "false" ? false : null;
+    setAlbumSearch({ ...albumSearch, useYn: value });
+  };
+
   const submitRegAlbum = async (e) => {
     e.preventDefault();
 
@@ -203,19 +184,19 @@ const AlbumList = () => {
           <CCard className="mb-4">
             <CCardHeader><strong>관리자검색</strong></CCardHeader>
             <CCardBody>
-              <CForm className="row" onSubmit={submitSearchAdmin}>
+              <CForm className="row" >
                 <CRow className="mb-3">
                   <CCol xs={1}>
                     <CFormLabel htmlFor="inputName" className="col-form-label">아이디</CFormLabel>
                   </CCol>
                   <CCol xs={5}>
-                    <CFormInput type="text" id="inputName" aria-label="앨범명" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, name: e.target.value })} />
+                    <CFormInput type="text" id="inputName" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, id: e.target.value })} />
                   </CCol>
                   <CCol xs={1}>
                     <CFormLabel htmlFor="inputArtist" className="col-form-label">이름</CFormLabel>
                   </CCol>
                   <CCol md={5}>
-                    <CFormInput type="text" id="inputArtist" aria-label="아티스트" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, artist: e.target.value })} />
+                    <CFormInput type="text" id="inputArtist" placeholder="전체" onChange={(e) => setAlbumSearch({ ...albumSearch, name: e.target.value })} />
                   </CCol>
                 </CRow>
                 <CRow className="mb-3">
@@ -225,13 +206,18 @@ const AlbumList = () => {
                   <CCol xs={5}>
                     <div style={{ display: 'flex' }}>
                       <div style={{ display: 'grid', placeItems: 'center', marginRight: 15 }}>
-                        <CFormCheck type="radio" name="exampleRadios" id="exampleRadios1" value="option1" label="전체" defaultChecked />
+                        <CFormCheck type="radio" name="useYnRadios" id="useYn_all" value="" checked={albumSearch.useYn === null} onChange={handleRadioChange} label="전체" />
                       </div>
                       <div style={{ display: 'grid', placeItems: 'center', marginRight: 15 }}>
-                        <CFormCheck type="radio" name="exampleRadios" id="exampleRadios2" value="option2" label="사용" />
+                        <CFormCheck type="radio" name="useYnRadios" id="useYn_true" value="true"
+                          checked={albumSearch.useYn === true}
+                          onChange={handleRadioChange} label="사용"/>
                       </div>
                       <div style={{ display: 'grid', placeItems: 'center', marginRight: 15 }}>
-                        <CFormCheck type="radio" name="exampleRadios" id="exampleRadios3" value="option3" label="미사용" />
+                        <CFormCheck type="radio" name="useYnRadios" id="useYn_false"
+                              value="false"
+                              checked={albumSearch.useYn === false}
+                              onChange={handleRadioChange} label="미사용"/>
                       </div>
                     </div>
                   </CCol>
@@ -244,7 +230,7 @@ const AlbumList = () => {
                     <CCol xs={4}>
                       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                         <CButton component="input" type="reset" color="light" value="초기화" onClick={clickReset} />
-                        <CButton component="input" color="primary" type="submit" value="조회하기" />
+                        <CButton component="input" color="primary" type="submit" value="조회하기"  onClick={submitSearch}/>
                       </div>
                     </CCol>
                   </CRow>
