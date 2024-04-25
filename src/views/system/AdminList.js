@@ -71,7 +71,7 @@ const AlbumList = () => {
 
     // 새로운 동작 실행
     // 예시: id를 이용한 페이지 이동 또는 다른 동작 수행
-    navigate('/system/AdminInfo', { state: { adminId: id } });
+    navigate('/system/AdminInfo', { state: { userId: id } });
   };
 
   /**********************************************************************

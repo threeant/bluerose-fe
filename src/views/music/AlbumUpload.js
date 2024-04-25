@@ -30,6 +30,7 @@ const SampleForm = () => {
 
   const [excelFile, setExcelFile] = useState(null);
   const [loadingYn, setLoadingYn] = useState(false);
+  const [fileUploadYn, setFileUploadYn] = useState(false);
   const [resultYn, setResultYn] = useState(false);
   const [resultUrl, setResultUrl] = useState('');
 
@@ -60,6 +61,7 @@ const SampleForm = () => {
 
     try {
       setLoadingYn(true);
+      setFileUploadYn(true);
       
 
       const response = await axiosInstance.post('/api/albums/upload', formData, {
@@ -148,7 +150,7 @@ const SampleForm = () => {
                 <CCol xs={12}>
                   <CCardBody>
                     <CCardText>
-                      <CFormInput type="file" id="formFile" accept=".xlsx, .xls" onChange={handleImageChange} disabled={loadingYn}/>
+                      <CFormInput type="file" id="formFile" accept=".xlsx, .xls" onChange={handleImageChange} disabled={fileUploadYn}/>
                     </CCardText>
                   </CCardBody>
                 </CCol>

@@ -178,13 +178,15 @@ const CodeList = () => {
 
       // 폼 데이터를 초기화합니다.
       alert('수정되었습니다.');
+      submitSearchDetailCodes(selCodeDatas.id);
       setCodeMstReqData(
         {
           "code": "",
           "description": ""
         }
       );
-      submitSearchCodes();
+      //submitSearchCodes();
+      
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -347,8 +349,11 @@ const CodeList = () => {
         headers: { 'Content-Type': 'application/json' }
       });
 
+      
+
       // API 응답에서 데이터 추출
       const data = response.data;
+      console.log(data);
       // 데이터를 상태 변수에 저장
       setCodeMasterDatas(data);
 
@@ -472,7 +477,7 @@ const CodeList = () => {
           <CCard className="mb-4">
             <CCardHeader>코드마스터</CCardHeader>
             <CCardBody>
-              <CForm className="row" onSubmit={submitSearch}>
+              <CForm className="row" >
                 <CRow className="mb-3">
                   <CCol xs={2}>
                     <CFormLabel htmlFor="inputName" className="col-form-label">코드정보</CFormLabel>
@@ -488,7 +493,7 @@ const CodeList = () => {
                     <CCol xs={4}>
                       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                         <CButton component="input" type="reset" color="light" value="초기화" onClick={clickReset} />
-                        <CButton component="input" color="primary" type="submit" value="조회하기" />
+                        <CButton component="input" color="primary" type="submit" value="조회하기" onClick={submitSearch}/>
                       </div>
                     </CCol>
                   </CRow>
@@ -528,18 +533,18 @@ const CodeList = () => {
                           <strong>{item.id}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <CFormInput type="text" id="inputCode" defaultValue={item.code} onChange={(e) => setCodeMasterDatas((prevData) => ({ ...prevData, contents: prevData.contents.map((content, i) => i === index ? { ...content, code: e.target.value } : content) }))} maxLength={20} />
+                          <CFormInput type="text" id="inputCode" value={item.code} onChange={(e) => setCodeMasterDatas((prevData) => ({ ...prevData, contents: prevData.contents.map((content, i) => i === index ? { ...content, code: e.target.value } : content) }))} maxLength={20} />
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <CFormInput type="text" id="inputCode" defaultValue={item.description} onChange={(e) => setCodeMasterDatas((prevData) => ({ ...prevData, contents: prevData.contents.map((content, i) => i === index ? { ...content, description: e.target.value } : content) }))} maxLength={20} />
+                          <CFormInput type="text" id="inputCode" value={item.description} onChange={(e) => setCodeMasterDatas((prevData) => ({ ...prevData, contents: prevData.contents.map((content, i) => i === index ? { ...content, description: e.target.value } : content) }))} maxLength={20} />
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           <CButton color="success" shape="rounded-pill" className="mb-3" onClick={(e) => clickUpdateCodeMst(e, index)}>
                             수정
                           </CButton>
-                          <CButton color="dark" shape="rounded-pill" className="mb-3" onClick={(e) => clickDeletCodeMaster(e, item.id)} >
+                          {/* <CButton color="dark" shape="rounded-pill" className="mb-3" onClick={(e) => clickDeletCodeMaster(e, item.id)} >
                             삭제
-                          </CButton>
+                          </CButton> */}
                         </CTableDataCell>
                       </CTableRow>
                     ))
@@ -643,7 +648,7 @@ const CodeList = () => {
                           </CButton>
                           <CButton color="dark" shape="rounded-pill" className="mb-3" onClick={(e) => clickDeletCode(e, item.id)}>
                             삭제
-                          </CButton>
+                          </CButton> 
                         </CTableDataCell>
                       </CTableRow>
                     ))

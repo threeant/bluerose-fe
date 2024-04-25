@@ -44,7 +44,7 @@ const AdminInfo = () => {
   const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
   const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
   const location = useLocation();
-  const { adminId } = location.state;
+  const { userId } = location.state;
 
   //목록이동
   const goListClick = () => {
@@ -81,7 +81,7 @@ const AdminInfo = () => {
   const submitSearchAdmin = async () => {
 
     try {
-      const response = await axiosInstance.get('/api/admin/' + adminId);
+      const response = await axiosInstance.get('/api/admin/' + userId);
 
       // API 응답에서 데이터 추출
       const data = response.data;
@@ -118,19 +118,22 @@ const AdminInfo = () => {
       return;
     }
 
-    if(adminData.password != adminData.passwordChk){
-      alert('비밀번호와 비밀번호 확인이 일치하지 않습니다');
-      setAdminData((prevData) => ({
-        ...prevData,
-        passwordChk: '',
-      }));
-      setValidated(false);
-      return;
+    if(adminData.password || adminData.passwordChk){
+      if(adminData.password != adminData.passwordChk){
+        alert('비밀번호와 비밀번호 확인이 일치하지 않습니다');
+        setAdminData((prevData) => ({
+          ...prevData,
+          passwordChk: '',
+        }));
+        setValidated(false);
+        return;
+      }
     }
+    
 
     try {
-      adminData.rawPassword = adminData.password
-      const response = await axiosInstance.post('/api/admin/'+adminId, adminData, {
+      //adminData.rawPassword = adminData.password
+      const response = await axiosInstance.post('/api/admin/'+userId, adminData, {
         headers: {
           'Content-Type': 'application/json',
         }
@@ -177,7 +180,7 @@ const AdminInfo = () => {
                   <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={adminData.useYn} onChange={(e) => setAdminData({ ...adminData, useYn: e.target.value })} />
                 </CCol> */}
                  <CCol xs={10} >
-                    <CFormLabel htmlFor="validationCustom04">ID : {adminId}</CFormLabel>
+                    <CFormLabel htmlFor="validationCustom04">ID : {userId}</CFormLabel>
                   </CCol>
                   <CCol xs={2} >
                     <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
@@ -185,7 +188,7 @@ const AdminInfo = () => {
                   </CCol>
                 <CCol xs={6}>
                   <CFormLabel htmlFor="inputId">아이디*</CFormLabel>
-                  <CFormInput type="text" id="inputId" disabled='true' required value={adminData.adminId} onChange={(e) => setAdminData({ ...adminData, adminId: e.target.value })} maxLength={10} />
+                  <CFormInput type="text" id="inputId" disabled='disabled' required value={adminData.adminId} onChange={(e) => setAdminData({ ...adminData, adminId: e.target.value })} maxLength={10} />
                   <CFormFeedback invalid>아이디를 입력해주세요.</CFormFeedback>
                 </CCol>
                 <CCol xs={6}>
@@ -195,12 +198,12 @@ const AdminInfo = () => {
                 </CCol>
                 <CCol xs={6}>
                   <CFormLabel htmlFor="inputPw">비밀번호*</CFormLabel>
-                  <CFormInput type="password" id="inputPw" required onChange={(e) => setAdminData({ ...adminData, password: e.target.value })} maxLength={20} />
+                  <CFormInput type="password" id="inputPw" onChange={(e) => setAdminData({ ...adminData, password: e.target.value })} maxLength={20} />
                   <CFormFeedback invalid>비밀번호을 입력해주세요.</CFormFeedback>
                 </CCol>
                 <CCol xs={6}>
                   <CFormLabel htmlFor="inputPwChk">비밀번호확인*</CFormLabel>
-                  <CFormInput type="password" id="inputPwChk" required onChange={(e) => setAdminData({ ...adminData, passwordChk: e.target.value })} maxLength={20} />
+                  <CFormInput type="password" id="inputPwChk" onChange={(e) => setAdminData({ ...adminData, passwordChk: e.target.value })} maxLength={20} />
                   <CFormFeedback invalid>비밀번호확인을 입력해주세요.</CFormFeedback>
                 </CCol>
                 <CCol xs={12}>
