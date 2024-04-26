@@ -186,6 +186,18 @@ const AlbumList = () => {
 
     console.log(albumSearch);
 
+
+    if(albumSearch.endReleaseDate || albumSearch.startReleaseDate){
+      if(!albumSearch.endReleaseDate){
+        alert('등록일 기간을 정확히 입력해주세요.')
+        return;
+      }
+      if(!albumSearch.startReleaseDate){
+        alert('등록일 기간을 정확히 입력해주세요.')
+        return;
+      }
+    }
+
     try {
       const response = await axiosInstance.get('/api/albums', {
         params: albumSearch,
