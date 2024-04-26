@@ -56,8 +56,14 @@ const AlbumList = () => {
 
   // 날짜가 선택될 때 호출될 콜백 함수
   const handleDateChange = date => {
+    debugger;
     //console.log(date);
     setSelectedDate(date);
+    if(!date){
+      return;
+    }
+
+    
     const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)); // 로컬 시간대로 조정
     const formattedDate = localDate.toISOString().slice(0, 10);
     
@@ -67,6 +73,11 @@ const AlbumList = () => {
   }
   const handleDateChange2 = date => {
     setSelectedDate2(date);
+    if(!date){
+      return;
+    }
+
+    
     const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)); // 로컬 시간대로 조정
     const formattedDate = localDate.toISOString().slice(0, 10);
     setAlbumSearch({ ...albumSearch, endReleaseDate: formattedDate })
