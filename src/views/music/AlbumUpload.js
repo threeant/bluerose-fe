@@ -7,6 +7,7 @@ import {
   cilDataTransferDown
 } from '@coreui/icons';
 import { throwError } from '../../common/utils'
+import appConfig from '../../common/appConfig';
 
 import {
   CButton,
@@ -94,7 +95,7 @@ const SampleForm = () => {
   //양식다운로드
   const downloadForm = (url) => {
     // 다운로드할 파일의 경로
-    const filePath = process.env.PUBLIC_URL + '/files/excel/form/excelUploadForm.xlsx'; // 예시 파일 경로
+    const filePath = appConfig.apiUrl + '/excel/form/excelUploadForm.xlsx'; // 예시 파일 경로
     console.log('filePath');
     console.log(filePath);
     // 파일 다운로드
@@ -110,8 +111,10 @@ const SampleForm = () => {
   //실패목록다운로드
   const downloadFailForm = (url) => {
     // 다운로드할 파일의 경로
+    console.log(resultUrl)
     var fileIndex = resultUrl.indexOf('/files/excel');
-    const filePath = process.env.PUBLIC_URL + resultUrl.substring(fileIndex); // 예시 파일 경로
+    //const filePath = process.env.PUBLIC_URL + resultUrl.substring(fileIndex); // 예시 파일 경로
+    const filePath = appConfig.apiUrl + resultUrl.substring(fileIndex); // 예시 파일 경로
  
     // 파일 다운로드
     const downloadLink = document.createElement('a');
