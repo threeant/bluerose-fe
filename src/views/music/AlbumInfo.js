@@ -411,7 +411,7 @@ const AlbumInfo = () => {
                     <CFormTextarea id="inputFormat" rows="3" value={albumData.format} onChange={(e) => setAlbumData({ ...albumData, format: e.target.value })} maxLength={250}  ></CFormTextarea>
                   </CCol>
                   <CCol xs={6}>
-                    <CFormLabel htmlFor="inputCountry">발매국가*</CFormLabel>
+                    <CFormLabel htmlFor="inputCountry">발매국</CFormLabel>
                     <div >
                       <CFormSelect id="inputCountry" value={albumData.countryCD} onChange={(e) => setAlbumData({ ...albumData, countryCD: e.target.value })}>
                         {cntryCD.map((item, index) => (
