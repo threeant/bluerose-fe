@@ -365,7 +365,7 @@ const AlbumInfo = () => {
                     <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.checked })} />
                   </CCol>
                   <CCol xs={3}>
-                    {previewUrl ? (<CImage rounded thumbnail align="center" src={previewUrl} width={150} height={150} />) : (
+                    {previewUrl ? (<CImage rounded thumbnail align="center" src={process.env.PUBLIC_URL + previewUrl} width={150} height={150} />) : (
                       <CImage rounded thumbnail align="center" src={process.env.PUBLIC_URL + '/basicImg/w_lp2.png'} width={150} height={150} />
                     )}
                   </CCol>
