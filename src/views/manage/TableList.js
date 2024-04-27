@@ -114,6 +114,8 @@ const TableList = () => {
 
   };
 
+ 
+
 
   //등록 하기 API
   const submitReqTable = async () => {
@@ -189,6 +191,43 @@ const TableList = () => {
   };
 
 
+   //연결해제
+   const clickDisconnTable = (e, tableId) => {
+    e.preventDefault();
+  
+    const result = window.confirm('해당 테이블을 연결 해제하시겠습니까?');
+   
+    if (!result) {
+      return;
+    }
+  
+    submitDisconnTable(tableId);
+  };
+
+
+  //삭제 API
+  const submitDisconnTable = async (tableId) => {
+
+
+    try {
+      const response = await axiosInstance.post('/api/tables/' + tableId +'/disconnect');
+
+      console.log('API 응답:', response.data);
+
+      // 폼 데이터를 초기화합니다.
+      alert('해제되었습니다.');
+      submitSearchTable();
+
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.log(error);
+      throwError(error,navigate);
+    }
+
+  };
+  
+
+
 
   return (
     <CContainer>
@@ -211,11 +250,14 @@ const TableList = () => {
               <CCol xs={3}>
                 <CFormInput type="text" id="staTitle" value="좌석수*" readOnly plainText />
               </CCol>
-              <CCol xs={2}>
-                <CFormInput type="text" id="staRunningTime" value="기기세팅여부" readOnly plainText />
+              <CCol xs={1}>
+                <CFormInput type="text" id="staRunningTime" value="세팅여부" readOnly plainText />
               </CCol>
               <CCol xs={1}>
-                <CFormInput type="text" id="staButton" value="" readOnly plainText />
+                <CFormInput type="text" id="staRunningTime" value="연결해제" readOnly plainText />
+              </CCol>
+              <CCol xs={1}>
+                <CFormInput type="text" id="staButton" value="삭제" readOnly plainText />
               </CCol>
             </CRow>
             <CRow>
@@ -225,14 +267,12 @@ const TableList = () => {
               <CCol xs={5}>
                 <CFormInput type="text" id="inputTableName" value={tableReqData.tableName} onChange={(e) => setTableReqData({ ...tableReqData, tableName: e.target.value })} maxLength={5} />
               </CCol>
-              <CCol xs={3}>
+              <CCol xs={2}>
                 <CFormInput type="number" id="inputTrackNumber" value={tableReqData.numberOfSeats} onChange={(e) => setTableReqData({ ...tableReqData, numberOfSeats: e.target.value })} />
               </CCol>
-              <CCol xs={2}>
-                <CFormInput type="text" id="inputTrackRuntime" value="-" readOnly plainText />
-              </CCol>
-              <CCol xs={1}>
-                <CButton color="info" className="mb-3" onClick={(e) => clickTableSong(e)}>
+              
+              <CCol xs={3}>
+                <CButton color="info"  onClick={(e) => clickTableSong(e)}>
                   추가
                 </CButton>
               </CCol>
@@ -249,14 +289,21 @@ const TableList = () => {
                 <CCol xs={3}>
                   <CFormInput type="text" id={'txtNumberOfSeats${index}'} value={item.numberOfSeats} readOnly plainText />
                 </CCol>
-                <CCol xs={2}>
-                  <CFormInput type="text" id={'txtSettingYn${index}'} value={item.settingYn} readOnly plainText />
+                <CCol xs={1}>
+                  <CFormInput type="text" id={'txtSettingYn${index}'} value={item.settingYn? 'O' : 'X'} readOnly plainText />
                 </CCol>
                 <CCol xs={1}>
-                  <CButton color="dark" className="mb-3" onClick={(e) => clickDeletTable(e, item.id)}>
-                    삭제
+                {item.settingYn ?
+                  <CButton color="danger" className="mb-3" onClick={(e) => clickDisconnTable(e, item.id)}>
+                    해제
                   </CButton>
+                  : '-'}
                 </CCol>
+                <CCol xs={1}>
+                <CButton color="dark" className="mb-3" onClick={(e) => clickDeletTable(e,item.id)}>
+                  삭제
+                </CButton>
+              </CCol>
               </CRow>
             ))}
           </CCardBody>
