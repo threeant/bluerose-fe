@@ -74,96 +74,11 @@ const AlbumReg = () => {
 
   useEffect(() => {
     //console.log(midiaCD);
-    //console.log(midiaCD[0].id)
-
-
-    test();
+    //console.log(midiaCD[0].id)\
 
   }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
   const [imageData, setImageData] = useState(null);
   const [fileContent, setFileContent] = useState('');
-
-
-  const test = ()=> {
-    console.log('dd')
-    //const response =  axiosInstance.get('/api/image/sample');
-    //console.log(response);
-
-    let config = {
-      method: 'get',
-      maxBodyLength: Infinity,
-      url: 'http://localhost:8080/api/image/sample',
-      headers: { }
-    };
-
-
-   axios({
-      method:'GET',
-      url:'http://localhost:8080/api/image/sample',
-      responseType:'blob',
-      headers: {
-         // 'Authorization': 'Bearer ' + state.generalStates.SESSION_JWT_TOKEN
-      },
-  })
-  .then((res) => {
-      const url = new Blob([res.data], { type: res.headers['content-type'] } );
-      //callback(url);
-
-      const blobUrl = URL.createObjectURL(url);
-      setImageData(blobUrl);
-  })
-  .catch(e => {
-      //console.log(`error === ${e}`)
-  })
-
-return;
-    
-    axios.request(config)
-    .then((response) => {
-      console.log(JSON.stringify(response.data));
-      const file = response.data;
-      const decodedString = decodeURIComponent(escape(atob(file)));
-      //let decodedData = atob(file);
-      setImageData(decodedString);
-      
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target.result;
-        setFileContent(content);
-      };
-      reader.readAsDataURL(file);
-      // if (file) {
-      //   const reader = new FileReader();
-      //   reader.onload = (e) => {
-      //     const content = e.target.result;
-      //     setFileContent(content);
-      //   };
-      //   reader.readAsText(file);
-      // }
-      //setImageData(response.data);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-
-
-    // fetch('http://localhost:8080/api/image/sample', {
-    //   method: 'GET',
-    //   //responseType: 'arraybuffer' // 바이너리 데이터를 ArrayBuffer로 받습니다.
-    // })
-    // .then(response => response.arrayBuffer())
-    // .then(buffer => {
-    //   // ArrayBuffer를 Uint8Array로 변환하여 상태에 설정합니다.
-    //   setImageData(new Uint8Array(buffer));
-    //   console.log(imageData);
-    // })
-    // .catch(error => {
-    //   console.error('Error fetching image:', error);
-    // });
-    
-
-  }
 
 
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -293,17 +208,6 @@ return;
                   {previewUrl ? (<CImage rounded thumbnail align="center" src={previewUrl} width={150} height={150} />) : (
                     <CImage rounded thumbnail align="center" src={process.env.PUBLIC_URL + '/basicImg/w_lp2.png'} width={150} height={150} />
                   )}
-                  
-                  {imageData && (
-                    <CImage rounded thumbnail align="center" src={imageData} width={150} height={150} />
-
-                  )}
-
-                  {fileContent && (
-                    <CImage rounded thumbnail align="center" src={fileContent} width={150} height={150} />
-
-                  )}
-
 
 
                 </CCol>

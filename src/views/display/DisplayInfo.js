@@ -13,6 +13,7 @@ import { getCodeList, getCurrentDate, throwError } from '../../common/utils'
 import SongList from '../common/SongList'; // MyModal 컴포넌트의 경로를 알맞게 설정
 import AlbumInfo from '../common/AlbumInfo'
 import axiosInstance from '../../common/axiosInstance';
+import ComModal from '../../common/ComModal'; // 모달 컴포넌트 임포트
 import {
   CAvatar,
   CButton,
@@ -58,6 +59,45 @@ const DisplayInfo = () => {
   const [dispCD] = useState(getCodeList('DISP')); // 전시CD
   const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
   const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
+
+
+  /**********************************************************************
+   * 메세지영역
+  **********************************************************************/
+  const [alertType, setAlertType] = useState('');
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertText, setAlertText] = useState('');
+  const [acceptType, setAcceptType] = useState('');
+ 
+
+
+  const alertPage = (txt) => {
+    setAlertType('alert');
+    setAlertText(txt);
+    setAlertVisible(true);
+  };
+
+  const confirmPage = (txt, type) => {
+    setAlertType('confirm');
+    setAlertText(txt);
+    setAlertVisible(true);
+    setAcceptType(type);
+  };
+
+  const handleCloseModal = () => {
+    setAlertVisible(false);
+  };
+  const handleAccept = () => {
+    setAlertVisible(false);
+    if(acceptType === 'updateDisp'){// 전시정보변경
+      submitUpdateDisplay();
+    }else if(acceptType === 'deletSong'){ //곡삭제
+      submitDeletDisplay();
+    }else if(acceptType === 'updateSongSort'){ // 전시순서변경
+      updateSort();
+    }
+  };
+
 
 
 
@@ -204,32 +244,31 @@ const DisplayInfo = () => {
   }
 
   
+  const [delDisplayContentId, setDelDisplayContentId] = useState('');
+ 
   //신청곡 삭제 클릭
   const clickDeletDisplayInfo = (e, displayContentId) => {
     e.preventDefault();
+    setDelDisplayContentId(displayContentId);
+    //const result = window.confirm('해당곡을 삭제 하시겠습니까?');
+    confirmPage('해당곡을 삭제 하시겠습니까?', 'deletSong')
 
-    const result = window.confirm('해당곡을 삭제 하시겠습니까?');
-
-    if (!result) {
-      return;
-    }
-
-    submitDeletDisplay(displayContentId);
+    
   };
 
   //곡 삭제 API
-  const submitDeletDisplay = async (displayContentId) => {
+  const submitDeletDisplay = async () => {
 
-    console.log(displayContentId);
+    console.log(delDisplayContentId);
 
     try {
       const response = await axiosInstance.delete('/api/display/' + displayId 
-                                          + '/display-content/' + displayContentId);
+                                          + '/display-content/' + delDisplayContentId);
 
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('삭제되었습니다.');
+      alertPage('삭제되었습니다.');
       refreshDisplayInfo();
 
     } catch (error) {
@@ -248,60 +287,13 @@ const DisplayInfo = () => {
     setVisibleAlbum(openYn);
   }
 
-  //신청곡 완료 클릭
-  const clickCompleteDisplayInfo = (e) => {
+  
+   //전시 수정하기 API
+   const confirmUpdateDisplay = async (e) => {
     e.preventDefault();
-
-    const result = window.confirm('해당곡을 완료 하시겠습니까?');
-
-    if (!result) {
-      return;
-    }
-
-    submitCompleteDisplayInfo();
-  };
-
-
-  //신청곡 완료 API
-  const submitCompleteDisplayInfo = async () => {
-
-
-    try {
-      const response = await axiosInstance.post('/api/song-request/now-playing/complete');
-
-      console.log('API 응답:', response.data);
-
-      // 폼 데이터를 초기화합니다.
-      alert('곡이 끝났습니다.');
-      refreshDisplayInfo();
-
-
-
-    } catch (error) {
-      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
-      console.log(error);
-      throwError(error,navigate);
-    }
-
-
-  }
-
-  //전시 수정하기 API
-  const submitUpdateDisplay = async (e) => {
-    e.preventDefault();
-
-    //console.log(displayData);
-
-    // setDisplayUpdateData({
-    //   codeId : displayData.codeId
-    //   , displayCount : displayData.displayNum
-    //   , sort :  displayData.sort
-    //   , title : displayData.title
-    //   , useYn : displayData.useYn
-
-    // })
 
     console.log(displayUpdateData);
+    
     setValidated(true);
     const form = e.currentTarget;
     if (form.checkValidity() === false) {
@@ -309,12 +301,13 @@ const DisplayInfo = () => {
       return;
     }
 
-    const result = window.confirm('수정하시겠습니까?');
+    confirmPage('전시정보를 수정하시겠습니까?', 'updateDisp')
 
-    if (!result) {
-      setValidated(false);
-      return;
-    }
+  }
+
+  //전시 수정하기 API
+  const submitUpdateDisplay = async () => {
+    
 
     try {
       const response = await axiosInstance.post('/api/display/' + displayId, displayUpdateData, {
@@ -326,7 +319,7 @@ const DisplayInfo = () => {
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('수정되었습니다.');
+      alertPage('변경되었습니다.');
       setValidated(false);
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -358,7 +351,7 @@ const DisplayInfo = () => {
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('추가되었습니다.');
+      alertPage('추가되었습니다.');
       refreshDisplayInfo();
       
     } catch (error) {
@@ -369,19 +362,18 @@ const DisplayInfo = () => {
     
   };
   //전시순서변경
-  const updateSort = async (e) => {
-    e.preventDefault();
-    const result = window.confirm('전시순서를 변경하시겠습니까?');
-
-    if (!result) {
-      return;
-    }
+  const updateSort = async () => {
     
     var contents = displaySongDatas;
     console.log(contents);
     var updateContents = [];
     for(var i = 0; i< contents.length; i++){
       updateContents.push(contents[i].displayContentId);
+    }
+
+    if(updateContents.length < 1){
+      alertPage('변경되는 데이터가 없습니다.');
+      return;
     }
 
     console.log(updateContents);
@@ -399,7 +391,7 @@ const DisplayInfo = () => {
       
       console.log(data);
       if(data.status == '200'){
-        alert('변경되었습니다.');
+        alertPage('변경되었습니다.');
       }
 
     } catch (error) {
@@ -444,6 +436,8 @@ const DisplayInfo = () => {
 
   return (
     <>
+      <ComModal type={alertType} visible={alertVisible} onClose={handleCloseModal} alertText={alertText} onAccpet={handleAccept}/>
+      
       <CModal
         size="xl"
         visible={visibleSong}
@@ -476,7 +470,7 @@ const DisplayInfo = () => {
                   className="row g-3 needs-validation"
                   noValidate
                   validated={validated}
-                  onSubmit={submitUpdateDisplay}
+                  onSubmit={confirmUpdateDisplay}
                 >
                   <CCol xs={10} >
                     <CFormLabel htmlFor="validationCustom04">ID : {displayId}</CFormLabel>
@@ -499,12 +493,13 @@ const DisplayInfo = () => {
                 </CCol>
                   <CCol xs={6}>
                   <CFormLabel htmlFor="inputName">전시타입*</CFormLabel>
-                  <CFormSelect id="sel_media" value={displayUpdateData.codeId} onChange={(e) => setDisplayUpdateData({ ...displayUpdateData, codeId: e.target.value })}  >
+                  <CFormSelect id="sel_media" value={displayUpdateData.codeId} onChange={(e) => setDisplayUpdateData({ ...displayUpdateData, codeId: e.target.value })} required >
+                    <option value={''} key='-1'>-선택-</option>
                     {dispCD.map((item, index) => (
                       <option value={item.id} key={index}>{item.name}</option>
                     ))}
                   </CFormSelect>
-                  <CFormFeedback invalid>제목을 입력해주세요.</CFormFeedback>
+                  <CFormFeedback invalid>전시타입을 선택해주세요.</CFormFeedback>
                 </CCol>
                   <div className="d-grid gap-2">
                     <CRow className="justify-content-between">
@@ -533,7 +528,7 @@ const DisplayInfo = () => {
                   <CCol xs={12}>
                     <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                       <CButton component="input" type="reset" color="secondary" value="전시곡 추가" onClick={popMusicAddClick} />
-                      <CButton component="input" color="primary" type="submit" value="순서변경하기" onClick={updateSort}/>
+                      <CButton component="input" color="primary" type="submit" value="순서변경하기" onClick={() => confirmPage('전시순서를 변경하시겠습니까?', 'updateSongSort')}/>
                       <CButton color="light" onClick={refreshDisplayInfo}>
                         <CIcon icon={cilSync} title="Download file" />
                       </CButton>

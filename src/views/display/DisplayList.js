@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { throwError } from '../../common/utils'
 import axiosInstance from '../../common/axiosInstance';
+import ComModal from '../../common/ComModal'; // 모달 컴포넌트 임포트
 
 import {
   cilCaretTop,
@@ -48,6 +49,38 @@ const DisplayList = () => {
   /**********************************************************************
    * 화면 영역
   **********************************************************************/
+  const [alertType, setAlertType] = useState('');
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertText, setAlertText] = useState('');
+  const [acceptType, setAcceptType] = useState('');
+  
+
+
+  const alertPage = (txt) => {
+    setAlertType('alert');
+    setAlertText(txt);
+    setAlertVisible(true);
+  };
+
+  const confirmPage = (txt, type) => {
+    setAlertType('confirm');
+    setAlertText(txt);
+    setAlertVisible(true);
+    setAcceptType(type);
+  };
+
+  const handleCloseModal = () => {
+    setAlertVisible(false);
+  };
+  const handleAccept = () => {
+    setAlertVisible(false);
+    if(acceptType === 'update'){// 전시순서변경
+      updateSort();
+    }
+  };
+
+
+
   
   const goFormClick = () => { //등록화면이동
     navigate('/display/displayReg');
@@ -121,14 +154,11 @@ const DisplayList = () => {
 
   };
 
-  //전시순서변경
-  const updateSort = async (e) => {
-    e.preventDefault();
-    const result = window.confirm('전시순서를 변경하시겠습니까?');
+   
 
-    if (!result) {
-      return;
-    }
+  //전시순서변경
+  const updateSort = async () => {
+    
     
     var contents = displayDatas.contents;
     console.log(displayDatas.contents);
@@ -154,7 +184,7 @@ const DisplayList = () => {
       
       console.log(data);
       if(data.status == '200'){
-        alert('변경되었습니다.');
+        alertPage('변경되었습니다.');
       }
 
     } catch (error) {
@@ -218,6 +248,7 @@ const DisplayList = () => {
 
   return (
     <>
+     <ComModal type={alertType} visible={alertVisible} onClose={handleCloseModal} alertText={alertText} onAccpet={handleAccept}/>
       <CRow>
         <CCol>
           <CCard className="mb-4">
@@ -229,7 +260,7 @@ const DisplayList = () => {
                   <CCol xs={3}>
                       <div className="d-grid gap-2 d-md-flex">
                         <CButton component="input" type="button" color="success" value="등록하기" onClick={goFormClick} />
-                        <CButton component="input" type="button" color="danger" value="전시순서변경" onClick={updateSort} />
+                        <CButton component="input" type="button" color="danger" value="전시순서변경" onClick={() => confirmPage('전시순서를 변경하시겠습니까?', 'update')} />
                       </div>
                     </CCol>
                     <CCol xs={9}>

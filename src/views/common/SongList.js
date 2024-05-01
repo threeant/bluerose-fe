@@ -32,6 +32,7 @@ import {
 import PropTypes from 'prop-types';
 
 import axiosInstance from '../../common/axiosInstance';
+import ComModal from '../../common/ComModal'; // 모달 컴포넌트 임포트
 
 import {
   cilCalendar
@@ -48,6 +49,41 @@ const SongList = ({ openModal, sendDataToParent }) => {
 
   const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
   const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
+
+    /**********************************************************************
+   * 메세지영역
+  **********************************************************************/
+    const [alertType, setAlertType] = useState('');
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alertText, setAlertText] = useState('');
+    const [acceptType, setAcceptType] = useState('');
+   
+  
+  
+    const alertPage = (txt) => {
+      setAlertType('alert');
+      setAlertText(txt);
+      setAlertVisible(true);
+    };
+  
+    const confirmPage = (txt, type) => {
+      setAlertType('confirm');
+      setAlertText(txt);
+      setAlertVisible(true);
+      setAcceptType(type);
+    };
+  
+    const handleCloseModal = () => {
+      setAlertVisible(false);
+    };
+    const handleAccept = () => {
+      setAlertVisible(false);
+      if(acceptType === 'add'){// 추가
+        submitRegAlbum();
+      }
+  
+      
+    };
 
   /**********************************************************************
    * 화면 영역
@@ -242,55 +278,30 @@ const SongList = ({ openModal, sendDataToParent }) => {
     }
   };
 
-  // const handleCheckboxChange = (index) => {
-  //   const newCheckboxStates = [...checkboxStates];
-  //   newCheckboxStates[index] = !newCheckboxStates[index];
-  //   setCheckboxStates(newCheckboxStates);
-  //   setSelectAll(newCheckboxStates.every((state) => state));
-  // };
-
-
-  
-
   //추가
-  const submitRegAlbum = async (e) => {
+  const confirmSubmitRegAlbum = async (e) => {
     e.preventDefault();
     console.log(songChkDatas);
 
     if (songChkDatas.length == 0) {
-      alert('곡을 선택해주세요');
-      return;
-    } else {
-      const result = window.confirm('해당곡을 등록 하시겠습니까?');
-
-      if (!result) {
-        return;
-      }
-    }
-
-    const form = e.currentTarget;
-    if (form.checkValidity() === false) {
-      e.stopPropagation();
+      alertPage('곡을 선택해주세요');
       return;
     }
+    confirmPage('해당곡을 등록 하시겠습니까?', 'add')
+  }
 
+  //추가
+  const submitRegAlbum = async () => {
     setSongChkDatas([]);
     setSelectAll(false);
     setCheckboxStates(Array(songDatas.contents.length).fill(false));
-    
-    
-
     sendDataToParent(songChkDatas);
-
-    
-
-
-    //openModal(false);
-
   };
 
   return (
     <>
+    <ComModal type={alertType} visible={alertVisible} onClose={handleCloseModal} alertText={alertText} onAccpet={handleAccept}/>
+      
       <CRow>
         <CCol>
           <CCard className="mb-4">
@@ -379,7 +390,7 @@ const SongList = ({ openModal, sendDataToParent }) => {
                 <div className="d-grid gap-2">
                   <CRow className="justify-content-between">
                     <CCol xs={4}>
-                      <CButton component="input" type="button" color="info" value="추가" onClick={submitRegAlbum} />
+                      <CButton component="input" type="button" color="info" value="추가" onClick={confirmSubmitRegAlbum} />
                     </CCol>
                     <CCol xs={4}>
                       <div className="d-grid gap-2 d-md-flex justify-content-md-end">

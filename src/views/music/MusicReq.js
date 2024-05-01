@@ -12,6 +12,7 @@ import AlbumInfo from '../common/AlbumInfo'
 import axiosInstance from '../../common/axiosInstance';
 import { Client } from "@stomp/stompjs";
 import appConfig from '../../common/appConfig';
+import ComModal from '../../common/ComModal'; // 모달 컴포넌트 임포트
 import {
   CAvatar,
   CButton,
@@ -26,12 +27,6 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
-  CFormSelect,
-  CFormLabel,
-  CFormInput,
-  CForm,
-  CPagination,
-  CPaginationItem,
   CModal,
   CModalHeader,
   CModalTitle,
@@ -55,6 +50,49 @@ const MusicReq = () => {
   const [albumId, setAlbumId] = useState();
 
   const [stompClient, setStompClient] = useState(null); // 소켓클라이언트
+
+    /**********************************************************************
+   * 메세지영역
+  **********************************************************************/
+    const [alertType, setAlertType] = useState('');
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alertText, setAlertText] = useState('');
+    const [acceptType, setAcceptType] = useState('');
+   
+  
+  
+    const alertPage = (txt) => {
+      setAlertType('alert');
+      setAlertText(txt);
+      setAlertVisible(true);
+    };
+  
+    const confirmPage = (txt, type) => {
+      setAlertType('confirm');
+      setAlertText(txt);
+      setAlertVisible(true);
+      setAcceptType(type);
+    };
+  
+    const handleCloseModal = () => {
+      setAlertVisible(false);
+    };
+    const handleAccept = () => {
+      setAlertVisible(false);
+      if(acceptType === 'pick'){// 선곡
+          submitSelectMusicReq();
+      }else if(acceptType === 'delete'){//삭제
+          submitDeletSong();
+      }else if(acceptType === 'reqStart'){//신청곡 받기
+          submitClickConditonChange(true);
+      }else if(acceptType === 'reqStop'){//신청곡 중지
+          submitClickConditonChange(false);
+      }else if(acceptType === 'complete'){//신청곡 완료
+        submitCompleteMusicReq();
+      }
+      setAcceptType('');
+      
+    };
   
 
 
@@ -256,29 +294,29 @@ const MusicReq = () => {
 
   }
 
+  
+  const [pickSongReqId, setPickSongReqId] = useState();
+
   //신청곡 선곡 클릭
   const clickSelectMusicReq = (e, musicReqId) => {
     e.preventDefault();
 
-    const result = window.confirm('해당곡을 선곡 하시겠습니까?');
+    //const result = window.confirm('해당곡을 선곡 하시겠습니까?');
+    confirmPage('해당곡을 선곡 하시겠습니까?', 'pick');
+    setPickSongReqId(musicReqId);
 
-    if (!result) {
-      return;
-    }
-
-    submitSelectMusicReq(musicReqId);
   };
 
 
   //신청곡 선곡 API
-  const submitSelectMusicReq = async (musicReqId) => {
+  const submitSelectMusicReq = async () => {
 
-    console.log(musicReqId);
+    console.log(pickSongReqId);
 
     try {
       const response = await axiosInstance.post('/api/song-request/now-playing/register',
         {
-          "songRequestId": musicReqId
+          "songRequestId": pickSongReqId
         }
         ,
         {
@@ -290,7 +328,7 @@ const MusicReq = () => {
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('선곡되었습니다.');
+      alertPage('선곡되었습니다.');
       refreshMusicReq();
 
 
@@ -307,27 +345,23 @@ const MusicReq = () => {
   const clickDeletMusicReq = (e, musicReqId) => {
     e.preventDefault();
 
-    const result = window.confirm('해당곡을 삭제 하시겠습니까?');
+    confirmPage('해당곡을 삭제 하시겠습니까?', 'delete');
+    setPickSongReqId(musicReqId);
 
-    if (!result) {
-      return;
-    }
-
-    submitDeletSong(musicReqId);
   };
 
   //곡 삭제 API
-  const submitDeletSong = async (musicReqId) => {
+  const submitDeletSong = async () => {
 
-    console.log(musicReqId);
+    console.log(pickSongReqId);
 
     try {
-      const response = await axiosInstance.delete('/api/song-request/' + musicReqId);
+      const response = await axiosInstance.delete('/api/song-request/' + pickSongReqId);
 
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('삭제되었습니다.');
+      alertPage('삭제되었습니다.');
       refreshMusicReq();
 
     } catch (error) {
@@ -350,20 +384,13 @@ const MusicReq = () => {
   const clickConditonChange = (e, startYn) => {
     e.preventDefault();
 
-    var msg = '신청곡을 중단 하시겠습니까?';
-
     if (startYn) {
-      msg = '신청곡을 받기 하시겠습니까?';
-    }
-
-    const result = window.confirm(msg);
-
-    if (!result) {
-      return;
+      confirmPage('신청곡을 다시 받으시겠습니까?', 'reqStart');
+    }else{
+      confirmPage('신청곡 받기를 중지 하시겠습니까?', 'reqStop');
     }
 
 
-    submitClickConditonChange(startYn);
   };
 
 
@@ -387,7 +414,7 @@ const MusicReq = () => {
 
       console.log('API 응답:', response.data);
 
-      alert('변경되었습니다.');
+      alertPage('변경되었습니다.');
       refreshMusicReq(); //신청곡 조회
       submitSearchNowPlayingCondition(); // 신청곡 상태조회
 
@@ -401,19 +428,6 @@ const MusicReq = () => {
   }
 
 
-  //신청곡 완료 클릭
-  const clickCompleteMusicReq = (e) => {
-    e.preventDefault();
-
-    const result = window.confirm('해당곡을 완료 하시겠습니까?');
-
-    if (!result) {
-      return;
-    }
-
-    submitCompleteMusicReq();
-  };
-
 
   //신청곡 완료 API
   const submitCompleteMusicReq = async () => {
@@ -425,7 +439,7 @@ const MusicReq = () => {
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('곡이 끝났습니다.');
+      alertPage('곡이 완료되었습니다.');
       refreshMusicReq();
 
 
@@ -460,7 +474,7 @@ const MusicReq = () => {
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert(' 추가 되었습니다.');
+      alertPage('추가 되었습니다.');
       refreshMusicReq(); //신청곡 조회
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -473,6 +487,7 @@ const MusicReq = () => {
 
   return (
     <>
+      <ComModal type={alertType} visible={alertVisible} onClose={handleCloseModal} alertText={alertText} onAccpet={handleAccept}/>
       <CModal
         size="xl"
         visible={visibleSong}
@@ -504,7 +519,7 @@ const MusicReq = () => {
                 <CCol xs={12}>
                   <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                     {nowPlayingConditionData.requestSongAvailable ? (<CButton component="input" type="reset" color="danger" value="신청곡정지" onClick={(e) => clickConditonChange(e, false)} />)
-                      : (<CButton component="input" color="info" value="신청곡시작" onClick={(e) => clickConditonChange(e, true)} />)}
+                      : (<><div className="p-3">지금은 신청곡을 받을 수 없습니다.</div><CButton component="input" color="info" value="신청곡시작" onClick={(e) => clickConditonChange(e, true)} /></>)}
 
                   </div>
                 </CCol>
@@ -526,19 +541,19 @@ const MusicReq = () => {
                     <CTableRow v-for="item in tableItems"  >
                       <CTableHeaderCell className="text-center" color="light">Now Playing</CTableHeaderCell>
                       <CTableDataCell className="text-center">
-                        <strong><a href='/' onClick={(e) => popAlbumInfoClick(e, nowPlayingData.albumId)}>{nowPlayingData.albumName}</a></strong>
+                        <a href='/' onClick={(e) => popAlbumInfoClick(e, nowPlayingData.albumId)}>{nowPlayingData.albumName}</a>
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
-                        <strong>{nowPlayingData.artist}</strong>
+                        {nowPlayingData.artist}
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
-                        <strong>{nowPlayingData.trackNumber}</strong>
+                        {nowPlayingData.trackNumber}
                       </CTableDataCell>
-                      <CTableDataCell className="text-center">
+                      <CTableDataCell className="text-center" >
                         <strong>{nowPlayingData.title}</strong>
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
-                        <strong>{nowPlayingData.runningTime}</strong>
+                        {nowPlayingData.runningTime}
                       </CTableDataCell>
                     </CTableRow>
                   ) :
@@ -559,7 +574,7 @@ const MusicReq = () => {
                   <CRow className="justify-content-between">
                     <CCol xs={12}>
                       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <CButton component="input" color="success" value="곡완료" onClick={(e) => clickCompleteMusicReq(e)} />
+                        <CButton component="input" color="success" value="곡완료" onClick={() => confirmPage('해당곡을 완료 하시겠습니까?', 'complete')} />
                       </div>
                     </CCol>
                   </CRow>
@@ -606,7 +621,7 @@ const MusicReq = () => {
                           <strong>{index+1}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-left">
-                          <strong><a href='/' onClick={(e) => popAlbumInfoClick(e, item.albumId)}>{item.albumName}</a></strong>
+                          <a href='/' onClick={(e) => popAlbumInfoClick(e, item.albumId)}>{item.albumName}</a>
                         </CTableDataCell>
                         <CTableDataCell className="text-left">
                           {item.artist}
@@ -615,7 +630,7 @@ const MusicReq = () => {
                           {item.trackNumber}
                         </CTableDataCell>
                         <CTableDataCell className="text-left">
-                          {item.title}
+                          <strong>{item.title}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           {item.tableName == '0' ? '관리자' : item.tableName}

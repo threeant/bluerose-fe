@@ -5,11 +5,8 @@ import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { getCodeList ,throwError} from '../../common/utils'
-import {
-  cilCalendar,
-  cifUs,
-} from '@coreui/icons';
 import axiosInstance from '../../common/axiosInstance';
+import ComModal from '../../common/ComModal'; // 모달 컴포넌트 임포트
 import {
   CButton,
   CCard,
@@ -17,20 +14,12 @@ import {
   CCardHeader,
   CCol,
   CForm,
-  CFormCheck,
   CFormInput,
   CFormFeedback,
   CFormLabel,
   CFormSelect,
-  CInputGroup,
-  CInputGroupText,
   CRow,
-  CCardImage,
-  CCardText,
-  CFormTextarea,
   CContainer,
-  CImage,
-  CFormSwitch,
 } from '@coreui/react';
 import ReactImg from 'src/assets/images/image400.jpg'
 const DisplayReg = () => {
@@ -40,6 +29,49 @@ const DisplayReg = () => {
   **********************************************************************/
   const navigate = useNavigate();
   const [dispCD] = useState(getCodeList('DISP')); // 전시CD
+
+    /**********************************************************************
+   * 메세지영역
+  **********************************************************************/
+    const [alertType, setAlertType] = useState('');
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alertText, setAlertText] = useState('');
+    const [acceptType, setAcceptType] = useState('');
+   
+  
+  
+    const alertPage = (txt) => {
+      setAlertType('alert');
+      setAlertText(txt);
+      setAlertVisible(true);
+    };
+  
+    const confirmPage = (txt, type) => {
+      setAlertType('confirm');
+      setAlertText(txt);
+      setAlertVisible(true);
+      setAcceptType(type);
+    };
+  
+    const handleCloseModal = () => {
+      console.log('??')
+      setAlertVisible(false);
+      //navigate('/display/displayList')
+    };
+
+    const handleAftFunc = () => {
+      navigate('/display/displayList');
+    };
+
+
+    const handleAccept = () => {
+      setAlertVisible(false);
+      if(acceptType === 'reg'){// 추가
+          submitRegDisp();
+      }
+  
+      
+    };
 
   //목록이동
   const goListClick = () => {
@@ -63,7 +95,7 @@ const DisplayReg = () => {
   });
 
   //등록하기 API
-  const submitRegAlbum = async (e) => {
+  const confirmSubmitRegDisp = async (e) => {
     e.preventDefault();
 
     console.log(displayData);
@@ -73,6 +105,13 @@ const DisplayReg = () => {
       e.stopPropagation();
       return;
     }
+
+    confirmPage('전시를 등록 하시겠습니까?', 'reg');
+  }
+
+  //등록하기 API
+  const submitRegDisp = async () => {
+    
 
     try {
       const response = await axiosInstance.post('/api/display', displayData, {
@@ -92,8 +131,8 @@ const DisplayReg = () => {
           useYn: true,      //사용여부
           displayCount : 0
         });
-      alert('등록되었습니다.');
-      navigate('/display/displayList');
+      alertPage('등록되었습니다.');
+      //navigate('/display/displayList');
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
       console.log(error);
@@ -103,6 +142,7 @@ const DisplayReg = () => {
   };
   return (
     <CContainer>
+      <ComModal type={alertType} visible={alertVisible} onClose={handleCloseModal} alertText={alertText} onAccpet={handleAccept} aftFunc={handleAftFunc}/>
       <CRow>
         <CCol >
           <CCard className="mb-4">
@@ -114,15 +154,8 @@ const DisplayReg = () => {
                 className="row g-3 needs-validation"
                 noValidate
                 validated={validated}
-                onSubmit={submitRegAlbum}
+                onSubmit={confirmSubmitRegDisp}
               >
-                {/* <CCol xs={10} >
-                  <CFormLabel></CFormLabel>
-                </CCol>
-                <CCol xs={2} >
-                  <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
-                  <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={displayData.useYn} onChange={(e) => setDisplayData({ ...displayData, useYn: e.target.value })} />
-                </CCol> */}
 
                 <CCol xs={12}>
                   <CFormLabel htmlFor="inputName">제목*</CFormLabel>

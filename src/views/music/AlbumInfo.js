@@ -73,7 +73,7 @@ const AlbumInfo = () => {
 
     submitSearchAlbum();
 
-  }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
+  }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정 d x
 
 
   const setSongRuntime = (e) => {
@@ -90,10 +90,10 @@ const AlbumInfo = () => {
 
   const handleFileChange = (event) => {
     // console.log(event);
-    // setAlbumData((prevAlbumData) => ({
-    //   ...prevAlbumData,
-    //   image: event.target.files[0]
-    // }));
+    setAlbumData((prevAlbumData) => ({
+      ...prevAlbumData,
+      image: event.target.files[0]
+    }));
 
 
     const selectedImage = event.target.files[0];
@@ -366,7 +366,7 @@ const AlbumInfo = () => {
                     <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.checked })} />
                   </CCol>
                   <CCol xs={3}>
-                    {previewUrl ? (<CImage rounded thumbnail align="center" src={appConfig.apiUrl + previewUrl} width={150} height={150} />) : (
+                    {previewUrl ? (<CImage rounded thumbnail align="center"  src={appConfig.apiUrl + previewUrl} width={150} height={150} />) : (
                       <CImage rounded thumbnail align="center" src={process.env.PUBLIC_URL + '/basicImg/w_lp2.png'} width={150} height={150} />
                     )}
                   </CCol>

@@ -13,11 +13,16 @@ import {
   CInputGroup,
   CInputGroupText,
   CRow,
+  CModal,
+  CModalBody,
+  CModalFooter,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import appConfig from '../../../common/appConfig';
 import axiosInstance from '../../../common/axiosInstance';
+import ComModal from '../../../common/ComModal'; // 모달 컴포넌트 임포트
+
 
 const Login = () => {
 
@@ -27,15 +32,28 @@ const Login = () => {
     password: ''
   });
 
+  const [alertType, setAlertType] = useState('');
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertText, setAlertText] = useState('');
+
+
+  const alertPage = (type, txt) => {
+    setAlertType(type);
+    setAlertText(txt);
+    setAlertVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setAlertVisible(false);
+  };
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(userData);
-
     if(!userData.id || !userData.password){
-      alert('아이디와 비밀번호를 입력해 주세요');
+      //alert('아이디와 비밀번호를 입력해 주세요');
+      alertPage('alert', '아이디와 비밀번호를 입력해 주세요.');
       return;
     }
     // 로그인 API 호출 또는 서버로 요청
@@ -112,19 +130,24 @@ const Login = () => {
 
       } else {
         // 로그인 실패 처리
-        alert('로그인 실패');
-        console.error('로그인 실패');
+        //alert('로그인 실패');
+        alertPage('alert', '로그인 오류 [관리자에게 문의하세요.]');
         console.log(response);
       }
     } catch (error) {
-      alert(error.response.data.message)
+      alertPage('alert', error.response.data.message);
+      //alert(error.response.data.message)
       console.error('오류 발생:', error);
     }
   }
 
+  
+
+
 
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
+      <ComModal type={alertType} visible={alertVisible} onClose={handleCloseModal} alertText={alertText} />
       <CContainer>
         <CRow className="justify-content-center">
           <CCol md={8}>

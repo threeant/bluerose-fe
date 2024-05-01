@@ -50,9 +50,6 @@ const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
-const SampleList = React.lazy(() => import('./views/sample/SampleList'))
-const SampleForm = React.lazy(() => import('./views/sample/SampleForm'))
-
 
 const AlbumInfo = React.lazy(() => import('./views/music/AlbumInfo'))
 const AlbumList = React.lazy(() => import('./views/music/AlbumList'))
@@ -101,11 +98,6 @@ const routes = [
   { path: '/system/adminReg', name: 'AdminReg', element: AdminReg },
   { path: '/system/adminInfo', name: 'AdminInfo', element: AdminInfo },
   { path: '/system/codeList', name: 'CodeList', element: CodeList },
-  { path: '/sample/sampleList', exact: true, name: 'SampleForm' },
-  { path: '/sample', exact: true, name: 'Sample' },
-  { path: '/sample/sampleList', name: 'SampleList', element: SampleList },
-  { path: '/sample/sampleForm', name: 'SampleForm', element: SampleForm },
-  { path: '/sample/sampleList', exact: true, name: 'SampleForm' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },

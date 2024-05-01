@@ -5,6 +5,7 @@ import CIcon from '@coreui/icons-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { getCodeList, throwError } from '../../common/utils'
+import appConfig from '../../common/appConfig';
 import {
   cilCalendar,
   cifUs,
@@ -49,9 +50,9 @@ const AlbumInfo = ({ openModal, albumId }) => {
    * 화면 영역
   **********************************************************************/
   //목록이동
-  const goListClick = () => {
-    navigate('/music/albumList');
-  };
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+
   const [selectedDate, setSelectedDate] = useState(null);
   const handleDateChange = date => {
     const formattedDate = date.toISOString().slice(0, 10);
@@ -111,6 +112,9 @@ const AlbumInfo = ({ openModal, albumId }) => {
       setAlbumData(data);
       console.log("앨범결과 ----")
       console.log(data);
+      if (data.imageUrl) {
+        setPreviewUrl(data.imageUrl);
+      }
       submitSearchSong();
 
     } catch (error) {
@@ -311,7 +315,9 @@ const AlbumInfo = ({ openModal, albumId }) => {
                     <CFormSwitch label="사용여부" id="formSwitchCheckChecked" disabled defaultChecked={albumData.useYn} onChange={(e) => setAlbumData({ ...albumData, useYn: e.target.value })} />
                   </CCol>
                   <CCol xs={12}>
-                    <CImage rounded thumbnail align="center" src={ReactImg} width={150} height={150} />
+                    {previewUrl ? (<CImage rounded thumbnail align="center"  src={appConfig.apiUrl + previewUrl} width={150} height={150} />) : (
+                      <CImage rounded thumbnail align="center" src={process.env.PUBLIC_URL + '/basicImg/w_lp2.png'} width={150} height={150} />
+                    )}
                     <CCardBody>
                       <CCardText>
                         <CFormInput type="file" id="formFile" disabled />
