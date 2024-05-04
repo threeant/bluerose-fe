@@ -117,7 +117,8 @@ const DisplayInfo = () => {
   }
 
   const [visibleSong, setVisibleSong] = useState(false);
-  const [visibleAlbum, setVisibleAlbum] = useState(false)
+  const [visibleAlbum, setVisibleAlbum] = useState(false);
+  const [albumId, setAlbumId] = useState();
   //신청곡 추가 버튼
   const popMusicAddClick = () => {
     setVisibleSong(!visibleSong)
@@ -127,8 +128,9 @@ const DisplayInfo = () => {
   //앨범 팝업 추가 버튼
   const popAlbumInfoClick = (e, pAlbumId) => {
     e.preventDefault();
-    //setAlbumId('1');
-    //setVisibleAlbum(!visibleAlbum);
+    setAlbumId(pAlbumId);
+    console.log(pAlbumId);
+    setVisibleAlbum(!visibleAlbum);
   }
 
   //목록이동
@@ -458,7 +460,7 @@ const DisplayInfo = () => {
         <CModalHeader>
           <CModalTitle id="OptionalSizesExample3">앨범정보</CModalTitle>
         </CModalHeader>
-        <CModalBody><AlbumInfo openModal={controllAlbumModal} displayId={displayId} /></CModalBody>
+        <CModalBody><AlbumInfo openModal={controllAlbumModal} albumId={albumId} /></CModalBody>
       </CModal>
       <CRow>
         <CCol>
@@ -543,8 +545,8 @@ const DisplayInfo = () => {
                     <CTableHeaderCell className="text-center">No</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">앨범명</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">아티스트</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">Track Number</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">Title</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Track Number</CTableHeaderCell>
                     <CTableHeaderCell className="text-center">전시순서</CTableHeaderCell>
                     <CTableHeaderCell className="text-center"></CTableHeaderCell>
                   </CTableRow>
@@ -558,16 +560,16 @@ const DisplayInfo = () => {
                           <strong>{item.displayContentId}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          <strong><a href='/' onClick={(e) => popAlbumInfoClick(e, item.displayId)}>{item.albumName}</a></strong>
+                          <strong><a href='/' onClick={(e) => popAlbumInfoClick(e, item.albumId)}>{item.albumName}</a></strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           {item.artist}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {item.trackInfo}
+                          <strong>{item.trackName}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {item.trackName}
+                        {item.trackInfo}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                         {index !== 0  ? (
