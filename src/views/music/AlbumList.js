@@ -7,6 +7,7 @@ import axios from 'axios'
 import { getCodeList, throwError } from '../../common/utils'
 import axiosInstance from '../../common/axiosInstance';
 import PaginationComponent from '../common/PaginationComponent';
+import ComModal from '../../common/ComModal'; // 모달 컴포넌트 임포트
 import {
   CAvatar,
   CButton,
@@ -42,6 +43,40 @@ const AlbumList = () => {
 
   const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
   const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
+
+  /**********************************************************************
+   * 메세지영역
+  **********************************************************************/
+  const [alertType, setAlertType] = useState('');
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertText, setAlertText] = useState('');
+  const [acceptType, setAcceptType] = useState('');
+ 
+
+
+  const alertPage = (txt) => {
+    setAlertType('alert');
+    setAlertText(txt);
+    setAlertVisible(true);
+  };
+
+  const confirmPage = (txt, type) => {
+    setAlertType('confirm');
+    setAlertText(txt);
+    setAlertVisible(true);
+    setAcceptType(type);
+  };
+
+  const handleCloseModal = () => {
+    setAlertVisible(false);
+  };
+  const handleAccept = () => {
+    setAlertVisible(false);
+    
+
+    setAcceptType('');
+    
+  };
 
   /**********************************************************************
    * 화면 영역
@@ -132,6 +167,7 @@ const AlbumList = () => {
     // 예시: id를 이용한 페이지 이동 또는 다른 동작 수행
     //const newQuery = encodeURIComponent(albumSearch);
     //setSearchQuery(newQuery);
+      console.log(id)
     localStorage.setItem('alblumListSearch', JSON.stringify(albumSearch));
     navigate('/music/albumInfo', { state: { albumId: id , listSearch : albumSearch} });
     //history.push('/music/albumInfo'+id);
@@ -199,12 +235,8 @@ const AlbumList = () => {
 
 
     if(albumSearch.endReleaseDate || albumSearch.startReleaseDate){
-      if(!albumSearch.endReleaseDate){
-        alert('등록일 기간을 정확히 입력해주세요.')
-        return;
-      }
-      if(!albumSearch.startReleaseDate){
-        alert('등록일 기간을 정확히 입력해주세요.')
+      if(!albumSearch.endReleaseDate || !albumSearch.startReleaseDate){
+        alertPage('등록일 기간을 정확히 입력해주세요.')
         return;
       }
     }
@@ -258,6 +290,7 @@ const AlbumList = () => {
 
   return (
     <>
+    <ComModal type={alertType} visible={alertVisible} onClose={handleCloseModal} alertText={alertText} onAccpet={handleAccept}/>
       <CRow>
         <CCol>
           <CCard className="mb-4">

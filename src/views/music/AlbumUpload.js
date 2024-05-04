@@ -8,6 +8,7 @@ import {
 } from '@coreui/icons';
 import { throwError } from '../../common/utils'
 import appConfig from '../../common/appConfig';
+import ComModal from '../../common/ComModal'; // 모달 컴포넌트 임포트
 
 import {
   CButton,
@@ -23,6 +24,46 @@ import {
   CSpinner
 } from '@coreui/react';
 const SampleForm = () => {
+  /**********************************************************************
+   * 메세지영역
+  **********************************************************************/
+  /**********************************************************************
+   * 메세지영역
+  **********************************************************************/
+  const [alertType, setAlertType] = useState('');
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertText, setAlertText] = useState('');
+  const [acceptType, setAcceptType] = useState('');
+ 
+
+
+  const alertPage = (txt) => {
+    setAlertType('alert');
+    setAlertText(txt);
+    setAlertVisible(true);
+  };
+
+  const confirmPage = (txt, type) => {
+    setAlertType('confirm');
+    setAlertText(txt);
+    setAlertVisible(true);
+    setAcceptType(type);
+  };
+
+  const handleCloseModal = () => {
+    setAlertVisible(false);
+  };
+  const handleAccept = () => {
+    setAlertVisible(false);
+    if(acceptType === 'req'){// 등록
+        handleSubmit();
+    }
+
+    setAcceptType('');
+    
+  };
+
+
 
   /**********************************************************************
    * 공통 영역
@@ -43,9 +84,10 @@ const SampleForm = () => {
   };
   const [validated, setValidated] = useState(false);
 
-  const handleSubmit = async (e) => {
+
+  const confirmHandleSubmit = async (e) => {
     e.preventDefault();
-   
+
     const form = e.currentTarget;
     if (form.checkValidity() === false) {
       e.stopPropagation();
@@ -56,9 +98,16 @@ const SampleForm = () => {
       formData.append('file', excelFile);
       console.log(excelFile);
     if(!excelFile){
-      alert('업로드할 파일을 선택하세요.');
+      alertPage('업로드할 파일을 선택하세요.');
       return;
     }
+
+    confirmPage('대용량 업로드를 하시겠습니까?', 'req')
+  }
+
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append('file', excelFile);
 
     try {
       setLoadingYn(true);
@@ -76,7 +125,7 @@ const SampleForm = () => {
       setResultUrl(response.data);
 
       
-      alert('완료되었습니다.');
+      alertPage('완료되었습니다.');
       setResultYn(true);
 
       //navigate('/sample/sampleList');
@@ -134,6 +183,7 @@ const SampleForm = () => {
 
   return (
     <CContainer>
+      <ComModal type={alertType} visible={alertVisible} onClose={handleCloseModal} alertText={alertText} onAccpet={handleAccept}/>
       <CRow>
         
       <CCol >
@@ -147,7 +197,7 @@ const SampleForm = () => {
                 className="row g-3 needs-validation"
                 noValidate
                 validated={validated}
-                onSubmit={handleSubmit}
+                onSubmit={confirmHandleSubmit}
               >
                 
                 <CCol xs={12}>

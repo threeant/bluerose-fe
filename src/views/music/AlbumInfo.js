@@ -10,7 +10,7 @@ import {
   cilCalendar,
   cifUs,
 } from '@coreui/icons';
-
+import ComModal from '../../common/ComModal'; // 모달 컴포넌트 임포트
 import axiosInstance from '../../common/axiosInstance';
 
 import {
@@ -46,6 +46,46 @@ const AlbumInfo = () => {
 
   const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
   const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
+
+  /**********************************************************************
+   * 메세지영역
+  **********************************************************************/
+  const [alertType, setAlertType] = useState('');
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertText, setAlertText] = useState('');
+  const [acceptType, setAcceptType] = useState('');
+ 
+
+
+  const alertPage = (txt) => {
+    setAlertType('alert');
+    setAlertText(txt);
+    setAlertVisible(true);
+  };
+
+  const confirmPage = (txt, type) => {
+    setAlertType('confirm');
+    setAlertText(txt);
+    setAlertVisible(true);
+    setAcceptType(type);
+  };
+
+  const handleCloseModal = () => {
+    setAlertVisible(false);
+  };
+  const handleAccept = () => {
+    setAlertVisible(false);
+    if(acceptType === 'update'){//앨범수정
+      submitUpdateAlbum();
+    }else if(acceptType === 'deleteSong'){//곡 삭제
+        submitDeletSong();
+    }else if(acceptType === 'reqSong'){//곡 등록
+        submitReqSong(true);
+    }
+
+    setAcceptType('');
+    
+  };
 
   /**********************************************************************
    * 화면 영역
@@ -121,7 +161,7 @@ const AlbumInfo = () => {
           ...prevAlbumData,
           image: null
         }));
-        alert('이미지 파일만 업로드할 수 있습니다.');
+        alertPage('이미지 파일만 업로드할 수 있습니다.');
       }
     }
 
@@ -198,7 +238,7 @@ const AlbumInfo = () => {
   };
 
   //앨범 수정하기 API
-  const submitUpdateAlbum = async (e) => {
+  const confirmSubmitUpdateAlbum = async (e) => {
     e.preventDefault();
 
     console.log(albumData);
@@ -209,12 +249,13 @@ const AlbumInfo = () => {
       return;
     }
 
-    const result = window.confirm('수정하시겠습니까?');
+    //const result = window.confirm('수정하시겠습니까?');
+    confirmPage('앨범정보를 수정하시겠습니까?', 'update');
+  }
 
-    if (!result) {
-      setValidated(false);
-      return;
-    }
+  //앨범 수정하기 API
+  const submitUpdateAlbum = async () => {
+    
 
     try {
       const response = await axiosInstance.post('/api/albums/' + albumId, albumData, {
@@ -226,7 +267,7 @@ const AlbumInfo = () => {
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('수정되었습니다.');
+      alertPage('수정되었습니다.');
       setValidated(false);
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -241,33 +282,28 @@ const AlbumInfo = () => {
     e.preventDefault();
 
     if (!songReqData.trackInfo) {
-      alert('Track Number를 입력해 주세요.');
+      alertPage('Track Number를 입력해 주세요.');
       return;
     }
 
     if (!songReqData.trackName) {
-      alert('Title을 입력해주세요.');
+      alertPage('Title을 입력해주세요.');
       return;
     }
 
     if (!songReqData.runtime) {
-      alert('Running Time을 입력해주세요/');
+      alertPage('Running Time을 입력해주세요.');
       return;
     } else {
       if (/^\d{0,2}:\d{0,2}$/.test(songReqData.runtime) == false) {
-        alert('Running Time을 알맞게 입력해주세요 [00:00] 형식 ');
+        alertPage('Running Time을 알맞게 입력해주세요 [00:00] 형식 ');
         return;
       }
     }
 
 
-    const result = window.confirm('해당곡을 등록 하시겠습니까?');
-
-    if (!result) {
-      return;
-    }
-
-    submitReqSong();
+    //const result = window.confirm('해당곡을 등록 하시겠습니까?');
+    confirmPage('곡을 등록 하시겠습니까?', 'reqSong')
 
   };
 
@@ -285,7 +321,7 @@ const AlbumInfo = () => {
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('등록되었습니다.');
+      alertPage('등록되었습니다.');
       setValidated(false);
       submitSearchSong();
       setSongReqData(
@@ -305,20 +341,17 @@ const AlbumInfo = () => {
   };
 
   //곡 삭제 클릭
+  const [songId, setSongId] = useState('');
   const clickDeletSong = (e, songId) => {
     e.preventDefault();
 
-    const result = window.confirm('해당곡을 삭제 하시겠습니까?');
-
-    if (!result) {
-      return;
-    }
-
-    submitDeletSong(songId);
+    //const result = window.confirm('해당곡을 삭제 하시겠습니까?');
+    confirmPage('해당곡을 삭제 하시겠습니까?', 'deleteSong');
+    setSongId(songId);
   };
 
   //곡 삭제 API
-  const submitDeletSong = async (songId) => {
+  const submitDeletSong = async () => {
 
     console.log(songId);
 
@@ -328,7 +361,7 @@ const AlbumInfo = () => {
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('삭제되었습니다.');
+      alertPage('삭제되었습니다.');
       setValidated(false);
       submitSearchSong();
 
@@ -344,6 +377,8 @@ const AlbumInfo = () => {
 
   return (
     <CContainer>
+      <ComModal type={alertType} visible={alertVisible} onClose={handleCloseModal} alertText={alertText} onAccpet={handleAccept} />
+      
       <CRow>
         <CCol >
           <CCard className="mb-4">
@@ -356,7 +391,7 @@ const AlbumInfo = () => {
                   className="row g-3 needs-validation"
                   noValidate
                   validated={validated}
-                  onSubmit={submitUpdateAlbum}
+                  onSubmit={confirmSubmitUpdateAlbum}
                 >
                   <CCol xs={10} >
                     <CFormLabel htmlFor="validationCustom04">ID : {albumId}</CFormLabel>

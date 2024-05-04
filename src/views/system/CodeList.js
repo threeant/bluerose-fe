@@ -4,7 +4,8 @@ import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { getCodeList, throwError } from '../../common/utils'
+import { getCodeList, throwError } from '../../common/utils';
+import ComModal from '../../common/ComModal'; // 모달 컴포넌트 임포트
 import axiosInstance from '../../common/axiosInstance';
 import {
   CAvatar,
@@ -41,6 +42,51 @@ const CodeList = () => {
 
   const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
   const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
+
+    /**********************************************************************
+   * 메세지영역
+  **********************************************************************/
+    const [alertType, setAlertType] = useState('');
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alertText, setAlertText] = useState('');
+    const [acceptType, setAcceptType] = useState('');
+    const [alertAftType, setAlertAftType] = useState('');
+  
+  
+    const alertPage = (txt) => {
+      setAlertType('alert');
+      setAlertText(txt);
+      setAlertVisible(true);
+    };
+  
+    const confirmPage = (txt, type) => {
+      setAlertType('confirm');
+      setAlertText(txt);
+      setAlertVisible(true);
+      setAcceptType(type);
+    };
+  
+    const handleCloseModal = () => {
+      setAlertVisible(false);
+    };
+    const handleAccept = () => {
+      setAlertVisible(false);
+      if(acceptType === 'updateMst'){
+          submitUpdateCodeMst();
+      }else if(acceptType === 'reqMst'){
+          submitReqCodeMst();
+      }else if(acceptType === 'updateCode'){
+          submitUpdateCode();
+      }else if(acceptType === 'reqCode'){
+          submitReqCode();
+      }else if(acceptType === 'deleteCode'){
+        submitDeletCode();
+      }
+  
+      setAcceptType('');
+      
+    };
+  
 
   /**********************************************************************
    * 화면 영역
@@ -93,29 +139,31 @@ const CodeList = () => {
   );
 
 
+  const [mstIndex, setMstIndex] = useState(-1);
   //마스터 수정 
   const clickUpdateCodeMst = (e, index) => {
-    var item = codeMasterDatas.contents[index];
-
+    var item = codeMasterDatas.contents[mstIndex];
 
     e.preventDefault();
     if (!item.code) {
-      alert('코드를 입력해 주세요.');
+      alertPage('코드를 입력해 주세요.');
       return;
     }
 
     if (!item.description) {
-      alert('코드 설명을 입력해주세요.');
+      alertPage('코드 설명을 입력해주세요.');
       return;
     }
 
-    const result = window.confirm('해당 코드 마스터를 수정 하시겠습니까?');
+    // const result = window.confirm('해당 코드 마스터를 수정 하시겠습니까?');
 
-    if (!result) {
-      return;
-    }
+    // if (!result) {
+    //   return;
+    // }
+    confirmPage('해당 코드 마스터를 수정 하시겠습니까?', 'updateMst');
+    setMstIndex(index);
 
-    submitUpdateCodeMst(item);
+  
   }
 
   //등록 클릭
@@ -123,46 +171,42 @@ const CodeList = () => {
 
     e.preventDefault();
     if (!codeMstReqData.code) {
-      alert('코드를 입력해 주세요.');
+      alertPage('코드를 입력해 주세요.');
       return;
     }
 
     if (!codeMstReqData.description) {
-      alert('코드 설명을 입력해주세요.');
+      alertPage('코드 설명을 입력해주세요.');
       return;
     }
 
-    const result = window.confirm('해당 코드 마스터를 등록 하시겠습니까?');
+    
+    confirmPage('해당 코드 마스터를 등록 하시겠습니까?', 'reqMst');
 
-    if (!result) {
-      return;
-    }
-
-    submitReqCodeMst();
   }
 
-  //마스터 수정 
+  //코드 수정 
+
+  const [codeInex, setCodeInex] = useState(-1);
   const clickUpdateCode = (e, index) => {
 
-    var item = codeDatas[index];
+    var item = codeDatas[codeInex];
 
     e.preventDefault();
     if (!item.name) {
-      alert('코드를 입력해 주세요.');
+      alertPage('코드를 입력해 주세요.');
       return;
     }
 
-    const result = window.confirm('해당 코드를 수정 하시겠습니까?');
-
-    if (!result) {
-      return;
-    }
-
-    submitUpdateCode(item);
+    //const result = window.confirm('해당 코드를 수정 하시겠습니까?');
+    confirmPage('해당 코드를 수정 하시겠습니까?', 'updateCode')
+    setCodeInex(index);
   }
 
   // 코드 수정 하기 API
-  const submitUpdateCode = async (item) => {
+  const submitUpdateCode = async () => {
+
+    var item = codeDatas[codeInex];
 
     try {
       const response = await axiosInstance.post('/api/code/' + item.id, item, {
@@ -172,12 +216,12 @@ const CodeList = () => {
       });
 
       if (response.data.statusCode) {
-        alert(response.data.resultMsg);
+        alertPage(response.data.resultMsg);
         return;
       }
 
       // 폼 데이터를 초기화합니다.
-      alert('수정되었습니다.');
+      alertPage('수정되었습니다.');
       submitSearchDetailCodes(selCodeDatas.id);
       setCodeMstReqData(
         {
@@ -201,17 +245,13 @@ const CodeList = () => {
 
     e.preventDefault();
     if (!codeReqData.codeNm) {
-      alert('코드명 입력해 주세요.');
+      alertPage('코드명 입력해 주세요.');
       return;
     }
 
-    const result = window.confirm('해당 코드를 등록 하시겠습니까?');
+    confirmPage('해당 코드를 등록 하시겠습니까?', 'reqCode')
 
-    if (!result) {
-      return;
-    }
-
-    submitReqCode();
+    
   }
 
 
@@ -227,13 +267,13 @@ const CodeList = () => {
       });
 
       if (response.data.statusCode) {
-        alert(response.data.resultMsg);
+        alertPage(response.data.resultMsg);
         return;
       }
 
 
       // 폼 데이터를 초기화합니다.
-      alert('등록되었습니다.');
+      alertPage('등록되었습니다.');
 
       const codeMstId = codeReqData.codeMstId;
       setCodeReqData((prevCodeReqData) => ({
@@ -265,12 +305,12 @@ const CodeList = () => {
       });
 
       if (response.data.statusCode) {
-        alert(response.data.resultMsg);
+        alertPage(response.data.resultMsg);
         return;
       }
 
       // 폼 데이터를 초기화합니다.
-      alert('등록되었습니다.');
+      alertPage('등록되었습니다.');
       setCodeMstReqData(
         {
           "code": "",
@@ -288,7 +328,9 @@ const CodeList = () => {
   };
 
   // 코드 마스터 수정 하기 API
-  const submitUpdateCodeMst = async (item) => {
+  const submitUpdateCodeMst = async () => {
+
+    var item = codeMasterDatas.contents[mstIndex];
 
     try {
       const response = await axiosInstance.post('/api/code/master/' + item.id, item, {
@@ -298,12 +340,12 @@ const CodeList = () => {
       });
 
       if (response.data.statusCode) {
-        alert(response.data.resultMsg);
+        alertPage(response.data.resultMsg);
         return;
       }
 
       // 폼 데이터를 초기화합니다.
-      alert('수정되었습니다.');
+      alertPage('수정되었습니다.');
       setCodeMstReqData(
         {
           "code": "",
@@ -422,7 +464,7 @@ const CodeList = () => {
 
 
       // 폼 데이터를 초기화합니다.
-      alert('삭제되었습니다.');
+      alertPage('삭제되었습니다.');
       submitSearchCodes();
       setSelCodeDatas({});
 
@@ -435,28 +477,26 @@ const CodeList = () => {
   };
 
   //곡 삭제 클릭
+  const [selCodeId, setSelCodeId] = useState(-1);
   const clickDeletCode = (e, id) => {
     e.preventDefault();
 
-    const result = window.confirm('해당코드를 삭제 하시겠습니까?');
+    //const result = window.confirm('해당코드를 삭제 하시겠습니까?');
+    confirmPage('해당코드를 삭제 하시겠습니까?', 'deleteCode')
 
-    if (!result) {
-      return;
-    }
-
-    submitDeletCode(id);
+    setSelCodeId(id);
   };
 
   //곡 삭제 API
-  const submitDeletCode = async (id) => {
+  const submitDeletCode = async () => {
 
 
     try {
-      const response = await axiosInstance.delete('/api/code/' + id);
+      const response = await axiosInstance.delete('/api/code/' + selCodeId);
 
 
       // 폼 데이터를 초기화합니다.
-      alert('삭제되었습니다.');
+      alertPage('삭제되었습니다.');
       const codeMstId = codeReqData.codeMstId;
       submitSearchDetailCodes(codeMstId);
 
@@ -472,6 +512,7 @@ const CodeList = () => {
 
   return (
     <>
+    <ComModal type={alertType} visible={alertVisible} onClose={handleCloseModal} alertText={alertText} onAccpet={handleAccept}/>
       <CRow>
         <CCol>
           <CCard className="mb-4">

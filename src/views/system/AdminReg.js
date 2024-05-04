@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import axiosInstance from '../../common/axiosInstance';
 
 import { getCodeList, throwError } from '../../common/utils'
+import ComModal from '../../common/ComModal'; // 모달 컴포넌트 임포트
 import {
   cilCalendar,
   cifUs,
@@ -44,6 +45,54 @@ const AdminReg = () => {
   const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
   const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
 
+
+    /**********************************************************************
+   * 메세지영역
+  **********************************************************************/
+    const [alertType, setAlertType] = useState('');
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alertText, setAlertText] = useState('');
+    const [acceptType, setAcceptType] = useState('');
+    const [alertAftType, setAlertAftType] = useState('');
+   
+  
+  
+    const alertPage = (txt) => {
+      setAlertType('alert');
+      setAlertText(txt);
+      setAlertVisible(true);
+    };
+  
+    const confirmPage = (txt, type) => {
+      setAlertType('confirm');
+      setAlertText(txt);
+      setAlertVisible(true);
+      setAcceptType(type);
+    };
+  
+    const handleCloseModal = () => {
+      setAlertVisible(false);
+    };
+    const handleAccept = () => {
+      setAlertVisible(false);
+      if(acceptType === 'req'){// 등록
+        submitRegAlbum();
+      }
+      setAcceptType('');
+      
+    };
+  
+  
+  
+    const handleAftFunc = () => {
+      if(alertAftType === 'req'){// 등록
+        navigate('/system/AdminList');
+      }
+      setAlertAftType('');
+      
+    };
+  
+
   //목록이동
   const goListClick = () => {
     navigate('/system/AdminList');
@@ -66,17 +115,15 @@ const AdminReg = () => {
       
   });
 
+  
+
   //등록하기 API
-  const submitRegAlbum = async (e) => {
+  const confirmSubmitRegAlbum = async (e) => {
     e.preventDefault();
 
     console.log(adminData);
 
-    const result = window.confirm('해당 관리자를 등록 하시겠습니까?');
 
-    if (!result) {
-      return;
-    }
     setValidated(true);
     const form = e.currentTarget;
     if (form.checkValidity() === false) {
@@ -84,8 +131,10 @@ const AdminReg = () => {
       return;
     }
 
+    
+
     if(adminData.password != adminData.passwordChk){
-      alert('비밀번호와 비밀번호 확인이 일치하지 않습니다');
+      alertPage('비밀번호와 비밀번호 확인이 일치하지 않습니다');
       setAdminData((prevData) => ({
         ...prevData,
         passwordChk: '',
@@ -93,6 +142,17 @@ const AdminReg = () => {
       setValidated(false);
       return;
     }
+
+    //const result = window.confirm('해당 관리자를 등록 하시겠습니까?');
+
+    confirmPage('해당 관리자를 등록 하시겠습니까?', 'req')
+
+    // if (!result) {
+    //   return;
+    // }
+  }
+
+  const submitRegAlbum = async () => {
 
     try {
       const response = await axiosInstance.post('/api/admin', adminData, {
@@ -110,8 +170,9 @@ const AdminReg = () => {
         "name": "",
         "password": ""
     });
-      alert('등록되었습니다.');
-      navigate('/system/AdminList');
+      alertPage('등록되었습니다.');
+      setAlertAftType('req');
+      
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
       console.log(error);
@@ -121,6 +182,7 @@ const AdminReg = () => {
   };
   return (
     <CContainer>
+      <ComModal type={alertType} visible={alertVisible} onClose={handleCloseModal} alertText={alertText} onAccpet={handleAccept} aftFunc={handleAftFunc}/>
       <CRow>
         <CCol >
           <CCard className="mb-4">
@@ -132,7 +194,7 @@ const AdminReg = () => {
                 className="row g-3 needs-validation"
                 noValidate
                 validated={validated}
-                onSubmit={submitRegAlbum}
+                onSubmit={confirmSubmitRegAlbum}
               >
                 {/* <CCol xs={10} >
                   <CFormLabel></CFormLabel>

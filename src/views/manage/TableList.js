@@ -3,7 +3,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import { useNavigate, useLocation } from 'react-router-dom'
 import axiosInstance from '../../common/axiosInstance';
 import { throwError } from '../../common/utils'
-
+import ComModal from '../../common/ComModal'; // 모달 컴포넌트 임포트
 
 import CIcon from '@coreui/icons-react'
 import {
@@ -27,6 +27,46 @@ const TableList = () => {
    * 공통 영역
   **********************************************************************/
   const navigate = useNavigate();
+
+    /**********************************************************************
+   * 메세지영역
+  **********************************************************************/
+    const [alertType, setAlertType] = useState('');
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alertText, setAlertText] = useState('');
+    const [acceptType, setAcceptType] = useState('');
+   
+  
+  
+    const alertPage = (txt) => {
+      setAlertType('alert');
+      setAlertText(txt);
+      setAlertVisible(true);
+    };
+  
+    const confirmPage = (txt, type) => {
+      setAlertType('confirm');
+      setAlertText(txt);
+      setAlertVisible(true);
+      setAcceptType(type);
+    };
+  
+    const handleCloseModal = () => {
+      setAlertVisible(false);
+    };
+    const handleAccept = () => {
+      setAlertVisible(false);
+      if(acceptType === 'req'){// 등록
+          submitReqTable();
+      }else if(acceptType === 'delete'){// 삭제
+          submitDeletTable();
+      }else if(acceptType === 'disconn'){//연결해제
+          submitDisconnTable();
+      }
+      setAcceptType('');
+      
+    };
+  
 
   /**********************************************************************
    * 화면 영역
@@ -93,24 +133,20 @@ const TableList = () => {
     e.preventDefault();
 
     if (!tableReqData.numberOfSeats) {
-      alert('테이블 번호를 입력해 주세요.');
+      alertPage('테이블 번호를 입력해 주세요.');
       return;
     }
 
     if (!tableReqData.tableName) {
-      alert('좌석수를 입력해주세요.');
+      alertPage('좌석수를 입력해주세요.');
       return;
     }
 
 
 
-    const result = window.confirm('해당 테이블을 등록 하시겠습니까?');
+    //const result = window.confirm('해당 테이블을 등록 하시겠습니까?');
+    confirmPage('해당 테이블을 등록 하시겠습니까?', 'req');
 
-    if (!result) {
-      return;
-    }
-
-    submitReqTable();
 
   };
 
@@ -132,7 +168,7 @@ const TableList = () => {
       if (response.status === 200) {
         
         // 폼 데이터를 초기화합니다.
-        alert('등록되었습니다.');
+        alertPage('등록되었습니다.');
         submitSearchTable();
         setTableReqData(
           {
@@ -142,7 +178,7 @@ const TableList = () => {
           }
         );
       } else {
-        alert('오류 발생');
+        alertPage('오류 발생');
       }
 
       
@@ -150,27 +186,27 @@ const TableList = () => {
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
       console.error('API 요청 실패:', error);
-      alert(error.response.data.message);
+      alertPage(error.response.data.message);
     }
 
   };
 
 
   //삭제 클릭
-  const clickDeletTable = (e, tableId) => {
+  const [tableId, setTableId] = useState('');
+
+  const clickDeletTable = (e, pTableId) => {
     e.preventDefault();
 
-    const result = window.confirm('해당 테이블을 삭제 하시겠습니까?');
+    //const result = window.confirm('해당 테이블을 삭제 하시겠습니까?');
+    confirmPage('해당 테이블을 삭제 하시겠습니까?', 'delete')
 
-    if (!result) {
-      return;
-    }
 
-    submitDeletTable(tableId);
+    setTableId(pTableId);
   };
 
   //삭제 API
-  const submitDeletTable = async (tableId) => {
+  const submitDeletTable = async () => {
 
 
     try {
@@ -179,7 +215,7 @@ const TableList = () => {
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('삭제되었습니다.');
+      alertPage('삭제되었습니다.');
       submitSearchTable();
 
     } catch (error) {
@@ -195,18 +231,15 @@ const TableList = () => {
    const clickDisconnTable = (e, tableId) => {
     e.preventDefault();
   
-    const result = window.confirm('해당 테이블을 연결 해제하시겠습니까?');
+    //const result = window.confirm('해당 테이블을 연결 해제하시겠습니까?');
+    confirmPage('해당 테이블을 연결 해제하시겠습니까?', 'disconn')
    
-    if (!result) {
-      return;
-    }
-  
-    submitDisconnTable(tableId);
+    setTableId(tableId);
   };
 
 
   //삭제 API
-  const submitDisconnTable = async (tableId) => {
+  const submitDisconnTable = async () => {
 
 
     try {
@@ -215,7 +248,7 @@ const TableList = () => {
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('해제되었습니다.');
+      alertPage('해제되었습니다.');
       submitSearchTable();
 
     } catch (error) {
@@ -231,6 +264,7 @@ const TableList = () => {
 
   return (
     <CContainer>
+      <ComModal type={alertType} visible={alertVisible} onClose={handleCloseModal} alertText={alertText} onAccpet={handleAccept}/>
       <CCard className="mb-4">
         <CCardHeader>
           <CButton color="light" onClick={submitSearchTable}>
@@ -240,12 +274,12 @@ const TableList = () => {
         </CCardHeader>
         {tableDatas ? (
           <CCardBody>
-            <CRow>
+            <CRow key='0'>
               <CCol xs={1}>
                 <CFormInput type="text" id="staNo" value="No" readOnly plainText />
               </CCol>
               <CCol xs={5}>
-                <CFormInput type="text" id="staTrackNumber" value="테이블번호*" readOnly plainText />
+                <CFormInput type="text" id="staTrackNumber" value="테이블명*" readOnly plainText />
               </CCol>
               <CCol xs={3}>
                 <CFormInput type="text" id="staTitle" value="좌석수*" readOnly plainText />
