@@ -287,7 +287,7 @@ const DisplayList = () => {
                     displayDatas.contents.map((item, index) => (
                       <CTableRow v-for="item in tableItems" key={index} >
                         <CTableDataCell className="text-center">
-                          <strong>{item.displayItemId}</strong>
+                          <strong>{index+1}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-left">
                         <a href='/' onClick={(e) => goInfoClick(e, item.displayItemId)}>{item.title}</a>

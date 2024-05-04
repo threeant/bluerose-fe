@@ -557,7 +557,7 @@ const DisplayInfo = () => {
                       <CTableRow v-for="item in tableItems" key={index} >
                         <CTableDataCell className="text-center">
                           {/* <strong>{index+1}</strong> */}
-                          <strong>{item.displayContentId}</strong>
+                          <strong>{index+1}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           <strong><a href='/' onClick={(e) => popAlbumInfoClick(e, item.albumId)}>{item.albumName}</a></strong>
