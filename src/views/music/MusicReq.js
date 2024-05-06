@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import {
   cilSync
 } from '@coreui/icons'
 import { useNavigate } from 'react-router-dom'
-import { getCodeList, getCurrentDate, throwError } from '../../common/utils'
+import { getCurrentDate, throwError } from '../../common/utils'
 import SongList from '../common/SongList'; // MyModal 컴포넌트의 경로를 알맞게 설정
 import AlbumInfo from '../common/AlbumInfo'
 import axiosInstance from '../../common/axiosInstance';
@@ -14,7 +13,6 @@ import { Client } from "@stomp/stompjs";
 import appConfig from '../../common/appConfig';
 import ComModal from '../../common/ComModal'; // 모달 컴포넌트 임포트
 import {
-  CAvatar,
   CButton,
   CCard,
   CCardBody,
@@ -32,9 +30,6 @@ import {
   CModalTitle,
   CModalBody
 } from '@coreui/react'
-import {
-  cilCalendar
-} from '@coreui/icons'
 
 
 const MusicReq = () => {
@@ -43,13 +38,8 @@ const MusicReq = () => {
   **********************************************************************/
   const navigate = useNavigate();
 
-  const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
-  const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
-
   //앨범아이디
   const [albumId, setAlbumId] = useState();
-
-  const [stompClient, setStompClient] = useState(null); // 소켓클라이언트
 
     /**********************************************************************
    * 메세지영역
@@ -80,16 +70,20 @@ const MusicReq = () => {
     const handleAccept = () => {
       setAlertVisible(false);
       if(acceptType === 'pick'){// 선곡
-          submitSelectMusicReq();
+        submitSelectMusicReq();
       }else if(acceptType === 'delete'){//삭제
-          submitDeletSong();
+        submitDeletSong();
       }else if(acceptType === 'reqStart'){//신청곡 받기
-          submitClickConditonChange(true);
+        submitClickConditonChange(true);
       }else if(acceptType === 'reqStop'){//신청곡 중지
-          submitClickConditonChange(false);
+        submitClickConditonChange(false);
       }else if(acceptType === 'complete'){//신청곡 완료
         submitCompleteMusicReq();
+      }else if(acceptType === 'init'){//신청곡 초기화
+        submitInitMusicReq();
       }
+
+      
       setAcceptType('');
       
     };
@@ -105,18 +99,27 @@ const MusicReq = () => {
     
     submitSearchNowPlayingCondition(); // 신청곡 상태조회
     
-    //callHeader();
+    callHeader();
   }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
 
 
-  const callHeader = () => {//헤더 초기화 하도록
-      const response = axiosInstance.get('/api/callRefresh', {
-        "code": "string",
-        "msg": "string"
-    },{
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
+  const callHeader = async() => {//헤더 초기화 하도록
+    try {
+      var refreshData  = {"code": "100", "msg": "신청곡헤더 refresh"};
+      const response = await axiosInstance.post('/api/callRefresh',refreshData);
+
+
+      console.log('API 응답:', response.data);
+
+      
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.log(error);
+      //throwError(error,navigate);
+    }
+
+  };
+
   const setSocket = async  () => {
     console.log('>>>>!!?');
     const stompConfig = {
@@ -143,7 +146,6 @@ const MusicReq = () => {
     };
 
     const client = new Client(stompConfig);
-    setStompClient(client);
     client.activate();
     
     client.onConnect = (frame) => {
@@ -154,7 +156,7 @@ const MusicReq = () => {
         //parentFunction(rtnTxt.type);
        
         
-        if(rtnTxt.type == 'APP_REQUEST_SONG'){
+        if(rtnTxt.type === 'APP_REQUEST_SONG'){
           console.log('DISPLAY : ADMIN_UPDATE_PLAYING!!! >> '+rtnTxt.requestSongSize);
          // var newRequestSongSize = rtnTxt.requestSongSize;
          refreshMusicReq();
@@ -484,6 +486,26 @@ const MusicReq = () => {
     
   };
 
+  const initSongReq = () => {
+    confirmPage('신청곡을 초기화 하시겠습니까? 초기화후 되돌릴 수 없습니다.', 'init');
+
+
+  };
+
+  const submitInitMusicReq = async() => {
+    try {
+      const response = await axiosInstance.delete('/api/song-request');
+      console.log('API 응답:', response.data);
+
+      window.location.reload(); // 페이지 새로고침
+    } catch (error) {
+      // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
+      console.log(error);
+      throwError(error,navigate);
+    }
+  }
+  
+
 
   return (
     <>
@@ -589,7 +611,10 @@ const MusicReq = () => {
             <CCardBody>
               <div className="d-grid gap-2">
                 <CRow className="justify-content-between">
-                  <CCol xs={12}>
+                  <CCol xs={4}>
+                      <CButton component="input" type="button" color="danger" value="신청곡 초기화" onClick={initSongReq} />
+                    </CCol>
+                  <CCol xs={8}>
                     <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                       <CButton component="input" type="reset" color="secondary" value="신청곡 추가" onClick={popMusicAddClick} />
                       <CButton color="light" onClick={refreshMusicReq}>
@@ -633,7 +658,7 @@ const MusicReq = () => {
                           <strong>{item.title}</strong>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {item.tableName == '0' ? '관리자' : item.tableName}
+                          {item.tableName === '0' ? '관리자' : item.tableName}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
                           <CButton color="success" shape="rounded-pill" className="mb-3" onClick={(e) => clickSelectMusicReq(e, item.songRequestId)}>

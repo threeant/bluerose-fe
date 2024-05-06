@@ -4,7 +4,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import axiosInstance from '../../common/axiosInstance';
-
+import PaginationComponent from '../common/PaginationComponent';
 import { getCodeList,throwError } from '../../common/utils'
 import {
   CAvatar,
@@ -47,7 +47,8 @@ const MusicReqHisInfo = () => {
   //const { searchParam} = location.state;
   
 
-
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
+  const [totalPages, setTotalPages] = useState(0); // 현재 페이지 상태
 
 
   //초기화
@@ -79,40 +80,37 @@ const MusicReqHisInfo = () => {
     navigate('/music/albumInfo', { state: { albumId: id } });
   };
 
+  const location = useLocation();
+  const dateStr = location.state.dateStr;
+
   /**********************************************************************
   * 비즈니스로직 영역
  **********************************************************************/
   //리스트
   const [albumDatas, setAlbumDatas] = useState({ contents: [] });
 
-
-
-  
-
   //검색조건
   const [albumSearch, setAlbumSearch] = useState({
-    "artist": "",
-    "endReleaseDate": "",
-    "musicGenre": "",
-    "name": "",
     "page": 0,
-    "size": 15,
-    "startReleaseDate": "",
-    "mediaCode": ""
+    "size": 30,
+    "startDate": location.state.dateStr
   });
 
-  const location = useLocation();
-  const dateStr = location.state.dateStr;
+ 
 
   useEffect(() => {
     console.log(dateStr);
+    submitSearchAlbums();
   }, []);
 
-  //조회하기
-  const submitSearch = (e) => {
-    e.preventDefault();
-    submitSearchAlbums();
-  }
+
+  //페이지 변경
+  const handlePageChange = (page) => {
+    //console.log('현재페이지 ');
+    //console.log(page);
+    setCurrentPage(page); // 페이지 변경 시 현재 페이지 상태 업데이트
+    submitSearchAlbums(page);
+  };
 
   //페이징
   const clickPage = (e, page) => {
@@ -123,12 +121,24 @@ const MusicReqHisInfo = () => {
   }
 
   //검색 API
-  const submitSearchAlbums = async () => {
+  const submitSearchAlbums = async (page) => {
+
+
+    if(page > -1){
+      setAlbumSearch(prevState => ({
+        ...prevState,
+        page: page
+      }));
+
+      albumSearch.page = page;
+    }
+
+    
 
     console.log(albumSearch);
 
     try {
-      const response = await axiosInstance.get('/api/albums', {
+      const response = await axiosInstance.get('/api/song-request/history/list', {
         params: albumSearch,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -138,7 +148,8 @@ const MusicReqHisInfo = () => {
       // 데이터를 상태 변수에 저장
       setAlbumDatas(data);
 
-      console.log(data)
+      console.log(data);
+      setTotalPages(data.totalPages);
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -204,26 +215,27 @@ const MusicReqHisInfo = () => {
                     albumDatas.contents.map((item, index) => (
                       <CTableRow v-for="item in tableItems" key={index} onClick={(e) => goInfoClick(e, item.id)}>
                         <CTableDataCell className="text-center">
-                          <strong>{item.id}</strong>
+                          <strong>{index+1}</strong>
                         </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          {item.name}
+                        <CTableDataCell className="text-left">
+                          {item.albumName}
                         </CTableDataCell>
-                        <CTableDataCell className="text-center">
+                        <CTableDataCell className="text-left">
                           {item.artist}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {item.name}
+                          {item.trackNumber}
+                        </CTableDataCell>
+                        <CTableDataCell className="text-left">
+                          {item.title}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {item.name}
+                          {item.tableNumber}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
-                          {item.name}
+                          {item.requestedAt}
                         </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          {item.releaseDate}
-                        </CTableDataCell>
+                        
                       </CTableRow>
                     ))
                   ) :
@@ -241,17 +253,7 @@ const MusicReqHisInfo = () => {
               {albumDatas.contents && albumDatas.contents.length > 0 ? (
                 <CRow>
                   <CCol md={{ span: 6, offset: 5 }}>
-                    <CPagination aria-label="Page navigation example">
-                      <CPaginationItem aria-label="Previous" disabled={!albumDatas.first} onClick={(e) => clickPage(e, 1)}>
-                        <span aria-hidden="true">&laquo;</span>
-                      </CPaginationItem>
-                      {Array.from({ length: albumDatas.totalPages }, (_, index) => (
-                        <CPaginationItem key={index} active onClick={(e) => clickPage(e, index + 1)}>{index + 1}</CPaginationItem>
-                      ))}
-                      <CPaginationItem aria-label="Next" disabled={!albumDatas.last}>
-                        <span aria-hidden="true">&raquo;</span>
-                      </CPaginationItem>
-                    </CPagination>
+                  <PaginationComponent totalPages={totalPages} currentPage={currentPage} onPageChange={handlePageChange} />
                   </CCol>
                   <CCol md={1}>
                     총 {albumDatas.totalCount}건

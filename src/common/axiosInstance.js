@@ -1,7 +1,6 @@
 // axiosInstance.js
 
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import appConfig from '../common/appConfig';
 
 const axiosInstance = axios.create({

@@ -445,17 +445,6 @@ const AlbumList = () => {
                 <CRow>
                   <CCol md={{ span: 6, offset: 5 }}>
                   <PaginationComponent totalPages={totalPages} currentPage={currentPage} onPageChange={handlePageChange} />
-                    {/* <CPagination aria-label="Page navigation example">
-                      <CPaginationItem aria-label="Previous" disabled={!albumDatas.first} onClick={(e) => clickPage(e, 1)}>
-                        <span aria-hidden="true">&laquo;</span>
-                      </CPaginationItem>
-                      {Array.from({ length: albumDatas.totalPages }, (_, index) => (
-                        <CPaginationItem key={index} active onClick={(e) => clickPage(e, index + 1)}>{index + 1}</CPaginationItem>
-                      ))}
-                      <CPaginationItem aria-label="Next" disabled={!albumDatas.last}>
-                        <span aria-hidden="true">&raquo;</span>
-                      </CPaginationItem>
-                    </CPagination> */}
                   </CCol>
                   <CCol md={1}>
                     총 {albumDatas.totalCount}건

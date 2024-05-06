@@ -687,9 +687,9 @@ const CodeList = () => {
                           <CButton color="success" shape="rounded-pill" className="mb-3" onClick={(e) => clickUpdateCode(e, index)}>
                             수정
                           </CButton>
-                          <CButton color="dark" shape="rounded-pill" className="mb-3" onClick={(e) => clickDeletCode(e, item.id)}>
+                          {/* <CButton color="dark" shape="rounded-pill" className="mb-3" onClick={(e) => clickDeletCode(e, item.id)}>
                             삭제
-                          </CButton> 
+                          </CButton>  */}
                         </CTableDataCell>
                       </CTableRow>
                     ))

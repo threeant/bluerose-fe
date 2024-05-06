@@ -144,7 +144,7 @@ const SampleForm = () => {
   //양식다운로드
   const downloadForm = (url) => {
     // 다운로드할 파일의 경로
-    const filePath = appConfig.apiUrl + '/excel/form/excelUploadForm.xlsx'; // 예시 파일 경로
+    const filePath = appConfig.apiUrl + '/files/excel/form/excelUploadForm.xlsx'; // 예시 파일 경로
     console.log('filePath');
     console.log(filePath);
     // 파일 다운로드

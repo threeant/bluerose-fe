@@ -214,8 +214,13 @@ const TableList = () => {
 
       console.log('API 응답:', response.data);
 
+      if(response.data && response.data.resultCode == '110'){
+        alertPage('사용중인 테이블은 삭제할 수 없습니다. 연결해제 후 삭제해 주세요.');
+      }else{
+        alertPage('삭제되었습니다.');
+      }
+
       // 폼 데이터를 초기화합니다.
-      alertPage('삭제되었습니다.');
       submitSearchTable();
 
     } catch (error) {
@@ -250,6 +255,12 @@ const TableList = () => {
       // 폼 데이터를 초기화합니다.
       alertPage('해제되었습니다.');
       submitSearchTable();
+
+      var refreshData  = {"code": "200", "msg": tableId};
+      const response3 = await axiosInstance.post('/api/callRefresh',refreshData);
+
+
+      console.log('API 2:', response3.data);
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -314,7 +325,7 @@ const TableList = () => {
             {tableDatas.map((item, index) => (
               <CRow key={index}>
                 <CCol xs={1}>
-                  <CFormInput type="text" id={'txtNoReq${index}'} value={tableDatas.length - index} readOnly plainText />
+                  <CFormInput type="text" id={'txtNoReq${index}'} value={item.id} readOnly plainText />
                 </CCol>
                 <CCol xs={5}>
                   <CFormInput type="text" id={'txtTableNumber${index}'} value={item.tableName} readOnly plainText />

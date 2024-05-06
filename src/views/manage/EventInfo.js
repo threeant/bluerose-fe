@@ -4,11 +4,14 @@ import 'react-datepicker/dist/react-datepicker.css'
 import CIcon from '@coreui/icons-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
-import { getCodeList , throwError} from '../../common/utils'
+import { getCodeList, throwError } from '../../common/utils'
+import appConfig from '../../common/appConfig';
 import {
   cilCalendar,
   cifUs,
 } from '@coreui/icons';
+import ComModal from '../../common/ComModal'; // 모달 컴포넌트 임포트
+import axiosInstance from '../../common/axiosInstance';
 
 import {
   CButton,
@@ -41,32 +44,83 @@ const EventInfo = () => {
   **********************************************************************/
   const navigate = useNavigate();
 
-  const [midiaCD] = useState(getCodeList('MEDIA')); // 미디어CD
+  const [midiaCD] = useState(getCodeList('EVENT')); // 미디어CD
   const [cntryCD] = useState(getCodeList('CNTRY')); // 발매국가CD
+
+  /**********************************************************************
+   * 메세지영역
+  **********************************************************************/
+  const [alertType, setAlertType] = useState('');
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertText, setAlertText] = useState('');
+  const [acceptType, setAcceptType] = useState('');
+ 
+
+
+  const alertPage = (txt) => {
+    setAlertType('alert');
+    setAlertText(txt);
+    setAlertVisible(true);
+  };
+
+  const confirmPage = (txt, type) => {
+    setAlertType('confirm');
+    setAlertText(txt);
+    setAlertVisible(true);
+    setAcceptType(type);
+  };
+
+  const handleCloseModal = () => {
+    setAlertVisible(false);
+  };
+  const handleAccept = () => {
+    setAlertVisible(false);
+    if(acceptType === 'update'){//앨범수정
+      submitUpdateEvent();
+    }else if(acceptType === 'deleteSong'){//곡 삭제
+        submitDeletSong();
+    }else if(acceptType === 'reqSong'){//곡 등록
+        submitReqSong(true);
+    }
+
+    setAcceptType('');
+    
+  };
 
   /**********************************************************************
    * 화면 영역
   **********************************************************************/
   const location = useLocation();
-  const { EventId } = location.state;
+  const { albumId, listSearch } = location.state;
 
   //목록이동
   const goListClick = () => {
-    navigate('/music/EventList');
+    
+    //const newQuery = encodeURIComponent(listSearch);
+    navigate('/manage/eventList');
+
+    //, { state: { albumId: id , listSearch : albumSearch} }
   };
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate2, setSelectedDate2] = useState(null); // 등록일 to
+
   const handleDateChange = date => {
     const formattedDate = date.toISOString().slice(0, 10);
     setSelectedDate(date);
-    setEventData({ ...EventData, releaseDate: formattedDate })
-
+    setEventData({ ...albumData, startDate: formattedDate })
+  }
+  const handleDateChange2 = date => {
+    setSelectedDate2(date);
+    const formattedDate = date.toISOString().slice(0, 10);
+    
+    setEventData({ ...albumData, endDate: formattedDate })
   }
 
   useEffect(() => {
 
     submitSearchEvent();
 
-  }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정
+  }, []); // 빈 배열을 넣어 처음 한 번만 실행되도록 설정 d x
 
 
   const setSongRuntime = (e) => {
@@ -83,10 +137,10 @@ const EventInfo = () => {
 
   const handleFileChange = (event) => {
     // console.log(event);
-    // setEventData((prevEventData) => ({
-    //   ...prevEventData,
-    //   image: event.target.files[0]
-    // }));
+    setEventData((prevEventData) => ({
+      ...prevEventData,
+      image: event.target.files[0]
+    }));
 
 
     const selectedImage = event.target.files[0];
@@ -114,7 +168,7 @@ const EventInfo = () => {
           ...prevEventData,
           image: null
         }));
-        alert('이미지 파일만 업로드할 수 있습니다.');
+        alertPage('이미지 파일만 업로드할 수 있습니다.');
       }
     }
 
@@ -127,7 +181,7 @@ const EventInfo = () => {
   const [validated, setValidated] = useState(false);
 
   //앨범 상세 
-  const [EventData, setEventData] = useState();
+  const [albumData, setEventData] = useState();
 
   // 곡조회리스트
   const [songDatas, setSongDatas] = useState([]);
@@ -147,7 +201,7 @@ const EventInfo = () => {
   const submitSearchEvent = async () => {
 
     try {
-      const response = await axios.get('http://localhost:8080/api/Events/' + EventId);
+      const response = await axiosInstance.get('/api/albums/' + albumId);
 
       // API 응답에서 데이터 추출
       const data = response.data;
@@ -173,7 +227,7 @@ const EventInfo = () => {
   const submitSearchSong = async () => {
 
     try {
-      const response = await axios.get('http://localhost:8080/api/Events/' + EventId + '/songs');
+      const response = await axiosInstance.get('/api/albums/' + albumId + '/songs');
 
       // API 응답에서 데이터 추출
       const data = response.data;
@@ -191,10 +245,10 @@ const EventInfo = () => {
   };
 
   //앨범 수정하기 API
-  const submitUpdateEvent = async (e) => {
+  const confirmSubmitUpdateEvent = async (e) => {
     e.preventDefault();
 
-    console.log(EventData);
+    console.log(albumData);
     setValidated(true);
     const form = e.currentTarget;
     if (form.checkValidity() === false) {
@@ -202,15 +256,16 @@ const EventInfo = () => {
       return;
     }
 
-    const result = window.confirm('수정하시겠습니까?');
+    //const result = window.confirm('수정하시겠습니까?');
+    confirmPage('앨범정보를 수정하시겠습니까?', 'update');
+  }
 
-    if (!result) {
-      setValidated(false);
-      return;
-    }
+  //앨범 수정하기 API
+  const submitUpdateEvent = async () => {
+    
 
     try {
-      const response = await axios.post('http://localhost:8080/api/Events/' + EventId, EventData, {
+      const response = await axiosInstance.post('/api/albums/' + albumId, albumData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         }
@@ -219,7 +274,7 @@ const EventInfo = () => {
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('수정되었습니다.');
+      alertPage('수정되었습니다.');
       setValidated(false);
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -234,33 +289,28 @@ const EventInfo = () => {
     e.preventDefault();
 
     if (!songReqData.trackInfo) {
-      alert('Track Number를 입력해 주세요.');
+      alertPage('Track Number를 입력해 주세요.');
       return;
     }
 
     if (!songReqData.trackName) {
-      alert('Title을 입력해주세요.');
+      alertPage('Title을 입력해주세요.');
       return;
     }
 
     if (!songReqData.runtime) {
-      alert('Running Time을 입력해주세요/');
+      alertPage('Running Time을 입력해주세요.');
       return;
     } else {
       if (/^\d{0,2}:\d{0,2}$/.test(songReqData.runtime) == false) {
-        alert('Running Time을 알맞게 입력해주세요 [00:00] 형식 /');
+        alertPage('Running Time을 알맞게 입력해주세요 [00:00] 형식 ');
         return;
       }
     }
 
 
-    const result = window.confirm('해당곡을 등록 하시겠습니까?');
-
-    if (!result) {
-      return;
-    }
-
-    submitReqSong();
+    //const result = window.confirm('해당곡을 등록 하시겠습니까?');
+    confirmPage('곡을 등록 하시겠습니까?', 'reqSong')
 
   };
 
@@ -269,7 +319,7 @@ const EventInfo = () => {
   const submitReqSong = async () => {
 
     try {
-      const response = await axios.post('http://localhost:8080/api/Events/' + EventId + '/songs', songReqData, {
+      const response = await axiosInstance.post('/api/albums/' + albumId + '/songs', songReqData, {
         headers: {
           'Content-Type': 'application/json',
         }
@@ -278,7 +328,7 @@ const EventInfo = () => {
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('등록되었습니다.');
+      alertPage('등록되었습니다.');
       setValidated(false);
       submitSearchSong();
       setSongReqData(
@@ -298,30 +348,27 @@ const EventInfo = () => {
   };
 
   //곡 삭제 클릭
+  const [songId, setSongId] = useState('');
   const clickDeletSong = (e, songId) => {
     e.preventDefault();
 
-    const result = window.confirm('해당곡을 삭제 하시겠습니까?');
-
-    if (!result) {
-      return;
-    }
-
-    submitDeletSong(songId);
+    //const result = window.confirm('해당곡을 삭제 하시겠습니까?');
+    confirmPage('해당곡을 삭제 하시겠습니까?', 'deleteSong');
+    setSongId(songId);
   };
 
   //곡 삭제 API
-  const submitDeletSong = async (songId) => {
+  const submitDeletSong = async () => {
 
     console.log(songId);
 
     try {
-      const response = await axios.delete('http://localhost:8080/api/songs/' + songId);
+      const response = await axiosInstance.delete('/api/songs/' + songId);
 
       console.log('API 응답:', response.data);
 
       // 폼 데이터를 초기화합니다.
-      alert('삭제되었습니다.');
+      alertPage('삭제되었습니다.');
       setValidated(false);
       submitSearchSong();
 
@@ -337,33 +384,35 @@ const EventInfo = () => {
 
   return (
     <CContainer>
+      <ComModal type={alertType} visible={alertVisible} onClose={handleCloseModal} alertText={alertText} onAccpet={handleAccept} />
+      
       <CRow>
         <CCol >
           <CCard className="mb-4">
             <CCardHeader>
-              <strong>앨범수정</strong> <small></small>
+              <strong>이벤트수정</strong> <small></small>
             </CCardHeader>
             <CCardBody>
-              {EventData ? (
+              {albumData ? (
                 <CForm
                   className="row g-3 needs-validation"
                   noValidate
                   validated={validated}
-                  onSubmit={submitUpdateEvent}
+                  onSubmit={confirmSubmitUpdateEvent}
                 >
                   <CCol xs={10} >
-                    <CFormLabel htmlFor="validationCustom04">ID : {EventId}</CFormLabel>
+                    <CFormLabel htmlFor="validationCustom04">ID : {albumId}</CFormLabel>
                   </CCol>
                   <CCol xs={2} >
                     <CFormFeedback invalid>You must agree before submitting.</CFormFeedback>
-                    <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={EventData.useYn} onChange={(e) => setEventData({ ...EventData, useYn: e.target.checked })} />
+                    <CFormSwitch label="사용여부" id="formSwitchCheckChecked" defaultChecked={albumData.useYn} onChange={(e) => setEventData({ ...albumData, useYn: e.target.checked })} />
                   </CCol>
-                  <CCol xs={3}>
-                    {previewUrl ? (<CImage rounded thumbnail align="center" src={previewUrl} width={150} height={150} />) : (
-                      <CImage rounded thumbnail align="center" src={ReactImg} width={150} height={150} />
+                  <CCol xs={6}>
+                    {previewUrl ? (<CImage rounded thumbnail align="center"  src={previewUrl} width={150} height={150} />) : (
+                      <CImage rounded thumbnail align="center" src={process.env.PUBLIC_URL + '/basicImg/w_lp2.png'} width={250} height={150} />
                     )}
                   </CCol>
-                  <CCol xs={9}>
+                  <CCol xs={6}>
                     <CCardBody>
                       <CCardText>
                         <CFormInput type="file" size="lg" accept="image/*" id="formFile" onChange={handleFileChange} ref={fileInputRef} />
@@ -372,56 +421,21 @@ const EventInfo = () => {
                   </CCol>
 
                   <CCol xs={6}>
-                    <CFormLabel htmlFor="lab_media">미디어*</CFormLabel>
-                    <CFormSelect id="sel_media" value={EventData.media} onChange={(e) => setEventData({ ...EventData, media: e.target.value })}  >
+                    <CFormLabel htmlFor="lab_media">이벤트 타입* </CFormLabel>
+                    <CFormSelect id="sel_media" disabled='true' value={28} onChange={(e) => setEventData({ ...albumData, mediaCD: e.target.value })}  >
                       {midiaCD.map((item, index) => (
-                        <option value={item.id} key={index}>{item.name}</option>
+                        <option value={item.id} key={index}>{item.etc1}</option>
                       ))}
                     </CFormSelect>
                     <CFormFeedback invalid>미디어를 선택해주세요</CFormFeedback>
                   </CCol>
                   <CCol xs={6}>
-                    <CFormLabel htmlFor="inputLabel">Label</CFormLabel>
-                    <CFormInput type="text" id="inputLabel" value={EventData.label} onChange={(e) => setEventData({ ...EventData, label: e.target.value })} maxLength={100} />
-                  </CCol>
-                  <CCol xs={6}>
-                    <CFormLabel htmlFor="inputName">앨범명*</CFormLabel>
-                    <CFormInput type="text" id="inputName" value={EventData.name} required onChange={(e) => setEventData({ ...EventData, name: e.target.value })} maxLength={100} />
-                    <CFormFeedback invalid>앨범명을 입력해주세요.</CFormFeedback>
-                  </CCol>
-                  <CCol xs={6}>
-                    <CFormLabel htmlFor="inputAartist">아티스트*</CFormLabel>
-                    <CFormInput type="text" id="inputAartist" value={EventData.artist} required onChange={(e) => setEventData({ ...EventData, artist: e.target.value })} maxLength={100} />
-                    <CFormFeedback invalid>아티스트를 입력해주세요.</CFormFeedback>
-                  </CCol>
-
-                  <CCol md={12}>
-                    <CFormLabel htmlFor="inputSeries">Series</CFormLabel>
-                    <CFormInput type="text" id="inputSeries" value={EventData.series} onChange={(e) => setEventData({ ...EventData, series: e.target.value })} maxLength={100} />
-                  </CCol>
-
-                  <CCol xs={12}>
-                    <CFormLabel htmlFor="inputFormat">Format</CFormLabel>
-                    <CFormTextarea id="inputFormat" rows="3" value={EventData.format} onChange={(e) => setEventData({ ...EventData, format: e.target.value })} maxLength={250}  ></CFormTextarea>
-                  </CCol>
-                  <CCol xs={6}>
-                    <CFormLabel htmlFor="inputCountry">발매국가*</CFormLabel>
-                    <div >
-                      <CFormSelect id="inputCountry" value={EventData.countryCD} onChange={(e) => setEventData({ ...EventData, countryCD: e.target.value })}>
-                        {cntryCD.map((item, index) => (
-                          <option value={item.id} key={index}>{item.name}</option>
-                        ))}
-                      </CFormSelect>
-                      <CFormFeedback invalid>발매국가를 선택해주세요.</CFormFeedback>
-                    </div>
-                  </CCol>
-                  <CCol xs={6}>
-                    <CFormLabel htmlFor="inputReleaseDate">발매일</CFormLabel>
-                    <div style={{ display: 'flex', width: '100%' }}>
+                    <CFormLabel htmlFor="inputLabel">이벤트 기간 *</CFormLabel>
+                    <div style={{ display: 'flex' }}>
                       <div style={{ display: 'grid', placeItems: 'center', marginRight: 5 }}>
                         <CIcon className="text-secondary" icon={cilCalendar} size="lg" />
                       </div>
-                      <div style={{ width: '90%' }}>
+                      <div>
                         <DatePicker
                           selected={selectedDate}
                           onChange={handleDateChange}
@@ -430,19 +444,38 @@ const EventInfo = () => {
                           minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
                           maxDate={new Date()} // maxDate 이후 날짜 선택 불가
                           className="DatePicker"
-                          value={EventData.releaseDate}
+                        />
+                      </div>
+                      <div style={{ whiteSpace: 'pre-wrap', display: 'grid', placeItems: 'center' }}>
+                        <span> ~ </span>
+                      </div>
+                      <div style={{ display: 'grid', placeItems: 'center', marginRight: 5 }}>
+                        <CIcon className="text-secondary" icon={cilCalendar} size="lg" />
+                      </div>
+                      <div>
+                        <DatePicker
+                          selected={selectedDate2}
+                          onChange={handleDateChange2}
+                          dateFormat={'yyyy-MM-dd'} // 날짜 형태
+                          shouldCloseOnSelect // 날짜를 선택하면 datepicker가 자동으로 닫힘
+                          minDate={new Date('2000-01-01')} // minDate 이전 날짜 선택 불가
+                          maxDate={new Date()} // maxDate 이후 날짜 선택 불가
+                          className="DatePicker"
                         />
                       </div>
                     </div>
                   </CCol>
-                  <CCol md={12}>
-                    <CFormLabel htmlFor="txt_genre">장르</CFormLabel>
-                    <CFormInput type="text" id="txt_genre" value={EventData.musicGenre} onChange={(e) => setEventData({ ...EventData, musicGenre: e.target.value })} maxLength={100} />
+                  <CCol xs={12}>
+                    <CFormLabel htmlFor="inputName">이벤트 명*</CFormLabel>
+                    <CFormInput type="text" id="inputName" value={albumData.name} required onChange={(e) => setEventData({ ...albumData, name: e.target.value })} maxLength={100} />
+                    <CFormFeedback invalid>앨범명을 입력해주세요.</CFormFeedback>
                   </CCol>
-                  <CCol md={12}>
-                    <CFormLabel htmlFor="txt_style">Style</CFormLabel>
-                    <CFormInput type="text" id="txt_style" value={EventData.style} onChange={(e) => setEventData({ ...EventData, style: e.target.value })} maxLength={100} />
+                  
+                  <CCol xs={12}>
+                    <CFormLabel htmlFor="inputFormat">비고</CFormLabel>
+                    <CFormTextarea id="inputFormat" rows="3" value={albumData.format} onChange={(e) => setEventData({ ...albumData, format: e.target.value })} maxLength={250}  ></CFormTextarea>
                   </CCol>
+                 
                   <div className="d-grid gap-2">
                     <CRow className="justify-content-between">
                       <CCol xs={12}>
@@ -464,44 +497,25 @@ const EventInfo = () => {
       </CRow >
       <CCard className="mb-4">
         <CCardHeader>
-          <strong>곡</strong> <small></small>
+          <strong>참여자</strong> <small></small><CButton component="input" type="button" color="danger" value="정보삭제"  />
         </CCardHeader>
-        {EventData ? (
+        {albumData ? (
           <CCardBody>
             <CRow>
               <CCol xs={1}>
                 <CFormInput type="text" id="staNo" value="No" readOnly plainText />
               </CCol>
-              <CCol xs={3}>
-                <CFormInput type="text" id="staTrackNumber" value="Track Number*" readOnly plainText />
+              <CCol xs={4}>
+                <CFormInput type="text" id="staTrackNumber" value="이름" readOnly plainText />
               </CCol>
               <CCol xs={5}>
-                <CFormInput type="text" id="staTitle" value="Title*" readOnly plainText />
-              </CCol>
-              <CCol xs={2}>
-                <CFormInput type="text" id="staRunningTime" value="Running Time*" readOnly plainText />
+                <CFormInput type="text" id="staTitle" value="연락처" readOnly plainText />
               </CCol>
               <CCol xs={1}>
-                <CFormInput type="text" id="staButton" value="" readOnly plainText />
-              </CCol>
-            </CRow>
-            <CRow>
-              <CCol xs={1}>
-                <CFormInput type="text" id="staNoReq" value="-" readOnly plainText />
-              </CCol>
-              <CCol xs={3}>
-                <CFormInput type="text" id="inputTrackNumber" value={songReqData.trackInfo} onChange={(e) => setSongReqData({ ...songReqData, trackInfo: e.target.value })} placeholder="A1" maxLength={4} />
-              </CCol>
-              <CCol xs={5}>
-                <CFormInput type="text" id="inputTrackName" value={songReqData.trackName} onChange={(e) => setSongReqData({ ...songReqData, trackName: e.target.value })} placeholder="Title" maxLength={150} />
-              </CCol>
-              <CCol xs={2}>
-                <CFormInput type="text" id="inputTrackRuntime" value={songReqData.runtime} onChange={(e) => setSongRuntime(e)} placeholder="00:00" maxLength={5} />
+                <CFormInput type="text" id="staNo" value="당첨여부" readOnly plainText />
               </CCol>
               <CCol xs={1}>
-                <CButton color="success" className="mb-3" onClick={(e) => clickReqSong(e)}>
-                  추가
-                </CButton>
+                <CFormInput type="text" id="staNo" value="당첨" readOnly plainText />
               </CCol>
             </CRow>
             {songDatas.map((item, index) => (
@@ -509,18 +523,20 @@ const EventInfo = () => {
                 <CCol xs={1}>
                   <CFormInput type="text" id={'txtNoReq${index}'} value={songDatas.length - index} readOnly plainText />
                 </CCol>
-                <CCol xs={3}>
-                  <CFormInput type="text" id={'txtTrackNumber${index}'} value={item.trackNumber} readOnly plainText />
+                <CCol xs={4}>
+                  {/* <CFormInput type="text" id={'txtTrackNumber${index}'} value={item.trackNumber} readOnly plainText /> */}
+                  김떙떙
                 </CCol>
                 <CCol xs={5}>
-                  <CFormInput type="text" id={'txtTrackName${index}'} value={item.trackName} readOnly plainText />
+                  {/* <CFormInput type="text" id={'txtTrackName${index}'} value={item.trackName} readOnly plainText /> */}
+                  010-XXXX-XXXX
                 </CCol>
-                <CCol xs={2}>
-                  <CFormInput type="text" id={'txtTrackRuntime${index}'} value={item.runtime} readOnly plainText />
+                <CCol xs={1}>
+                  X
                 </CCol>
                 <CCol xs={1}>
                   <CButton color="dark" className="mb-3" onClick={(e) => clickDeletSong(e, item.id)}>
-                    삭제
+                    당첨
                   </CButton>
                 </CCol>
               </CRow>

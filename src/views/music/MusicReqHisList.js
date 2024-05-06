@@ -5,7 +5,7 @@ import CIcon from '@coreui/icons-react'
 import { useNavigate } from 'react-router-dom'
 import axiosInstance from '../../common/axiosInstance';
 
-
+import PaginationComponent from '../common/PaginationComponent';
 import { throwError } from '../../common/utils'
 import {
   CAvatar,
@@ -28,7 +28,7 @@ import {
   CPagination,
   CPaginationItem,
 } from '@coreui/react'
-
+import ComModal from '../../common/ComModal'; // 모달 컴포넌트 임포트
 import {
   cilCalendar
 } from '@coreui/icons'
@@ -46,6 +46,43 @@ const MusicReqHisList = () => {
   const [selectedDate, setSelectedDate] = useState(null); //등록일 from
   const [selectedDate2, setSelectedDate2] = useState(null); // 등록일 to
 
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
+  const [totalPages, setTotalPages] = useState(0); // 현재 페이지 상태
+
+  /**********************************************************************
+   * 메세지영역
+  **********************************************************************/
+  const [alertType, setAlertType] = useState('');
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertText, setAlertText] = useState('');
+  const [acceptType, setAcceptType] = useState('');
+ 
+
+
+  const alertPage = (txt) => {
+    setAlertType('alert');
+    setAlertText(txt);
+    setAlertVisible(true);
+  };
+
+  const confirmPage = (txt, type) => {
+    setAlertType('confirm');
+    setAlertText(txt);
+    setAlertVisible(true);
+    setAcceptType(type);
+  };
+
+  const handleCloseModal = () => {
+    setAlertVisible(false);
+  };
+  const handleAccept = () => {
+    setAlertVisible(false);
+    
+
+    setAcceptType('');
+    
+  };
+
   //검색조건
   const [albumSearch, setAlbumSearch] = useState({
     "startDate": "",
@@ -53,6 +90,14 @@ const MusicReqHisList = () => {
     "page": 1,
     "size": 15
   });
+
+  //페이지 변경
+  const handlePageChange = (page) => {
+    //console.log('현재페이지 ');
+    //console.log(page);
+    setCurrentPage(page); // 페이지 변경 시 현재 페이지 상태 업데이트
+    submitSearchAlbums(page);
+  };
 
 
   // 날짜가 선택될 때 호출될 콜백 함수
@@ -86,6 +131,8 @@ const MusicReqHisList = () => {
     
     handleDateChange(pastDate);
     handleDateChange2(todayDate);
+
+    //submitSearchAlbums(0);
   }, []);
 
   //초기화
@@ -122,25 +169,31 @@ const MusicReqHisList = () => {
 
   
 
-  //조회하기
-  const submitSearch = (e) => {
-    e.preventDefault();
-    submitSearchAlbums();
-  }
-
-  //페이징
-  const clickPage = (e, page) => {
-    e.preventDefault();
-    albumSearch.page = page;
-    submitSearchAlbums();
-    console.log("===page =  : " + page);
-  }
 
   //검색 API
-  const submitSearchAlbums = async (e) => {
-    e.preventDefault();
+  const submitSearchAlbums = async (page) => {
 
     console.log(albumSearch);
+    if(page > -1){
+      setAlbumSearch(prevState => ({
+        ...prevState,
+        page: page
+      }));
+
+      albumSearch.page = page;
+    }
+
+    
+
+    console.log(albumSearch);
+
+
+      if(!albumSearch.startDate || !albumSearch.endDate){
+        alertPage('등록일 기간을 정확히 입력해주세요.')
+        return;
+      }
+    
+
 
     try {
       const response = await axiosInstance.get('/api/song-request/history', {
@@ -153,7 +206,10 @@ const MusicReqHisList = () => {
       // 데이터를 상태 변수에 저장
       setAlbumDatas(data);
 
-      console.log(data)
+      console.log(data);
+
+      console.log(data);
+      setTotalPages(data.totalPages);
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -165,6 +221,7 @@ const MusicReqHisList = () => {
 
   return (
     <>
+      <ComModal type={alertType} visible={alertVisible} onClose={handleCloseModal} alertText={alertText} onAccpet={handleAccept}/>
       <CRow>
         <CCol>
           <CCard className="mb-4">
@@ -263,17 +320,7 @@ const MusicReqHisList = () => {
               {albumDatas.contents && albumDatas.contents.length > 0 ? (
                 <CRow>
                   <CCol md={{ span: 6, offset: 5 }}>
-                    <CPagination aria-label="Page navigation example">
-                      <CPaginationItem aria-label="Previous" disabled={!albumDatas.first} onClick={(e) => clickPage(e, 1)}>
-                        <span aria-hidden="true">&laquo;</span>
-                      </CPaginationItem>
-                      {Array.from({ length: albumDatas.totalPages }, (_, index) => (
-                        <CPaginationItem key={index} active onClick={(e) => clickPage(e, index + 1)}>{index + 1}</CPaginationItem>
-                      ))}
-                      <CPaginationItem aria-label="Next" disabled={!albumDatas.last}>
-                        <span aria-hidden="true">&raquo;</span>
-                      </CPaginationItem>
-                    </CPagination>
+                  <PaginationComponent totalPages={totalPages} currentPage={currentPage} onPageChange={handlePageChange} />
                   </CCol>
                   <CCol md={1}>
                     총 {albumDatas.totalCount}건

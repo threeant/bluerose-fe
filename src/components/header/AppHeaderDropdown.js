@@ -98,14 +98,13 @@ const AppHeaderDropdown = () => {
             setRequestSongSize(0);
             
           }
-          
-
-
           //(1)admin 에서 헤더 새 신청곡 갯수 update  (2)admin 신청곡 리스트 update 
           
-        }else if(rtnTxt.type == 'REFRESH'){
-          console.log('----');
-          console.log(rtnTxt);
+        }else if(rtnTxt.type == "REFRESH"){
+          if(rtnTxt.code == '100'){//신청곡 관리 메뉴 왔을시 상단 메뉴 초기화
+           console.log('~!!!');
+           setRequestSongSize(0);
+          }
         }
       });
     }
@@ -164,7 +163,8 @@ const AppHeaderDropdown = () => {
         console.log(response.data);
         // 데이터를 상태 변수에 저장
         navigate('/login');
-        //sessionStorage.removeItem('codeData');
+        //sessionStorage.removeItem('codeData');  
+        sessionStorage.clear();
 
 
       } catch (error) {
