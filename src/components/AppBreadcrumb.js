@@ -32,19 +32,20 @@ const AppBreadcrumb = () => {
   const breadcrumbs = getBreadcrumbs(currentLocation)
 
   return (
-    <CBreadcrumb className="m-0 ms-2">
-      <CBreadcrumbItem href="/">Home</CBreadcrumbItem>
-      {breadcrumbs.map((breadcrumb, index) => {
-        return (
-          <CBreadcrumbItem
-            {...(breadcrumb.active ? { active: true } : { href: breadcrumb.pathname })}
-            key={index}
-          >
-            {breadcrumb.name}
-          </CBreadcrumbItem>
-        )
-      })}
-    </CBreadcrumb>
+    <></>
+    // <CBreadcrumb className="m-0 ms-2">
+    //   <CBreadcrumbItem href="/">Home</CBreadcrumbItem>
+    //   {breadcrumbs.map((breadcrumb, index) => {
+    //     return (
+    //       <CBreadcrumbItem
+    //         {...(breadcrumb.active ? { active: true } : { href: breadcrumb.pathname })}
+    //         key={index}
+    //       >
+    //         {breadcrumb.name}
+    //       </CBreadcrumbItem>
+    //     )
+    //   })}
+    // </CBreadcrumb>
   )
 }
 

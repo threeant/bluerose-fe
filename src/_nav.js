@@ -95,13 +95,13 @@ const _nav = [
     to: '/manage/tableList',
     icon: <CIcon icon={cilSofa} customClassName="nav-icon" />,
   },
-  {
-    component: CNavItem,
-    name: '이벤트관리',
-    to: '/manage/eventList',
-    icon: <CIcon icon={cilBirthdayCake} customClassName="nav-icon" />,
+  // {
+  //   component: CNavItem,
+  //   name: '이벤트관리',
+  //   to: '/manage/eventList',
+  //   icon: <CIcon icon={cilBirthdayCake} customClassName="nav-icon" />,
     
-  },
+  // },
   {
     component: CNavTitle,
     name: '시스템관리',
