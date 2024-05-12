@@ -41,18 +41,19 @@ const AppHeaderDropdown = () => {
   const toaster = useRef()
   
   useEffect(() => {
+    console.log('AppHeaderDropdown >> s' );
     setSocket();
     
       
   }, []);
 
   const setSocket = async  () => {
-    console.log('>>>>!!?');
+    //console.log('>>>>!!?');
     const stompConfig = {
       connectHeaders: {},
       brokerURL: appConfig.wsUrl,
       debug: function (str) {
-        console.log('STOMP ADMIN: ' + str);
+        console.log('STOMP ADMIN Header: ' + str);
       },
       // reconnectDelay: 200,
       forceBinaryWSFrames: true,
@@ -67,7 +68,7 @@ const AppHeaderDropdown = () => {
       },
       onMessage: function (message) {
         // 서버로부터 메시지를 수신할 때의 처리
-        console.log('>>>여깁니다 받았Received message:', message.body);
+       // console.log('>>>여깁니다 받았Received message:', message.body);
       }
     };
 
@@ -102,9 +103,9 @@ const AppHeaderDropdown = () => {
           
         }else if(rtnTxt.type == "REFRESH"){
           if(rtnTxt.code == '100'){//신청곡 관리 메뉴 왔을시 상단 메뉴 초기화
-           console.log('~!!!');
-           setRequestSongSize(0);
-          }
+            console.log('~!!!');
+            setRequestSongSize(0);
+           }
         }
       });
     }
@@ -165,12 +166,13 @@ const AppHeaderDropdown = () => {
         navigate('/login');
         //sessionStorage.removeItem('codeData');  
         sessionStorage.clear();
-
+        stompClient.deactivate();
 
       } catch (error) {
         //alert(error.response.data.message)
         console.error('오류 발생:', error);
         navigate('/login');
+        stompClient.deactivate();
       }
 
   }

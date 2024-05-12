@@ -1,7 +1,7 @@
 import React, { Component, Suspense } from 'react'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import './scss/style.scss'
-import { isAuthenticated } from './common/utils'; // 위에서 추가한 인증 함수
+
 
 
 const loading = (
