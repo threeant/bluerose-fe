@@ -230,7 +230,7 @@ const CodeList = () => {
         }
       );
       //submitSearchCodes();
-      
+      setCodeSession();
 
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
@@ -353,7 +353,7 @@ const CodeList = () => {
         }
       );
       submitSearchCodes();
-
+      setCodeSession();
     } catch (error) {
       // API 요청이 실패한 경우 에러를 처리할 수 있습니다.
       console.log(error);
@@ -507,6 +507,44 @@ const CodeList = () => {
     }
 
   };
+
+  const setCodeSession = async ()=>{
+    try {
+      //공통코드 
+      const codeResponse = await axiosInstance.get('/api/code', {}, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      console.log(codeResponse.data);
+
+          // API 응답에서 데이터 추출
+      const codeData = codeResponse.data;
+      // 데이터를 상태 변수에 저장
+
+      console.log(codeData)
+      const jsonData = JSON.stringify(codeData);
+      sessionStorage.setItem('codeData', jsonData);
+
+
+      // 세션에서 JSON 데이터 가져오기
+      const jsonCodeData = sessionStorage.getItem('codeData');
+
+      // JSON 문자열을 파싱하여 JavaScript 객체로 변환
+      const codeList = JSON.parse(jsonCodeData);
+
+      // userData 객체 사용
+      for (const c of codeList) {
+        //console.log(c);
+        console.log(c.description);
+        console.log(c.code);
+        console.log(c.codes);
+      }
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
 
 
 
