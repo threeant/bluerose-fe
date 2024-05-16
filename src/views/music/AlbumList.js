@@ -303,7 +303,7 @@ const AlbumList = () => {
                   </CCol>
                   <CCol xs={5}>
                     <CFormSelect id="inputMedia" aria-label="미디어" value={albumSearch.mediaCode} onChange={(e) => setAlbumSearch({ ...albumSearch, mediaCode: e.target.value })}>
-                      <option>-전체-</option>
+                      <option value={''}>-전체-</option>
                       {midiaCD.map((item, index) => (
                         <option value={item.id} key={index}>{item.name}</option>
                       ))}

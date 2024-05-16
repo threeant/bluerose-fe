@@ -142,7 +142,7 @@ const CodeList = () => {
   const [mstIndex, setMstIndex] = useState(-1);
   //마스터 수정 
   const clickUpdateCodeMst = (e, index) => {
-    var item = codeMasterDatas.contents[mstIndex];
+    var item = codeMasterDatas.contents[index];
 
     e.preventDefault();
     if (!item.code) {

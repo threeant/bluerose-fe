@@ -293,6 +293,7 @@ const DisplayList = () => {
                         <a href='/' onClick={(e) => goInfoClick(e, item.displayItemId)}>{item.title}</a>
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
+                        {displayDatas.contents.length == 1 ? '-' : '' }
                         {index != 0  ? (
                           <CButton color="info" variant="outline" onClick={(e) => handleMoveUp(e, index)} >
                             <CIcon icon={cilCaretTop} title="UP" />

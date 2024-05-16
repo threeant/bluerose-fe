@@ -572,6 +572,7 @@ const DisplayInfo = () => {
                         {item.trackInfo}
                         </CTableDataCell>
                         <CTableDataCell className="text-center">
+                        {displaySongDatas.length == 1 ? '-' : '' }
                         {index !== 0  ? (
                           <CButton color="info" variant="outline" onClick={() => handleMoveUp(index)} disabled={index === 0}>
                             <CIcon icon={cilCaretTop} title="Download file" />
