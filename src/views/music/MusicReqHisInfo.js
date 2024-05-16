@@ -213,7 +213,7 @@ const MusicReqHisInfo = () => {
                 <CTableBody>
                   {albumDatas.contents && albumDatas.contents.length > 0 ? (
                     albumDatas.contents.map((item, index) => (
-                      <CTableRow v-for="item in tableItems" key={index} onClick={(e) => goInfoClick(e, item.id)}>
+                      <CTableRow v-for="item in tableItems" key={index} >
                         <CTableDataCell className="text-center">
                           <strong>{index+1}</strong>
                         </CTableDataCell>

@@ -190,7 +190,7 @@ const CodeList = () => {
   const [codeInex, setCodeInex] = useState(-1);
   const clickUpdateCode = (e, index) => {
 
-    var item = codeDatas[codeInex];
+    var item = codeDatas[index];
 
     e.preventDefault();
     if (!item.name) {

@@ -227,7 +227,7 @@ const MusicReqHisList = () => {
           <CCard className="mb-4">
             <CCardHeader><strong>신청곡 히스토리 검색</strong></CCardHeader>
             <CCardBody>
-              <CForm className="row" onSubmit={submitSearchAlbums}>
+              <CForm className="row" >
                 <CRow className="mb-3">
                   <CCol md={1}>
                     <CFormLabel htmlFor="inputEmail3" className="col-form-label">검색일</CFormLabel>
@@ -275,7 +275,7 @@ const MusicReqHisList = () => {
                     <CCol xs={12}>
                       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                         <CButton component="input" type="reset" color="light" value="초기화" onClick={clickReset} />
-                        <CButton component="input" color="primary" type="submit" value="조회하기" />
+                        <CButton component="input" color="primary" type="submit" value="조회하기" onClick={submitSearchAlbums}/>
                       </div>
                     </CCol>
                   </CRow>
