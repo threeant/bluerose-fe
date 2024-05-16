@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/bluerose-fe/static/css/main.d444a425.css",
-    "main.js": "/bluerose-fe/static/js/main.4edcbb5c.js",
+    "main.js": "/bluerose-fe/static/js/main.64f01861.js",
     "static/css/4255.21a10b3b.chunk.css": "/bluerose-fe/static/css/4255.21a10b3b.chunk.css",
     "static/js/4255.103c4760.chunk.js": "/bluerose-fe/static/js/4255.103c4760.chunk.js",
     "static/js/3024.9550a79c.chunk.js": "/bluerose-fe/static/js/3024.9550a79c.chunk.js",
@@ -47,8 +47,8 @@
     "static/js/2066.429300d3.chunk.js": "/bluerose-fe/static/js/2066.429300d3.chunk.js",
     "static/js/5198.d764b3a9.chunk.js": "/bluerose-fe/static/js/5198.d764b3a9.chunk.js",
     "static/js/1453.ea658a80.chunk.js": "/bluerose-fe/static/js/1453.ea658a80.chunk.js",
-    "static/js/2305.bff315fd.chunk.js": "/bluerose-fe/static/js/2305.bff315fd.chunk.js",
-    "static/js/2224.1046752b.chunk.js": "/bluerose-fe/static/js/2224.1046752b.chunk.js",
+    "static/js/2305.338a8ae7.chunk.js": "/bluerose-fe/static/js/2305.338a8ae7.chunk.js",
+    "static/js/2224.1f375fd7.chunk.js": "/bluerose-fe/static/js/2224.1f375fd7.chunk.js",
     "static/js/9337.ce8c84a1.chunk.js": "/bluerose-fe/static/js/9337.ce8c84a1.chunk.js",
     "static/js/8207.f0bd2475.chunk.js": "/bluerose-fe/static/js/8207.f0bd2475.chunk.js",
     "static/js/8346.bdfe10ea.chunk.js": "/bluerose-fe/static/js/8346.bdfe10ea.chunk.js",
@@ -58,9 +58,9 @@
     "static/js/8336.828b76ef.chunk.js": "/bluerose-fe/static/js/8336.828b76ef.chunk.js",
     "static/js/7877.53a402ac.chunk.js": "/bluerose-fe/static/js/7877.53a402ac.chunk.js",
     "static/js/4280.04f21db8.chunk.js": "/bluerose-fe/static/js/4280.04f21db8.chunk.js",
-    "static/js/4215.0cb01e8f.chunk.js": "/bluerose-fe/static/js/4215.0cb01e8f.chunk.js",
-    "static/js/7761.0873fe34.chunk.js": "/bluerose-fe/static/js/7761.0873fe34.chunk.js",
-    "static/js/3683.bcb77461.chunk.js": "/bluerose-fe/static/js/3683.bcb77461.chunk.js",
+    "static/js/4215.7f246192.chunk.js": "/bluerose-fe/static/js/4215.7f246192.chunk.js",
+    "static/js/7761.5714c911.chunk.js": "/bluerose-fe/static/js/7761.5714c911.chunk.js",
+    "static/js/3683.ffed0ad9.chunk.js": "/bluerose-fe/static/js/3683.ffed0ad9.chunk.js",
     "static/js/7885.e80ad623.chunk.js": "/bluerose-fe/static/js/7885.e80ad623.chunk.js",
     "static/js/6798.cd2071c5.chunk.js": "/bluerose-fe/static/js/6798.cd2071c5.chunk.js",
     "static/js/9753.0361c7c0.chunk.js": "/bluerose-fe/static/js/9753.0361c7c0.chunk.js",
@@ -82,7 +82,7 @@
     "static/media/cocktail.png": "/bluerose-fe/static/media/cocktail.40e0067e467310c6355d.png",
     "index.html": "/bluerose-fe/index.html",
     "main.d444a425.css.map": "/bluerose-fe/static/css/main.d444a425.css.map",
-    "main.4edcbb5c.js.map": "/bluerose-fe/static/js/main.4edcbb5c.js.map",
+    "main.64f01861.js.map": "/bluerose-fe/static/js/main.64f01861.js.map",
     "4255.21a10b3b.chunk.css.map": "/bluerose-fe/static/css/4255.21a10b3b.chunk.css.map",
     "4255.103c4760.chunk.js.map": "/bluerose-fe/static/js/4255.103c4760.chunk.js.map",
     "3024.9550a79c.chunk.js.map": "/bluerose-fe/static/js/3024.9550a79c.chunk.js.map",
@@ -128,8 +128,8 @@
     "2066.429300d3.chunk.js.map": "/bluerose-fe/static/js/2066.429300d3.chunk.js.map",
     "5198.d764b3a9.chunk.js.map": "/bluerose-fe/static/js/5198.d764b3a9.chunk.js.map",
     "1453.ea658a80.chunk.js.map": "/bluerose-fe/static/js/1453.ea658a80.chunk.js.map",
-    "2305.bff315fd.chunk.js.map": "/bluerose-fe/static/js/2305.bff315fd.chunk.js.map",
-    "2224.1046752b.chunk.js.map": "/bluerose-fe/static/js/2224.1046752b.chunk.js.map",
+    "2305.338a8ae7.chunk.js.map": "/bluerose-fe/static/js/2305.338a8ae7.chunk.js.map",
+    "2224.1f375fd7.chunk.js.map": "/bluerose-fe/static/js/2224.1f375fd7.chunk.js.map",
     "9337.ce8c84a1.chunk.js.map": "/bluerose-fe/static/js/9337.ce8c84a1.chunk.js.map",
     "8207.f0bd2475.chunk.js.map": "/bluerose-fe/static/js/8207.f0bd2475.chunk.js.map",
     "8346.bdfe10ea.chunk.js.map": "/bluerose-fe/static/js/8346.bdfe10ea.chunk.js.map",
@@ -139,9 +139,9 @@
     "8336.828b76ef.chunk.js.map": "/bluerose-fe/static/js/8336.828b76ef.chunk.js.map",
     "7877.53a402ac.chunk.js.map": "/bluerose-fe/static/js/7877.53a402ac.chunk.js.map",
     "4280.04f21db8.chunk.js.map": "/bluerose-fe/static/js/4280.04f21db8.chunk.js.map",
-    "4215.0cb01e8f.chunk.js.map": "/bluerose-fe/static/js/4215.0cb01e8f.chunk.js.map",
-    "7761.0873fe34.chunk.js.map": "/bluerose-fe/static/js/7761.0873fe34.chunk.js.map",
-    "3683.bcb77461.chunk.js.map": "/bluerose-fe/static/js/3683.bcb77461.chunk.js.map",
+    "4215.7f246192.chunk.js.map": "/bluerose-fe/static/js/4215.7f246192.chunk.js.map",
+    "7761.5714c911.chunk.js.map": "/bluerose-fe/static/js/7761.5714c911.chunk.js.map",
+    "3683.ffed0ad9.chunk.js.map": "/bluerose-fe/static/js/3683.ffed0ad9.chunk.js.map",
     "7885.e80ad623.chunk.js.map": "/bluerose-fe/static/js/7885.e80ad623.chunk.js.map",
     "6798.cd2071c5.chunk.js.map": "/bluerose-fe/static/js/6798.cd2071c5.chunk.js.map",
     "9753.0361c7c0.chunk.js.map": "/bluerose-fe/static/js/9753.0361c7c0.chunk.js.map",
@@ -159,6 +159,6 @@
   },
   "entrypoints": [
     "static/css/main.d444a425.css",
-    "static/js/main.4edcbb5c.js"
+    "static/js/main.64f01861.js"
   ]
 }
