@@ -485,6 +485,11 @@ const AlbumInfo = () => {
                     <CFormLabel htmlFor="txt_style">Style</CFormLabel>
                     <CFormInput type="text" id="txt_style" value={albumData.style} onChange={(e) => setAlbumData({ ...albumData, style: e.target.value })} maxLength={100} />
                   </CCol>
+                  <CCol md={10}></CCol>
+                  <CCol md={3}>
+                    <CFormLabel htmlFor="txt_style">등록일</CFormLabel>
+                    <CFormInput type="text" id="txt_style" value={albumData.createdDate}   readOnly plainText/>
+                  </CCol>
                   <div className="d-grid gap-2">
                     <CRow className="justify-content-between">
                       <CCol xs={12}>

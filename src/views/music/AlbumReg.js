@@ -103,7 +103,7 @@ const AlbumReg = () => {
     format: '',      //포맷
     releaseDate: '',      //발매일
     musicGenre: '',      //장르
-    countryCD: '9',        //발매국가
+    countryCD: '4',        //발매국가
     mediaCD: midiaCD[0].id,        //미디어
     style: '',       //스타일
     series: '',      //시리즈
@@ -311,7 +311,7 @@ const AlbumReg = () => {
                 <CCol xs={6}>
                   <CFormLabel htmlFor="inputCountry">발매국가*</CFormLabel>
                   <div >
-                    <CFormSelect id="inputCountry" onChange={(e) => setAlbumData({ ...albumData, countryCD: e.target.value })}>
+                    <CFormSelect id="inputCountry" defaultValue={albumData.countryCD}  onChange={(e) => setAlbumData({ ...albumData, countryCD: e.target.value })}>
                       {cntryCD.map((item, index) => (
                         <option value={item.id} key={index}>{item.name}</option>
                       ))}
